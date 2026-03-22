@@ -1,25 +1,33 @@
-
 @import "tailwindcss";
 @tailwind utilities;
 
-:root {
-    --color-primary: #2563EB;
-    --color-secondary: #9333EA;
-    --color-accent: #DB2777;
-    --color-background: #EDF3FF;
+@theme {
+  --color-primary: #2563eb;
+  --color-secondary: #9333ea;
+  --color-accent: #db2777;
+  --color-background: #edf3ff;
 }
 
 @layer utilities {
-    .main-gradient {
-        @apply bg-linear-to-r from-[primary] to-[secondary] 
-    }
-    .secondary-gradient { 
-        @apply bg-linear-to-r from-[secondary] to-[accnent]
-    }
-    .advertisement1{
-        @apply bg-linear-to-br to-[#F97316] from-[#FBBF24] p-8
-    }
-    .advertisement2{
-        @apply bg-linear-to-br from-[#22C55E] to-[#14B8A6] p-2
-    }
+  .main-gradient {
+    @apply bg-linear-to-r from-primary to-secondary ;
+  }
+  .secondary-gradient {
+    @apply bg-linear-to-r from-secondary to-accent;
+  }
+  .advertisement1 {
+    @apply bg-linear-to-br to-[#F97316] from-[#FBBF24] p-8 text-white;
+  }
+  .advertisement2 {
+    @apply bg-linear-to-br from-[#22C55E] to-[#14B8A6] p-8 text-white;
+  }
+  .button1 {
+    @apply w-fit bg-linear-to-r from-primary to-secondary p-2 px-12 text-white text-lg font-bold rounded-full text-center;
+  }
+  /* .button2 {
+    @apply  w-fit p-2 px-12 bg-linear-to-r from-primary to-secondary bg-white bg-clip-text text-transparent text-lg font-bold text-center rounded-full;
+  } */
+  .button3{
+    @apply w-fit bg-linear-to-r from-secondary to-accent p-2 px-12 text-white text-lg font-bold rounded-full text-center;
+  }
 }
