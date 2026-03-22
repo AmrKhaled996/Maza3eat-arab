@@ -1,0 +1,25 @@
+
+@import "tailwindcss";
+@tailwind utilities;
+
+:root {
+    --color-primary: #2563EB;
+    --color-secondary: #9333EA;
+    --color-accent: #DB2777;
+    --color-background: #EDF3FF;
+}
+
+@layer utilities {
+    .main-gradient {
+        @apply bg-linear-to-r from-[primary] to-[secondary] 
+    }
+    .secondary-gradient { 
+        @apply bg-linear-to-r from-[secondary] to-[accnent]
+    }
+    .advertisement1{
+        @apply bg-linear-to-br to-[#F97316] from-[#FBBF24] p-8
+    }
+    .advertisement2{
+        @apply bg-linear-to-br from-[#22C55E] to-[#14B8A6] p-2
+    }
+}
