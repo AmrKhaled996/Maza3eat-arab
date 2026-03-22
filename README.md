@@ -60,6 +60,6 @@ This project is built using a modern full-stack approach:
 1. **Clone the repository:**
 
    ```bash
-   git clone [https://github.com/your-username/maza3eat-arab.git](https://github.com/your-username/maza3eat-arab.git)
+   git clone [https://github.com/AmrKhaled996/maza3eat-arab.git](https://github.com/AmrKhaled996/maza3eat-arab.git)
    cd maza3eat-arab
    ```
