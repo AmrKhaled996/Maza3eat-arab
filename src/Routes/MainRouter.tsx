@@ -9,6 +9,7 @@ import QandAPage from "../Pages/Q&A/QandAPage";
 import QndACreatePage from "../Pages/Q&A/QandACreatePage";
 import CommunityMainPage from "../Pages/Community/CommunityMainPage";
 import ProfilePostPage from "../Pages/Profile/ProfilePostPage";
+import FeaturedMainPage from "../Pages/Community/FeaturedMainPage";
 
 
 export default function MainRouter(): React.ReactElement<any> {
@@ -25,6 +26,7 @@ export default function MainRouter(): React.ReactElement<any> {
         <Route path="/q&a" element={<QandAMainPage />} />
         <Route path="/q&a/:id" element={<QandAPage />} />
         <Route path="/create-q&a" element={<QndACreatePage />} />
+        <Route path="/featured" element={<FeaturedMainPage />} />
 
         <Route path="/profile/:id/posts" element={<ProfilePostPage />} />
         <Route path="/profile/:id/q&a" element={<ProfileQandAPage />} />

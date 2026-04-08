@@ -4,7 +4,7 @@
 @theme {
   --color-primary: #2563eb;
   --color-secondary: #9333ea;
-  --color-accent: #db2777;
+  --color-accent: #EC4899;
   --color-background: #edf3ff;
 }
 
@@ -13,7 +13,10 @@
     @apply bg-linear-to-r from-primary to-secondary ;
   }
   .secondary-gradient {
-    @apply bg-linear-to-r from-secondary to-accent;
+    @apply bg-linear-to-br from-secondary from-0% to-70%   to-accent;
+  }
+  .hero-gradient{
+    @apply bg-linear-to-br from-primary/75 via-secondary/75 to-accent/75 from-0% via-50% to-100%  ;
   }
   .advertisement1 {
     @apply bg-linear-to-br to-[#F97316] from-[#FBBF24] p-8 text-white;
@@ -29,5 +32,30 @@
   } */
   .button3{
     @apply w-fit bg-linear-to-r from-secondary to-accent p-2 px-12 text-white text-lg font-bold rounded-full text-center;
+  }
+  .gradient-text{
+    @apply bg-white bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+}
+
+
+*{
+  direction: rtl;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+  box-sizing: border-box;
+}
+.scrollSlider {
+  display: flex;
+  width: max-content;
+  animation: scroll 30s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50%);
   }
 }
