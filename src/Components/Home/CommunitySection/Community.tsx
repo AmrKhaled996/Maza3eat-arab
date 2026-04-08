@@ -8,11 +8,7 @@ import HomeCommunitySectionSmallCard from "./SmallCard";
 import HomeCommunitySectionTrendingTopics from "./TreningTopics";
 
 function CommunitySection() {
-  const {
-    data: posts,
-    isLoading: postsLoading,
-    error: postsError,
-  } = useHomePosts();
+  const { data: posts } = useHomePosts();
 
   return (
     <HomeCommunitySectionLayout>

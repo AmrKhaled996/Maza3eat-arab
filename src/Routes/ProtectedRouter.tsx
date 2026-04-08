@@ -1,7 +1,8 @@
 import { jwtDecode } from "jwt-decode";
 import { Navigate, Outlet } from "react-router-dom";
-import { axiosInstance } from "../Apis/axiosInstence";
+import { axiosInstance } from "../Apis/axiosInstance";
 import type { MyJwtPayload } from "../Types/config/JWTPayload";
+import { DEFAULT_LOCALE } from "../i18n/config";
 
 export default function ProtectedRoute({
   allowedRoles,
@@ -18,11 +19,11 @@ export default function ProtectedRoute({
   console.log(decoded);
 
   if (!token) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={`/${DEFAULT_LOCALE}/login`} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(role || "")) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={`/${DEFAULT_LOCALE}`} replace />;
   }
 
   return <Outlet />;

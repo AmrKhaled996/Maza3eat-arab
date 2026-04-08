@@ -39,8 +39,16 @@
 }
 
 
-*{
+html[dir="rtl"] {
   direction: rtl;
+}
+
+html[dir="ltr"] {
+  direction: ltr;
+}
+
+* {
+  direction: inherit;
   font-family: 'Poppins', sans-serif;
   user-select: none;
   box-sizing: border-box;

@@ -1,25 +1,49 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Badge } from "./Tag";
 import cn from "../../utils/Cn";
+import { useLocale } from "../../i18n/useLocale";
+import { localizedPath } from "../../i18n/paths";
+import type { SupportedLocale } from "../../i18n/config";
 
-function NavigationBar({ page }: { page: string }) {
+function NavigationBar({
+  page,
+  solidNav = false,
+}: {
+  page: string;
+  solidNav?: boolean;
+}) {
+  const { t } = useTranslation("common");
+  const { lang } = useLocale();
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
+  const profileWrapRef = useRef<HTMLDivElement>(null);
+
   const [notifCount] = useState(3);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
+
+  const effectiveScrolled = solidNav || scrolled;
+
+  const goLocale = (next: SupportedLocale) => {
+    const nextPath = pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);
+    navigate(`${nextPath}${search}${hash}`);
+    setMenuOpen(false);
+    setProfileOpen(false);
+  };
 
   const handlePage = (tape: string) => {
     if (page && page === "home") {
-      return scrolled ? "gradient-text" : "text-white";
+      return effectiveScrolled ? "gradient-text" : "text-white";
     }
     if (page && page === tape) {
-      return scrolled ? "gradient-text" : "text-primary";
-    } else {
-      return scrolled
-        ? "text-gray-500 hover:text-primary"
-        : "text-gray-500 hover:text-primary";
+      return effectiveScrolled ? "gradient-text" : "text-primary";
     }
+    return effectiveScrolled
+      ? "text-gray-500 hover:text-primary"
+      : "text-gray-500 hover:text-primary";
   };
 
   useEffect(() => {
@@ -36,14 +60,27 @@ function NavigationBar({ page }: { page: string }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!profileOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (
+        profileWrapRef.current &&
+        !profileWrapRef.current.contains(e.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [profileOpen]);
+
   return (
     <>
       <nav
-        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${scrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] " : "absolute "}   transition-all duration-700`}
+        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] " : "absolute "}   transition-all duration-700`}
       >
-        {/* Logo */}
         <div
-          className={`flex items-center gap-2 ${scrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
+          className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
         >
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
             <path
@@ -51,59 +88,93 @@ function NavigationBar({ page }: { page: string }) {
               fill="#2563eb"
             />
           </svg>
-          <span
-            className="font-extrabold text-lg tracking-tight"
-            style={{ color: "#2563eb" }}
-          >
-            Loooogooo
-          </span>
+          <Link to={localizedPath(lang, "")}>
+            <span
+              className="font-extrabold text-lg tracking-tight"
+              style={{ color: "#2563eb" }}
+            >
+              Loooogooo
+            </span>
+          </Link>
         </div>
 
-        {/* Desktop Nav Links */}
         <div className={`hidden sm:flex lg:gap-8 items-center gap-4 group`}>
           <Link
-            to="/featured"
+            to={localizedPath(lang, "featured")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
               handlePage("featured"),
             )}
           >
-            منشورات مميزة
+            {t("nav.featured")}
           </Link>
           <Link
-            to="/cummunity"
+            to={localizedPath(lang, "community")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("cummunity"),
             )}
           >
-            المجتمع
+            {t("nav.community")}
           </Link>
           <Link
-            to="q&a"
+            to={localizedPath(lang, "q&a")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
             )}
           >
-            سؤال و جواب
+            {t("nav.qna")}
           </Link>
           <Link
-            to="/about"
+            to={localizedPath(lang, "about")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("about"),
             )}
           >
-            حول
+            {t("nav.about")}
           </Link>
         </div>
 
-        {/* Right side */}
-        <div className="hidden md:flex items-center gap-4">
-          {/* Bell */}
+        <div className="hidden md:flex items-center gap-3">
+          <div
+            className={`flex rounded-full border px-1 py-0.5 text-xs font-bold ${effectiveScrolled ? "border-gray-200 bg-white" : "border-white/40 bg-white/10"}`}
+            role="group"
+            aria-label={lang === "ar" ? "Language" : "اللغة"}
+          >
+            <button
+              type="button"
+              onClick={() => goLocale("ar")}
+              className={cn(
+                "rounded-full px-2 py-1 transition-colors",
+                lang === "ar"
+                  ? "bg-primary text-white"
+                  : effectiveScrolled
+                    ? "text-gray-600 hover:bg-gray-100"
+                    : "text-white hover:bg-white/20",
+              )}
+            >
+              {t("lang.shortAr")}
+            </button>
+            <button
+              type="button"
+              onClick={() => goLocale("en")}
+              className={cn(
+                "rounded-full px-2 py-1 transition-colors",
+                lang === "en"
+                  ? "bg-primary text-white"
+                  : effectiveScrolled
+                    ? "text-gray-600 hover:bg-gray-100"
+                    : "text-white hover:bg-white/20",
+              )}
+            >
+              {t("lang.shortEn")}
+            </button>
+          </div>
+
           <button
-            className={`relative ${scrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
+            className={`relative ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
           >
             <svg
               width="24"
@@ -116,27 +187,49 @@ function NavigationBar({ page }: { page: string }) {
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notifCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -end-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {notifCount}
               </span>
             )}
           </button>
 
-          {/* Avatar */}
-          <img
-            src="https://i.pravatar.cc/40?img=12"
-            alt="User"
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow outline-2 hover:opacity-80 hover:cursor-pointer transition-opacity"
-            style={{ outlineColor: "#FFD700" }}
-          />
+          <div className="relative" ref={profileWrapRef}>
+            <button
+              type="button"
+              onClick={() => setProfileOpen((o) => !o)}
+              className="rounded-full ring-2 ring-white shadow outline-2 outline-offset-0 transition-opacity hover:opacity-90"
+              style={{ outlineColor: "#FFD700" }}
+              aria-expanded={profileOpen}
+              aria-haspopup="true"
+            >
+              <img
+                src="https://i.pravatar.cc/40?img=12"
+                alt=""
+                className="h-9 w-9 rounded-full object-cover"
+              />
+            </button>
+            {profileOpen && (
+              <div
+                className="absolute end-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                role="menu"
+              >
+                <Link
+                  to={localizedPath(lang, "create-post")}
+                  role="menuitem"
+                  className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                  onClick={() => setProfileOpen(false)}
+                >
+                  {t("createPost.menuCreatePost")}
+                </Link>
+              </div>
+            )}
+          </div>
 
-          {/* Gold badge */}
           <Badge tier="Gold" color=" #FFD700" />
         </div>
 
-        {/* Mobile hamburger */}
         <button
-          className={`md:hidden ${scrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
+          className={`md:hidden ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <svg
@@ -164,34 +257,66 @@ function NavigationBar({ page }: { page: string }) {
         </button>
       </nav>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div
-          className={`${scrolled ? "fixed " : "absolute "}  top-20 left-4 right-4 z-40 bg-white rounded-2xl shadow-xl p-5 flex flex-col `}
+          className={`${effectiveScrolled ? "fixed " : "absolute "}  top-20 left-4 right-4 z-40 bg-white rounded-2xl shadow-xl p-5 flex flex-col `}
         >
+          <div className="flex gap-2 pb-3 border-b border-gray-100 mb-2">
+            <button
+              type="button"
+              onClick={() => goLocale("ar")}
+              className={cn(
+                "flex-1 rounded-lg py-2 text-sm font-bold",
+                lang === "ar" ? "bg-primary text-white" : "bg-gray-100 text-gray-700",
+              )}
+            >
+              {t("lang.shortAr")}
+            </button>
+            <button
+              type="button"
+              onClick={() => goLocale("en")}
+              className={cn(
+                "flex-1 rounded-lg py-2 text-sm font-bold",
+                lang === "en" ? "bg-primary text-white" : "bg-gray-100 text-gray-700",
+              )}
+            >
+              {t("lang.shortEn")}
+            </button>
+          </div>
           <Link
-            to="/featured"
+            to={localizedPath(lang, "create-post")}
             className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5"
+            onClick={() => setMenuOpen(false)}
           >
-            منشورات مميزة
+            {t("createPost.menuCreatePost")}
           </Link>
           <Link
-            to="/cummunity"
+            to={localizedPath(lang, "featured")}
             className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5"
+            onClick={() => setMenuOpen(false)}
           >
-            المجتمع
+            {t("nav.featured")}
           </Link>
           <Link
-            to="q&a"
+            to={localizedPath(lang, "community")}
             className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5"
+            onClick={() => setMenuOpen(false)}
           >
-            سؤال و جواب
+            {t("nav.community")}
           </Link>
           <Link
-            to="/about"
+            to={localizedPath(lang, "q&a")}
+            className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5"
+            onClick={() => setMenuOpen(false)}
+          >
+            {t("nav.qna")}
+          </Link>
+          <Link
+            to={localizedPath(lang, "about")}
             className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5 pb-3"
+            onClick={() => setMenuOpen(false)}
           >
-            حول
+            {t("nav.about")}
           </Link>
 
           <div className="flex items-center gap-3 pt-2 border-t border-gray-100">

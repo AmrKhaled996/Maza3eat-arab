@@ -4,62 +4,97 @@
 
 It combines the storytelling of a **Travel Blog** with the interactive nature of **Reddit-style Q&A**.
 
----
+## Current Project Status
 
-## ✨ Features
+- This repository currently contains the **frontend application only**.
+- The home experience is partially implemented with real API calls via Axios + React Query.
+- Several routed pages still exist as placeholders (empty fragments) and are not yet feature-complete.
+- Development uses a Vite proxy for `/api` requests to `http://localhost:3000`.
 
-### 📖 Travel Blog & Reviews
+## Tech Stack
 
-- **Share Your Journey:** Write detailed posts about your travels, including itineraries and tips.
-- **Rate & Review:** Provide honest feedback on hotels, restaurants, and tourist spots to help others.
-- **Visual Storytelling:** Upload photos to showcase the beauty of the places you've visited.
+- React 19
+- TypeScript
+- Vite 8
+- Tailwind CSS 4
+- React Router 7
+- TanStack React Query 5
+- Axios
+- ESLint 9
 
-### 💬 Community Q&A (Ask & Answer)
+## Implemented Areas
 
-- **Reddit-Style Questions:** Have a specific question about a visa, a hidden gem, or local safety? Post it to the community!
-- **Expert Answers:** Get real-time advice from travelers who have "been there, done that."
-- **Upvoting:** Highlight the most helpful answers so the best advice rises to the top.
+- Home page composition with:
+  - Hero section
+  - Featured posts section
+  - Community section
+  - Q&A section
+  - Footer
+- API integration for home data:
+  - Home community posts
+  - Home featured posts
+  - Home questions
+  - Popular questions
+  - Trending tags
+- Axios response interceptor for token refresh flow using `VITE_BACKEND_URL`.
 
-### 🔍 Discovery
+## Routes (Current)
 
-- **Search & Filter:** Find content based on specific countries, budget levels, or travel types (Family, Solo, Adventure).
+- `/` (Home page)
+- `/login` (placeholder)
+- `/community` (placeholder)
+- `/post/:id` (placeholder content)
+- `/create-post` (placeholder)
+- `/q&a` (placeholder)
+- `/q&a/:id` (placeholder)
+- `/create-q&a` (placeholder)
+- `/featured` (basic shell page with navigation)
+- `/profile/:id/posts` (placeholder)
+- `/profile/:id/q&a` (placeholder)
 
----
+## Known Gaps
 
-## React + TypeScript + Vite
+- Multiple pages are still scaffolded and need UI + data wiring.
+- Lint currently fails due unused variables/imports and a few `any` types.
+- Auth guarding exists (`ProtectedRoute`) but is not wired into route definitions.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## 🛠️ Tech Stack
-
-This project is built using a modern full-stack approach:
-
-- **Frontend:** [React.js](https://reactjs.org/) & [Tailwind CSS](https://tailwindcss.com/)
-- **Backend:** [Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/)
-- **Database:** [MongoDB](https://www.mongodb.com/)
-- **Authentication:** JWT (JSON Web Tokens) stored via secure Cookies.
-- **Payments:** [Stripe](https://stripe.com/) (Integration for bookings or community support).
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v16.x or higher)
-- npm or yarn
-- MongoDB (Local or Atlas)
+- Node.js 20+ recommended
+- npm
 
 ### Installation
 
-1. **Clone the repository:**
+```bash
+git clone https://github.com/AmrKhaled996/maza3eat-arab.git
+cd maza3eat-arab
+npm install
+```
 
-   ```bash
-   git clone [https://github.com/AmrKhaled996/maza3eat-arab.git](https://github.com/AmrKhaled996/maza3eat-arab.git)
-   cd maza3eat-arab
-   ```
+### Run Development Server
+
+```bash
+npm run dev
+```
+
+### Available Scripts
+
+- `npm run dev` - start Vite dev server
+- `npm run build` - type-check and build
+- `npm run lint` - run ESLint
+- `npm run preview` - preview production build
+
+## Environment
+
+The app expects this variable when using refresh-token flow:
+
+```bash
+VITE_BACKEND_URL=http://localhost:3000
+```
+
+Also note:
+
+- Axios instance uses `baseURL: /api/v1`.
+- Vite proxies `/api/*` to `http://localhost:3000` in development.

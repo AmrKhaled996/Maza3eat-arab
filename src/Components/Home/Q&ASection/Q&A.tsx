@@ -7,11 +7,7 @@ import type { Question } from "../../../Types/Question";
 import useHomeQuestions from "../../../Hooks/HomeHooks/useHomeQuestion";
 
 export default function QAForum() {
-  const {
-    data: questions,
-    isLoading: questionsLoading,
-    error: questionsError,
-  } = useHomeQuestions();
+  const { data: questions } = useHomeQuestions();
 
   return (
     <HomeQandALayout>
