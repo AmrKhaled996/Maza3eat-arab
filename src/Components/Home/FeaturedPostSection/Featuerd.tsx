@@ -6,11 +6,7 @@ import HomeFeaturedPostsLayout from "./Layout";
 import HomeFeaturedPostsSectionMoreButton from "./MoreButton";
 
 function FeaturedPosts() {
-  const {
-    data: posts,
-    isLoading: FeatuerdPostsLoading,
-    error: FeatuerdPostsError,
-  } = useHomeFeatured();
+  const { data: posts } = useHomeFeatured();
   console.log("featuerd: ", posts);
   return (
     <HomeFeaturedPostsLayout>

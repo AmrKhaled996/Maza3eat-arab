@@ -1,4 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { DEFAULT_LOCALE } from "../i18n/config";
 
 
 export const axiosInstance = axios.create({
@@ -33,7 +34,14 @@ axiosInstance.interceptors.response.use(
         console.error("Proccess failed, Refresh token Error", refreshTokenerror);
 
 
-        window.location.href = "/login";
+        try {
+          const stored = localStorage.getItem("maza3eat-locale");
+          const lang =
+            stored === "ar" || stored === "en" ? stored : DEFAULT_LOCALE;
+          window.location.href = `/${lang}/login`;
+        } catch {
+          window.location.href = `/${DEFAULT_LOCALE}/login`;
+        }
 
         return Promise.reject(refreshTokenerror);
       }

@@ -1,7 +1,7 @@
 import { Badge, Tag } from "../../shared/Tag";
 import type { Question } from "../../../Types/Question";
 import { ContactButton } from "../../shared/ContactButton";
-import type { Tag as TagType } from "../../../Types/Amr'sTypes/Tag";
+import type { Tag as TagType } from "../../../Types/Tag";
 import {
   ArrowDown,
   ArrowRight,
@@ -12,14 +12,20 @@ import {
 } from "lucide-react";
 import ThreeDotsOptionIcon from "../../../assets/images/icons/ThreeDotsOptionIcon";
 import PostsComments from "../../../assets/images/icons/PostComments";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useLocale } from "../../../i18n/useLocale";
+import { localizedPath } from "../../../i18n/paths";
 
 export function QuestionCard({ question }: { question: Question }) {
+  const { t } = useTranslation("common");
   const navigate = useNavigate();
+  const { lang } = useLocale();
+  const answerCount = question?.answersCount ?? 0;
 
   return (
     <div
-      onClick={() => navigate(`/q&a/:${question.id}`)}
+      onClick={() => navigate(localizedPath(lang, `q&a/${question.id}`))}
       className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 overflow-hidden pb-2 hover:cursor-pointer"
     >
       <div className="p-5">
@@ -69,7 +75,9 @@ export function QuestionCard({ question }: { question: Question }) {
             <span>
               <PostsComments color="#4B5563" />
             </span>
-            <span className="font-medium">{question?.answersCount} اجابة</span>
+            <span className="font-medium">
+              {t("home.answerCount", { count: answerCount })}
+            </span>
           </span>
         </div>
       </div>
@@ -80,7 +88,7 @@ export function QuestionCard({ question }: { question: Question }) {
       {/* Answers section */}
       <div className="px-5 py-3">
         <p className="text-xs font-bold text-gray-700 mb-3">
-          {question?.answersCount} اجابة
+          {t("home.answersHeading", { count: answerCount })}
         </p>
 
         <div
@@ -107,7 +115,7 @@ export function QuestionCard({ question }: { question: Question }) {
             <ContactButton />
 
             <span className="text-[11px] font-bold bg-[#22C55E] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
-              <Check className="w-4 h-4" /> افضل اجابة
+              <Check className="w-4 h-4" /> {t("home.bestAnswer")}
             </span>
 
             <div className="ml-auto flex items-center gap-1.5 text-xs font-bold">
@@ -125,7 +133,7 @@ export function QuestionCard({ question }: { question: Question }) {
           </p>
           <div className="flex items-center gap-3 text-[11px] text-gray-400">
             <button className="font-semibold text-primary mr-2 underline transition-colors flex gap-1">
-              رد
+              {t("home.reply")}
               <Reply className="h-4 w-4" />
             </button>
             <button className="hover:text-gray-600 transition-colors flex text-primary hover:cursor-pointer hover:opacity-80">
@@ -135,8 +143,8 @@ export function QuestionCard({ question }: { question: Question }) {
         </div>
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" /> عرض {question?.answersCount} من
-          الاجوبة
+          <ArrowRight className="w-4 h-4" />{" "}
+          {t("home.viewAnswers", { count: answerCount })}
         </button>
       </div>
     </div>

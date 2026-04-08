@@ -1,5 +1,5 @@
-import { axiosInstance } from "../axiosInstence";
-import axios, { AxiosError } from "axios";
+import { axiosInstance } from "../axiosInstance";
+import { AxiosError } from "axios";
 
 export async function getHomePosts() {
   try {

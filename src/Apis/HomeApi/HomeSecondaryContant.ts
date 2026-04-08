@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import { axiosInstance } from "../axiosInstence";
+import { axiosInstance } from "../axiosInstance";
 
 // Function to fetch popular questions for the home page
 export async function getHomePopularQuestions() {

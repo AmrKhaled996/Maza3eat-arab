@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import HeroSectionLayout from "../../Components/Home/HeroSection/Layout";
 import QAForum from "../../Components/Home/Q&ASection/Q&A";
 import CommunitySection from "../../Components/Home/CommunitySection/Community";
@@ -86,11 +86,12 @@ import InfiniteSlider from "../../Components/Home/Saperators/Saperator1";
 //   },
 // ];
 
-export default  function HomePage() {
+export default function HomePage() {
+  const { t } = useTranslation("common");
 
   return (
     <>
-     <Title>الرئيسية - مزاعيط العرب</Title>
+      <Title>{t("meta.homeTitle")}</Title>
       <HeroSectionLayout />
       <FeaturedPosts  />
       <InfiniteSlider />

@@ -5,14 +5,17 @@ import type { Tag as TagType } from "../../../Types/Tag";
 
 import { Badge, Tag } from "../../shared/Tag";
 import { useNavigate } from "react-router-dom";
+import { useLocale } from "../../../i18n/useLocale";
+import { localizedPath } from "../../../i18n/paths";
 import PostsComments from "../../../assets/images/icons/PostComments";
 
 function HomeCommunitySectionSmallCard(props: Post) {
   const post: Post = props;
   const navigate = useNavigate();
+  const { lang } = useLocale();
   return (
     <div
-      onClick={() => navigate(`/post/:${post.id}`)}
+      onClick={() => navigate(localizedPath(lang, `post/${post.id}`))}
       className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group flex flex-col hover:cursor-pointer"
     >
       <div className="relative overflow-hidden">
