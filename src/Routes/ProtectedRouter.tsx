@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { Navigate, Outlet } from "react-router-dom";
 import { axiosInstance } from "../Apis/axiosInstence";
-import type { MyJwtPayload } from "../Types/Amr'sTypes/config/JWTPayload";
+import type { MyJwtPayload } from "../Types/config/JWTPayload";
 
 export default function ProtectedRoute({
   allowedRoles,
