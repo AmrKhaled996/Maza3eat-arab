@@ -1,3 +1,8 @@
+interface DateTimeResult {
+  date: string;
+  time: string;
+}
+
 /**
  * Extract date and time from an ISO 8601 datetime string.
  *
@@ -9,7 +14,7 @@
  * console.log(result.date); // "2022-01-01"
  * console.log(result.time); // "12:30"
  */
-export const extractDateTime = (dateinput: string): object => {
+export const extractDateTime = (dateinput: string): DateTimeResult => {
   // Remove the 'Z' at the end of the input string to avoid timezone issues
   const realDate: string = dateinput.replace("Z", "") as string;
 
@@ -33,8 +38,8 @@ export const extractDateTime = (dateinput: string): object => {
   const extractedTime = `${get("hour")}:${get("minute")}`;
 
   return {
-    date: extractedDate as string,
-    time: extractedTime as string,
+    date: extractedDate,
+    time: extractedTime,
   };
 };
 
@@ -71,7 +76,43 @@ export const extractDateParts = (dateInput: string): object => {
     "Dec",
   ];
 
-  const month:string = monthNames[dateObj.getMonth()]; // Month short name
+  const month: string = monthNames[dateObj.getMonth()]; // Month short name
 
   return { day, month, year };
+};
+
+/**
+ * Format a date string into a string like "1 Jan 2022"
+ *
+ * @param {string} dateInput - a date string
+ * @returns {string} - a formatted date string
+ * @example
+ * const input = "2022-01-01";
+ * const result = formatDate(input);
+ * console.log(result); // "1 Jan 2022"
+ */
+export const PostformatDate = (dateInput: Date): string => {
+  const formatedDate = extractDateTime(dateInput.toString()).date as string; // "2022-01-01"
+  const dateObj: Date = new Date(formatedDate);
+
+  const day: number = dateObj.getDate(); // Day number
+  const monthNames: string[] = [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "ابريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "اغسطس",
+    "سيبتمبر",
+    "اكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ];
+
+  const month: string = monthNames[dateObj.getMonth()]; // Month short name
+  const year: number = dateObj.getFullYear(); // Year number
+
+  return `${day} ${month} ${year}`; // 1 Jan 2022
 };
