@@ -39,7 +39,7 @@ function NavigationBar({ page }: { page: string }) {
   return (
     <>
       <nav
-        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${scrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] " : "absolute "}   transition-all duration-700`}
+        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${scrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700  `}
       >
         {/* Logo */}
         <div
@@ -71,10 +71,10 @@ function NavigationBar({ page }: { page: string }) {
             منشورات مميزة
           </Link>
           <Link
-            to="/cummunity"
+            to="/community"
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
-              handlePage("cummunity"),
+              handlePage("community"),
             )}
           >
             المجتمع
