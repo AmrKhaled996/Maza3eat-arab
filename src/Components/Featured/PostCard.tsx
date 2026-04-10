@@ -6,9 +6,13 @@ import type { Tag as TagType } from "../../Types/Tag";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
 import FeaturedBadge from "../shared/FeaturedBadge";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../i18n/useLocale";
 
 function PostCard({ post }: { post: Post }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("common");
+  const {lang} = useLocale();
 
   return (
     <div
@@ -94,7 +98,7 @@ function PostCard({ post }: { post: Post }) {
             className="flex items-center gap-1.5 text-sm font-bold hover:opacity-75 transition-opacity"
             style={{ color: "#2563eb" }}
           >
-            {"قراءة المقال كاملاً"}{" "}
+            {t("CommunityMainPage.morePosts")}
             <ArrowUpRight size={16} className=" text-primary" />
           </button>
         </div>

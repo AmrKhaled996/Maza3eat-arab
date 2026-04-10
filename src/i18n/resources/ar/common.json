@@ -129,5 +129,41 @@
     "goBack": "رجوع",
     "exploreTitle": "جرب أحد هذه الأقسام",
     "exploreSubtitle": "استكشف الأقسام الشائعة في المنصة"
+  },
+  "QandAMainPage": {
+    "meta": "سؤال و جواب - مزاعيط العرب",
+    "title": "سؤال و جواب",
+    "subtitle": "هل لديك أسئلة عن السفر؟\n لدينا الإجابات.",
+    "forumTitle": "منتدى الأسئلة",
+    "forumSubtitle": "احصل على الإجابات من المسافرين المختصين",
+    "sortBy": "ترتيب حسب",
+    "popular": "الأكثر شيوعاً",
+    "latest": "الأحدث",
+    "searchPlaceholder": "ابحث عن أسئلة أو جواب...",
+    "askQuestion": "اطرح سؤالاً",
+    "popularQuestions": "الأسئلة الشائعة"
+  },
+  "CommunityMainPage": {
+    "meta": "المجتمع - مزاعيط العرب",
+    "title": "المجتمع",
+    "subtitle": " شارك تجربة سفرك\n على شكل قصة",
+    "communityTitle": "المجتمع",
+    "communitySubtitle": "شارك تجاربك وتواصل مع المسافرين الآخرين",
+    "sortBy": "ترتيب حسب",
+    "popular": "الأكثر شيوعاً",
+    "latest": "الأحدث",
+    "searchPlaceholder": "ابحث عن تجارب..."
+  },
+  "FeaturedMainPage": {
+    "meta": "منشورات مميزة - مزاعيط العرب",
+    "title": "منشورات مميزة",
+    "subtitle": "اكتشف مغامرات مختارة بعناية\n لإشباع شغفك بالسفر",
+    "featuredTitle": "منشورات مميزة",
+    "featuredSubtitle": "محتوى منتقى من فريق الإدارة لدينا",
+    "sortBy": "ترتيب حسب",
+    "popular": "الأكثر شيوعاً",
+    "latest": "الأحدث",
+    "searchPlaceholder": "ابحث عن منشورات..."
   }
+
 }

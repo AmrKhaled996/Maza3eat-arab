@@ -129,5 +129,41 @@
     "goBack": "Go Back",
     "exploreTitle": "Maybe try one of these?",
     "exploreSubtitle": "Explore popular sections of the platform"
+  },
+  "QandAMainPage": {
+    "meta": "Q&A - Maza3eat Arab",
+    "title": "Q&A",
+    "subtitle": "Got Travel Questions? \n We’ve Got Answers.",
+    "forumTitle": "Forum",
+    "forumSubtitle": "Get answers from experienced travelers",
+    "sortBy": "Sort by",
+    "popular": "Most Popular",
+    "searchPlaceholder": "Search for questions or answers...",
+    "latest": "Latest",
+    "askQuestion": "Ask a Question",
+    "popularQuestions": "Popular Questions"
+  },
+  "CommunityMainPage": {
+    "meta": "Community - Maza3eat Arab",
+    "title": "Community",
+    "subtitle": "Share your travel experience \n as a story",
+    "communityTitle": "Community",
+    "communitySubtitle": "Share your experiences and connect with fellow travelers",
+    "sortBy": "Sort by",
+    "popular": "Most Popular",
+    "latest": "Latest",
+    "searchPlaceholder": "Search for experiences..."
+
+  },
+  "FeaturedMainPage": {
+    "meta": "Featured Posts - Maza3eat Arab",
+    "title": "Featured Posts",
+    "subtitle": "Hand-picked content from our editorial team",
+    "featuredTitle": "Featured Posts",
+    "featuredSubtitle": "Content curated by our editorial team",
+    "sortBy": "Sort by",
+    "popular": "Most Popular",
+    "latest": "Latest",
+    "searchPlaceholder": "Search for posts..."
   }
 }

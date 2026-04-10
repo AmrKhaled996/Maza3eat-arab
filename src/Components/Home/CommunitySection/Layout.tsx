@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
+import HomeCommunitySectionMoreButton from "./MoreButton";
 import HomeCommunitySectionCreateButton from "../../shared/CreateButton";
 
 function HomeCommunitySectionLayout({ children }: PropsWithChildren) {
@@ -10,14 +11,14 @@ function HomeCommunitySectionLayout({ children }: PropsWithChildren) {
         {/* Header */}
         <div className="flex items-start sm:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight text-shadow-lg">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight text-shadow-md">
               {t("home.communityTitle")}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
               {t("home.communitySubtitle")}
             </p>
           </div>
-          <HomeCommunitySectionCreateButton />
+        <HomeCommunitySectionCreateButton />
         </div>
         {children}
       </div>
