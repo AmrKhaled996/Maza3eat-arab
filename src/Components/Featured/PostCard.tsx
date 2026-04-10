@@ -5,6 +5,7 @@ import { ArrowUpRight, Heart, Plus } from "lucide-react";
 import type { Tag as TagType } from "../../Types/Tag";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
+import FeaturedBadge from "../shared/FeaturedBadge";
 
 function PostCard({ post }: { post: Post }) {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function PostCard({ post }: { post: Post }) {
               <Plus size={24} strokeWidth={3} className=" font-bold" />
             </span>
           )}
+        <FeaturedBadge />
       </div>
 
       {/* Content */}

@@ -2,9 +2,9 @@ import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstence";
 
 // Function to fetch popular questions for the home page
-export async function getHomePopularQuestions() {
+export async function getHomePopularQuestions(limit: number) {
     try {
-        const response = await axiosInstance.get(`/questions/popular?limit=3`);
+        const response = await axiosInstance.get(`/questions/popular?limit=${limit}`);
         return response.data.data;
     } catch (error) {
         const axiosError = error as AxiosError<{message: string}>;
@@ -17,9 +17,9 @@ export async function getHomePopularQuestions() {
 }
 
 // Function to fetch top trending tags for the home page
-export async function getHomeTopTrending() {
+export async function getHomeTopTrending(limit: number) {
     try{
-        const response =await axiosInstance.get(`tags/trending?limit=3`)
+        const response =await axiosInstance.get(`tags/trending?limit=${limit}`)
         return response.data.data;
     }catch(error){
         const axiosError = error as AxiosError<{message: string}>;

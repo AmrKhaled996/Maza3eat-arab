@@ -1,10 +1,10 @@
 import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstence";
 
-export async function getCommunityPostsBySearch(searchTerm: string ,sortBy: string ) {
+export async function getFeaturedPostsBySearch(searchTerm: string ,sortBy: string ) {
   try {
     console.log("search ",searchTerm,"sort:",sortBy)
-    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}`);
+    const response = await axiosInstance.get(`/posts?scope=admin&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}`);
     // console.log(response.data)
     return response.data.data;
   } catch (error) {
@@ -19,11 +19,11 @@ export async function getCommunityPostsBySearch(searchTerm: string ,sortBy: stri
 }
 
 //with cursor
-export async function getCommunityPostsBySearchWithCursor(searchTerm: string ,sortBy: string, cursor:string ) {
+export async function getFeaturedPostsBySearchWithCursor(searchTerm: string ,sortBy: string, cursor:string ) {
 
   try {
     console.log("search ",searchTerm,"sort:",sortBy)
-    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}&cursor=${cursor}`);
+    const response = await axiosInstance.get(`/posts?scope=admin&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}&cursor=${cursor}`);
     // console.log(response.data)
     return response.data.data;
   } catch (error) {

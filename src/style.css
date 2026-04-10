@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
 @import "tailwindcss";
 @tailwind utilities;
+
 
 @theme {
   --color-primary: #2563eb;
@@ -41,7 +45,7 @@
 
 *{
   direction: rtl;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Noto Kufi Arabic", sans-serif;
   user-select: none;
   box-sizing: border-box;
 }
