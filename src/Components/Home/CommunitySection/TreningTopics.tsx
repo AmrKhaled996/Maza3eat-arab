@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import useHomeTrendingPosts from "../../../Hooks/HomeHooks/useHomeTrending";
 import type { Tag } from "../../../Types/Tag";
+import { t } from "i18next";
 
 function PostTrendingTopicsSection({ limit }: { limit?: number }) {
   const {
