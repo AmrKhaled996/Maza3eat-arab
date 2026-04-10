@@ -24,7 +24,7 @@ export interface Question {
   content: string;
   likesCount: number;
   answersCount: number;
-  publishDate: string;
+  publishDate: Date;
   tags: Tag[];
   author: Author;
   topAnswer?: TopAnswer;

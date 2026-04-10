@@ -1,7 +1,7 @@
-import { Badge, Tag } from "../../shared/Tag";
-import type { Question } from "../../../Types/Question";
-import { ContactButton } from "../../shared/ContactButton";
-import type { Tag as TagType } from "../../../Types/Tag";
+import { Badge, Tag } from "../shared/Tag";
+import type { Question } from "../../Types/Question";
+import { ContactButton } from "../shared/ContactButton";
+import type { Tag as TagType } from "../../Types/Tag";
 import {
   ArrowDown,
   ArrowRight,
@@ -9,24 +9,18 @@ import {
   Check,
   Heart,
   Reply,
+  MessageCircle,
+  MoreHorizontal,
 } from "lucide-react";
-import ThreeDotsOptionIcon from "../../../assets/images/icons/ThreeDotsOptionIcon";
-import PostsComments from "../../../assets/images/icons/PostComments";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useLocale } from "../../../i18n/useLocale";
-import { localizedPath } from "../../../i18n/paths";
-import { FormatPublishDate } from "../../../utils/DateFormater";
+import { FormatPublishDate } from "../../utils/DateFormater";
 
 export function QuestionCard({ question }: { question: Question }) {
-  const { t } = useTranslation("common");
   const navigate = useNavigate();
-  const { lang } = useLocale();
-  const answerCount = question?.answersCount ?? 0;
 
   return (
     <div
-      onClick={() => navigate(localizedPath(lang, `q&a/${question.id}`))}
+      onClick={() => navigate(`/q&a/${question.id}`)}
       className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 overflow-hidden pb-2 hover:cursor-pointer"
     >
       <div className="p-5">
@@ -73,12 +67,8 @@ export function QuestionCard({ question }: { question: Question }) {
             <span className="font-medium">{question?.likesCount}</span>
           </button>
           <span className="flex items-center gap-1.5">
-            <span>
-              <PostsComments color="#4B5563" />
-            </span>
-            <span className="font-medium">
-              {t("home.answerCount", { count: answerCount })}
-            </span>
+            <MessageCircle size={16} color="#4B5563" />
+            <span className="font-medium">{question?.answersCount} اجابة</span>
           </span>
         </div>
       </div>
@@ -89,13 +79,13 @@ export function QuestionCard({ question }: { question: Question }) {
       {/* Answers section */}
       <div className="px-5 py-3">
         <p className="text-xs font-bold text-gray-700 mb-3">
-          {t("home.answersHeading", { count: answerCount })}
+          {question?.answersCount} اجابة
         </p>
 
-        <div
+        {/* <div
           key={question?.topAnswer?.id}
           className="rounded-l-xl p-3 mb-2 bg-[#effff4] relative before:content-[''] before:block before:absolute  before:top-0 before:right-0 before:w-0.75 before:rounded-r-xl before:h-full before:bg-[#22C55E] "
-        >
+         >
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <img
               src={question?.topAnswer?.author?.avatar}
@@ -116,7 +106,7 @@ export function QuestionCard({ question }: { question: Question }) {
             <ContactButton />
 
             <span className="text-[11px] font-bold bg-[#22C55E] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
-              <Check className="w-4 h-4" /> {t("home.bestAnswer")}
+              <Check className="w-4 h-4" /> افضل اجابة
             </span>
 
             <div className="ml-auto flex items-center gap-1.5 text-xs font-bold">
@@ -134,18 +124,18 @@ export function QuestionCard({ question }: { question: Question }) {
           </p>
           <div className="flex items-center gap-3 text-[11px] text-gray-400">
             <button className="font-semibold text-primary mr-2 underline transition-colors flex gap-1">
-              {t("home.reply")}
+              رد
               <Reply className="h-4 w-4" />
             </button>
             <button className="hover:text-gray-600 transition-colors flex text-primary hover:cursor-pointer hover:opacity-80">
-              <ThreeDotsOptionIcon />
+              <MoreHorizontal size={16} />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" />{" "}
-          {t("home.viewAnswers", { count: answerCount })}
+          <ArrowRight className="w-4 h-4" /> عرض {question?.answersCount} من
+          الاجوبة
         </button>
       </div>
     </div>
