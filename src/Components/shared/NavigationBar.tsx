@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
-import { Badge } from "./Tag";
-import cn from "../../utils/Cn";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import type { SupportedLocale } from "../../i18n/config";
+
+import { Badge } from "./Tag";
+import cn from "../../utils/Cn";
 
 function NavigationBar({
   page,
@@ -24,6 +31,11 @@ function NavigationBar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
+
+  const [searchBar, setsearchBar] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchP = searchParams.get("search") || "";
+  const [searchval, setsearchval] = useState<string>(search);
 
   const effectiveScrolled = solidNav || scrolled;
 
@@ -46,9 +58,37 @@ function NavigationBar({
       : "text-gray-500 hover:text-primary";
   };
 
+  const handleSearch = () => {
+    const params = new URLSearchParams(searchParams);
+
+    const trimmed = searchval.trim();
+
+    if (trimmed) {
+      params.set("search", trimmed);
+    } else {
+      params.delete("search");
+    }
+
+    setSearchParams(params);
+  };
+  useEffect(() => {
+    setsearchval(searchP);
+  }, [searchP]);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 650 && window.scrollY < 2990) {
+      if (
+        window.scrollY > 650 &&
+        window.scrollY < 2990 &&
+        page &&
+        page === "home"
+      ) {
+        setScrolled(true);
+      } else if (
+        window.scrollY > 650 &&
+        page &&
+        (page === "community" || page === "q&a")
+      ) {
         setScrolled(true);
       } else {
         setScrolled(false);
@@ -77,7 +117,7 @@ function NavigationBar({
   return (
     <>
       <nav
-        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] " : "absolute "}   transition-all duration-700`}
+        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
       >
         <div
           className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
@@ -112,13 +152,13 @@ function NavigationBar({
             to={localizedPath(lang, "community")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
-              handlePage("cummunity"),
+              handlePage("community"),
             )}
           >
             {t("nav.community")}
           </Link>
           <Link
-            to={localizedPath(lang, "q&a")}
+            to={localizedPath(lang, "community")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
@@ -172,7 +212,38 @@ function NavigationBar({
               {t("lang.shortEn")}
             </button>
           </div>
-
+          {((scrolled && page === "community") || page === "q&a") && (
+            <button
+              onClick={() => setsearchBar(!searchBar)}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </button>
+          )}
+          {searchBar && scrolled && (
+            <div className="hidden md:flex absolute top-18 left-1/2 transform -translate-x-1/2 w-full max-w-lg bg-white rounded-full p-1 text-sm text-gray-700 placeholder-gray-400 shadow-md">
+              <input
+                type="text"
+                value={searchval}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                onChange={(e) => setsearchval(e.target.value)}
+                placeholder="ماذا تريد أن ترى؟"
+                className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+              />
+            </div>
+          )}
           <button
             className={`relative ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
           >
@@ -180,14 +251,14 @@ function NavigationBar({
               width="24"
               height="24"
               fill="none"
-              stroke="currentColor"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notifCount > 0 && (
-              <span className="absolute -top-1 -end-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -inset-e-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {notifCount}
               </span>
             )}
@@ -210,7 +281,7 @@ function NavigationBar({
             </button>
             {profileOpen && (
               <div
-                className="absolute end-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
                 role="menu"
               >
                 <Link
@@ -267,7 +338,9 @@ function NavigationBar({
               onClick={() => goLocale("ar")}
               className={cn(
                 "flex-1 rounded-lg py-2 text-sm font-bold",
-                lang === "ar" ? "bg-primary text-white" : "bg-gray-100 text-gray-700",
+                lang === "ar"
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-700",
               )}
             >
               {t("lang.shortAr")}
@@ -277,7 +350,9 @@ function NavigationBar({
               onClick={() => goLocale("en")}
               className={cn(
                 "flex-1 rounded-lg py-2 text-sm font-bold",
-                lang === "en" ? "bg-primary text-white" : "bg-gray-100 text-gray-700",
+                lang === "en"
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-700",
               )}
             >
               {t("lang.shortEn")}
@@ -318,6 +393,20 @@ function NavigationBar({
           >
             {t("nav.about")}
           </Link>
+          {((scrolled && page === "community") || page === "q&a") && (
+            <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">
+              <input
+                type="text"
+                value={searchval}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                onChange={(e) => setsearchval(e.target.value)}
+                placeholder="ماذا تريد أن ترى؟"
+                className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
             <img

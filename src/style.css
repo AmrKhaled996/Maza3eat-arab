@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
 @import "tailwindcss";
 @tailwind utilities;
+
 
 @theme {
   --color-primary: #2563eb;
@@ -46,10 +50,9 @@ html[dir="rtl"] {
 html[dir="ltr"] {
   direction: ltr;
 }
-
 * {
   direction: inherit;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Noto Kufi Arabic", sans-serif;
   user-select: none;
   box-sizing: border-box;
 }
@@ -58,6 +61,9 @@ html[dir="ltr"] {
   width: max-content;
   animation: scroll 30s linear infinite;
 }
+.navApperance {
+  animation: navApperance 0.5s ease-in-out;
+}
 
 @keyframes scroll {
   0% {
@@ -65,5 +71,13 @@ html[dir="ltr"] {
   }
   100% {
     transform: translateX(50%);
+  }
+}
+@keyframes navApperance {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

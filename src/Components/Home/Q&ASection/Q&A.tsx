@@ -1,10 +1,10 @@
 import { QuestionCard } from "./QuestionCard";
 import HomeQandAPostsAdvertisement from "./Advertisement";
 import HomeQandAPostsSectionMoreButton from "./CreateButton";
-import HomeQandAPopularQuestion from "./PopularQuestion";
 import HomeQandALayout from "./Layout";
 import type { Question } from "../../../Types/Question";
 import useHomeQuestions from "../../../Hooks/HomeHooks/useHomeQuestion";
+import QandAPopularQuestion from "../../shared/PopularQuestion";
 
 export default function QAForum() {
   const { data: questions } = useHomeQuestions();
@@ -24,7 +24,7 @@ export default function QAForum() {
         <div className="flex flex-col gap-5">
           {/* Popular Questions */}
 
-          <HomeQandAPopularQuestion />
+          <QandAPopularQuestion limit={3} />
 
           {/* Sponsored */}
           <HomeQandAPostsAdvertisement />

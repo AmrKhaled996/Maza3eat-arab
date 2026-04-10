@@ -5,7 +5,8 @@ import HomeCommunitySectionBigCard from "./BigCard";
 import HomeCommunitySectionLayout from "./Layout";
 import HomeCommunitySectionMoreButton from "./MoreButton";
 import HomeCommunitySectionSmallCard from "./SmallCard";
-import HomeCommunitySectionTrendingTopics from "./TreningTopics";
+import PostTrendingTopicsSection from "./TreningTopics";
+
 
 function CommunitySection() {
   const { data: posts } = useHomePosts();
@@ -22,7 +23,7 @@ function CommunitySection() {
         {/* Right sidebar */}
         <div className="flex flex-col gap-5">
           {/* Trending Topics */}
-          <HomeCommunitySectionTrendingTopics />
+          <PostTrendingTopicsSection limit={3} />
 
           {/* Sponsored / Ad */}
           <HomeCommunitySectionAdd />

@@ -11,6 +11,7 @@ export interface Post {
   tags: Tag[];
   image: Image;
   author: Author;
+  publishDate?: Date; 
 }
 
 export interface PostsResponse {

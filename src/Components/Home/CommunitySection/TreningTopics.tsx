@@ -2,9 +2,12 @@ import { useTranslation } from "react-i18next";
 import useHomeTrendingPosts from "../../../Hooks/HomeHooks/useHomeTrending";
 import type { Tag } from "../../../Types/Tag";
 
-function HomeCommunitySectionTrendingTopics() {
-  const { t } = useTranslation("common");
-  const { data: trendingTopics } = useHomeTrendingPosts();
+function PostTrendingTopicsSection({ limit }: { limit?: number }) {
+  const {
+    data: trendingTopics,
+    isLoading: trendingTopicsLoading,
+    error: trendingTopicsError,
+  } = useHomeTrendingPosts();
   console.log(trendingTopics, "topics");
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md">
@@ -30,4 +33,4 @@ function HomeCommunitySectionTrendingTopics() {
   );
 }
 
-export default HomeCommunitySectionTrendingTopics;
+export default PostTrendingTopicsSection;
