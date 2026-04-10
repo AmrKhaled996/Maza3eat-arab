@@ -91,7 +91,7 @@ export const extractDateParts = (dateInput: string): object => {
  * const result = formatDate(input);
  * console.log(result); // "1 Jan 2022"
  */
-export const PostformatDate = (dateInput: Date): string => {
+export const FormatPublishDate = (dateInput: Date): string => {
   const formatedDate = extractDateTime(dateInput.toString()).date as string; // "2022-01-01"
   const dateObj: Date = new Date(formatedDate);
 

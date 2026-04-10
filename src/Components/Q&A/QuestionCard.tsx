@@ -1,7 +1,7 @@
-import { Badge, Tag } from "../../shared/Tag";
-import type { Question } from "../../../Types/Question";
-import { ContactButton } from "../../shared/ContactButton";
-import type { Tag as TagType } from "../../../Types/Tag";
+import { Badge, Tag } from "../shared/Tag";
+import type { Question } from "../../Types/Question";
+import { ContactButton } from "../shared/ContactButton";
+import type { Tag as TagType } from "../../Types/Tag";
 import {
   ArrowDown,
   ArrowRight,
@@ -9,11 +9,11 @@ import {
   Check,
   Heart,
   Reply,
+  MessageCircle,
+  MoreHorizontal,
 } from "lucide-react";
-import ThreeDotsOptionIcon from "../../../assets/images/icons/ThreeDotsOptionIcon";
-import PostsComments from "../../../assets/images/icons/PostComments";
 import { useNavigate } from "react-router-dom";
-import { FormatPublishDate } from "../../../utils/DateFormater";
+import { FormatPublishDate } from "../../utils/DateFormater";
 
 export function QuestionCard({ question }: { question: Question }) {
   const navigate = useNavigate();
@@ -67,9 +67,7 @@ export function QuestionCard({ question }: { question: Question }) {
             <span className="font-medium">{question?.likesCount}</span>
           </button>
           <span className="flex items-center gap-1.5">
-            <span>
-              <PostsComments color="#4B5563" />
-            </span>
+            <MessageCircle size={16} color="#4B5563" />
             <span className="font-medium">{question?.answersCount} اجابة</span>
           </span>
         </div>
@@ -84,10 +82,10 @@ export function QuestionCard({ question }: { question: Question }) {
           {question?.answersCount} اجابة
         </p>
 
-        <div
+        {/* <div
           key={question?.topAnswer?.id}
           className="rounded-l-xl p-3 mb-2 bg-[#effff4] relative before:content-[''] before:block before:absolute  before:top-0 before:right-0 before:w-0.75 before:rounded-r-xl before:h-full before:bg-[#22C55E] "
-        >
+         >
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <img
               src={question?.topAnswer?.author?.avatar}
@@ -130,10 +128,10 @@ export function QuestionCard({ question }: { question: Question }) {
               <Reply className="h-4 w-4" />
             </button>
             <button className="hover:text-gray-600 transition-colors flex text-primary hover:cursor-pointer hover:opacity-80">
-              <ThreeDotsOptionIcon />
+              <MoreHorizontal size={16} />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
           <ArrowRight className="w-4 h-4" /> عرض {question?.answersCount} من

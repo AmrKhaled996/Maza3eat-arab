@@ -2,7 +2,7 @@ import { Heart } from "lucide-react";
 import { Badge, Tag } from "../../shared/Tag";
 import PostsComments from "../../../assets/images/icons/PostComments";
 import type { Post } from "../../../Types/Post";
-import type { Tag as TagType } from "../../../Types/Amr'sTypes/Tag";
+import type { Tag as TagType } from "../../../Types/Tag";
 import { useNavigate } from "react-router-dom";
 import FeaturedBadge from "../../shared/FeaturedBadge";
 

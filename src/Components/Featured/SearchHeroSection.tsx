@@ -41,9 +41,9 @@ function SearchHeroSection({
       {/* Hero heading */}
       <div className="text-center mb-10 ">
         <h1 className="text-4xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">
-          شارك تجربة سفرك
+         اكتشف مغامرات مختارة بعناية 
           <br />
-          على شكل قصة
+         لإشباع شغفك بالسفر
         </h1>
       </div>
 

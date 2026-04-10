@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Badge } from "./Tag";
 import cn from "../../utils/Cn";
 
 function NavigationBar({ page }: { page: string }) {
+  const navigate = useNavigate();
   const [notifCount] = useState(3);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [scrolled, setScrolled] = useState<boolean>(false);
+
+  const [searchBar, setsearchBar] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
+  const [searchval, setsearchval] = useState<string>(search);
 
   const handlePage = (tape: string) => {
     if (page && page === "home") {
@@ -22,9 +28,37 @@ function NavigationBar({ page }: { page: string }) {
     }
   };
 
+  const handleSearch = () => {
+    const params = new URLSearchParams(searchParams);
+
+    const trimmed = searchval.trim();
+
+    if (trimmed) {
+      params.set("search", trimmed);
+    } else {
+      params.delete("search");
+    }
+
+    setSearchParams(params);
+  };
+  useEffect(() => {
+    setsearchval(search);
+  }, [search]);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 650 && window.scrollY < 2990) {
+      if (
+        window.scrollY > 650 &&
+        window.scrollY < 2990 &&
+        page &&
+        page === "home"
+      ) {
+        setScrolled(true);
+      } else if (
+        window.scrollY > 650 &&
+        page &&
+        (page === "community" || page === "q&a")
+      ) {
         setScrolled(true);
       } else {
         setScrolled(false);
@@ -39,10 +73,11 @@ function NavigationBar({ page }: { page: string }) {
   return (
     <>
       <nav
-        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${scrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700  `}
+        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${scrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700  hover:cursor-pointer`}
       >
         {/* Logo */}
         <div
+        onClick={()=>navigate(`/`)}
           className={`flex items-center gap-2 ${scrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
         >
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -80,7 +115,7 @@ function NavigationBar({ page }: { page: string }) {
             المجتمع
           </Link>
           <Link
-            to="q&a"
+            to="/q&a"
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
@@ -101,6 +136,38 @@ function NavigationBar({ page }: { page: string }) {
 
         {/* Right side */}
         <div className="hidden md:flex items-center gap-4">
+          {((scrolled && page === "community") || page === "q&a") && (
+            <button
+              onClick={() => setsearchBar(!searchBar)}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="black"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </button>
+          )}
+          {searchBar && scrolled && (
+            <div className="hidden md:flex absolute top-18 left-1/2 transform -translate-x-1/2 w-full max-w-lg bg-white rounded-full p-1 text-sm text-gray-700 placeholder-gray-400 shadow-md">
+              <input
+                type="text"
+                value={searchval}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                onChange={(e) => setsearchval(e.target.value)}
+                placeholder="ماذا تريد أن ترى؟"
+                className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+              />
+            </div>
+          )}
           {/* Bell */}
           <button
             className={`relative ${scrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
@@ -109,7 +176,7 @@ function NavigationBar({ page }: { page: string }) {
               width="24"
               height="24"
               fill="none"
-              stroke="currentColor"
+              stroke="black"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
@@ -193,6 +260,20 @@ function NavigationBar({ page }: { page: string }) {
           >
             حول
           </Link>
+          {((scrolled && page === "community") || page === "q&a") && (
+            <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">
+              <input
+                type="text"
+                value={searchval}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+                onChange={(e) => setsearchval(e.target.value)}
+                placeholder="ماذا تريد أن ترى؟"
+                className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
             <img

@@ -1,11 +1,11 @@
 import useHomeTrendingPosts from "../../../Hooks/HomeHooks/useHomeTrending";
-import type { Tag } from "../../../Types/Amr'sTypes/Tag";
+import type { Tag } from "../../../Types/Tag";
 
 
 
-function HomeCommunitySectionTrendingTopics() {
+function PostTrendingTopicsSection({limit}: {limit?: number}) {
 
-  const {data: trendingTopics ,isLoading: trendingTopicsLoading ,error: trendingTopicsError } = useHomeTrendingPosts();
+  const {data: trendingTopics ,isLoading: trendingTopicsLoading ,error: trendingTopicsError } = useHomeTrendingPosts(limit);
   console.log(trendingTopics,"topics")
     return (  <div className="bg-white rounded-2xl p-5 shadow-md">
               <h3 className="font-bold text-gray-900 mb-4 text-base">
@@ -29,4 +29,4 @@ function HomeCommunitySectionTrendingTopics() {
             </div> );
 }
 
-export default HomeCommunitySectionTrendingTopics;
+export default PostTrendingTopicsSection;
