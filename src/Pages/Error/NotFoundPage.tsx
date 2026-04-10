@@ -1,10 +1,11 @@
-import { useTranslation } from "react-i18next";
+
 import { useNavigate } from "react-router-dom";
 import { Title } from "react-head";
 import { MapPinOff, Home, ArrowLeft, Compass } from "lucide-react";
 import NavigationBar from "../../Components/shared/NavigationBar";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
+import { useTranslation } from "react-i18next";
 
 export default function NotFoundPage() {
   const { t } = useTranslation("common");

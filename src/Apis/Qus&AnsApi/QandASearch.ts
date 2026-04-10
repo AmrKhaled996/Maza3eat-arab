@@ -1,6 +1,7 @@
 
 import type { AxiosError } from "axios";
-import { axiosInstance } from "../axiosInstence";
+import { axiosInstance } from "../axiosInstance";
+
 
 export async function getQuestionsBySearch(searchTerm: string ,sortBy: string ) {
   try {

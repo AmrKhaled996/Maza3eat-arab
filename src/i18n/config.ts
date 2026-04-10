@@ -1,7 +1,9 @@
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+
 import arCommon from "./resources/ar/common.json";
 import enCommon from "./resources/en/common.json";
+import { initReactI18next } from "react-i18next";
+
 
 export const SUPPORTED_LOCALES = ["ar", "en"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
