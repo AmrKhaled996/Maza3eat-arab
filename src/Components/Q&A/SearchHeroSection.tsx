@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocale } from "../../i18n/useLocale";
 
 function SearchHeroSection({
   searchValue,
@@ -12,6 +14,9 @@ function SearchHeroSection({
   searchLoading: boolean;
   setSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation("common");
+  const { lang } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
   const search= searchParams.get("search") || "";
   const [searchval, setsearchval] = useState<string>(search);
@@ -41,9 +46,9 @@ function SearchHeroSection({
       {/* Hero heading */}
       <div className="text-center mb-10 ">
         <h1 className="text-4xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">
-          شارك تجربة سفرك
+          {t("QandAMainPage.subtitle").split("\n")[0]}
           <br />
-          على شكل قصة
+           {t("QandAMainPage.subtitle").split("\n")[1]}
         </h1>
       </div>
 
@@ -56,12 +61,12 @@ function SearchHeroSection({
             if (e.key === "Enter") handleSearch();
           }}
           onChange={(e) => setsearchval(e.target.value)}
-          placeholder="ماذا تريد أن ترى؟"
+          placeholder={t("QandAMainPage.searchPlaceholder")}
           className="w-full bg-white rounded-full ring-1 ring-primary px-5 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
         />
         <button
           onClick={() => handleSearch()}
-          className="absolute left-3 top-1/2 main-gradient -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
+          className={`absolute -translate-y-1/2 ${lang === "en" ? "right-3" : "left-3"} top-1/2 main-gradient  w-8 h-8 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer`}
         >
           {searchLoading ? (
             <div className="w-4 h-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></div>

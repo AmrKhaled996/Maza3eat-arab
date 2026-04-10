@@ -39,7 +39,7 @@ function Footer() {
         <source src="/Footer.mp4" type="video/mp4" />
       </video>
       <footer className="absolute object-cover bottom-0 z-20 w-full  text-gray-200 px-8 py-8">
-        <div className="bg-transparent text-slate-800 py-6 text-center z-10  h-full p-auto w-full my-30">
+        <div className="bg-transparent text-slate-800 py-6 text-center z-10  h-full p-auto w-full my-30 md:my-20 flex flex-col items-center justify-center">
           <p className="text-5xl text-white font-bold">
             {t("footer.taglineTitle")}
           </p>
@@ -47,7 +47,7 @@ function Footer() {
             {t("footer.taglineSubtitle")}
           </p>
         </div>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="max-w-7xl mx-auto  grid grid-cols-1 md:grid-cols-3 gap-10">
           <div>
             <h2 className="text-xl font-semibold text-white mb-4">
               {t("footer.contact")}

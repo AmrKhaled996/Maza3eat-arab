@@ -14,9 +14,14 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../i18n/useLocale";
 
 export function QuestionCard({ question }: { question: Question }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("common");
+  const { lang } = useLocale();
+  const answerCount = question?.answersCount ?? 0;
 
   return (
     <div
@@ -68,7 +73,7 @@ export function QuestionCard({ question }: { question: Question }) {
           </button>
           <span className="flex items-center gap-1.5">
             <MessageCircle size={16} color="#4B5563" />
-            <span className="font-medium">{question?.answersCount} اجابة</span>
+            <span className="font-medium">{t("home.answerCount", { count: answerCount })}</span>
           </span>
         </div>
       </div>
@@ -134,8 +139,7 @@ export function QuestionCard({ question }: { question: Question }) {
         </div> */}
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" /> عرض {question?.answersCount} من
-          الاجوبة
+          <ArrowRight className="w-4 h-4" />{t("home.viewAnswers", { count: answerCount })}
         </button>
       </div>
     </div>

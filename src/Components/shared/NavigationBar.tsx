@@ -87,7 +87,7 @@ function NavigationBar({
       } else if (
         window.scrollY > 650 &&
         page &&
-        (page === "community" || page === "q&a")
+        (page === "community" || page === "q&a" || page === "featured")
       ) {
         setScrolled(true);
       } else {
@@ -158,7 +158,7 @@ function NavigationBar({
             {t("nav.community")}
           </Link>
           <Link
-            to={localizedPath(lang, "community")}
+            to={localizedPath(lang, "q&a")}
             className={cn(
               ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
@@ -179,7 +179,7 @@ function NavigationBar({
 
         <div className="hidden md:flex items-center gap-3">
           <div
-            className={`flex rounded-full border px-1 py-0.5 text-xs font-bold ${effectiveScrolled ? "border-gray-200 bg-white" : "border-white/40 bg-white/10"}`}
+            className={`flex rounded-full border px-1 py-0.5 text-xs font-bold ${effectiveScrolled ? "border-gray-200 bg-white" : "border-gray-200 bg-white/10"}`}
             role="group"
             aria-label={lang === "ar" ? "Language" : "اللغة"}
           >
@@ -187,12 +187,12 @@ function NavigationBar({
               type="button"
               onClick={() => goLocale("ar")}
               className={cn(
-                "rounded-full px-2 py-1 transition-colors",
+                "rounded-full px-3 py-1 transition-colors ",
                 lang === "ar"
                   ? "bg-primary text-white"
                   : effectiveScrolled
-                    ? "text-gray-600 hover:bg-gray-100"
-                    : "text-white hover:bg-white/20",
+                     ? "text-gray-600 hover:bg-gray-100"
+                    :page === "home" ? "text-white hover:bg-white/20":"text-slate-800 hover:bg-white/20",
               )}
             >
               {t("lang.shortAr")}
@@ -201,18 +201,18 @@ function NavigationBar({
               type="button"
               onClick={() => goLocale("en")}
               className={cn(
-                "rounded-full px-2 py-1 transition-colors",
+                "rounded-full px-3 py-1 transition-colors",
                 lang === "en"
                   ? "bg-primary text-white"
-                  : effectiveScrolled
+                  : effectiveScrolled 
                     ? "text-gray-600 hover:bg-gray-100"
-                    : "text-white hover:bg-white/20",
+                    :page === "home" ? "text-white hover:bg-white/20":"text-slate-800 hover:bg-white/20",
               )}
             >
               {t("lang.shortEn")}
             </button>
           </div>
-          {((scrolled && page === "community") || page === "q&a") && (
+          {(scrolled && (page === "community" || page === "q&a" || page === "featured")) && (
             <button
               onClick={() => setsearchBar(!searchBar)}
               className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
@@ -393,7 +393,7 @@ function NavigationBar({
           >
             {t("nav.about")}
           </Link>
-          {((scrolled && page === "community") || page === "q&a") && (
+          {(scrolled && (page === "community" || page === "q&a" || page === "featured")) && (
             <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">
               <input
                 type="text"

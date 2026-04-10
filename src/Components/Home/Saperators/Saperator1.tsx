@@ -61,9 +61,9 @@ export default function InfiniteSlider() {
   }, []);
   return (
     <div className="overflow-hidden w-full py-10">
-      <div className="flex w-max scrollSlider gap-4">
+      <div className={`flex w-max scrollSlider gap-4`}>
         {videosList.map((vid, index) => (
-          <div key={index} className="aspect-9/16 w-48 shrink-0">
+          <div key={index} className="aspect-9/16 w-72 shrink-0">
             <video
               ref={(el) => {
                 videoRefs.current[index] = el;

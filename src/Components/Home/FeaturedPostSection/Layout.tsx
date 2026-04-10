@@ -9,7 +9,7 @@ function HomeFeaturedPostsLayout({ children }: PropsWithChildren) {
         {/* Header */}
         <div className="flex items-start sm:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight  text-shadow-lg">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight  text-shadow-md">
               {t("home.featuredTitle")}
             </h1>
             <p className="text-sm text-gray-500 mt-1">

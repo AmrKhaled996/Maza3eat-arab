@@ -17,12 +17,17 @@ import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
 import { FormatPublishDate } from "../../../utils/DateFormater";
+import { useEffect } from "react";
 
 export function QuestionCard({ question }: { question: Question }) {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
   const { lang } = useLocale();
   const answerCount = question?.answersCount ?? 0;
+
+  useEffect(() => {
+    console.log("QuestionCard rendered with question:", question);
+  }, [question]);
 
   return (
     <div
@@ -46,9 +51,7 @@ export function QuestionCard({ question }: { question: Question }) {
             tier={question?.author?.tierName}
           />
           <ContactButton />
-          <span className="ml-auto text-xs text-gray-400 whitespace-nowrap">
-            {FormatPublishDate(question?.publishDate)}
-          </span>
+          
         </div>
 
         {/* Question */}
