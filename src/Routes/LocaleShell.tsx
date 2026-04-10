@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
 import type { SupportedLocale } from "../i18n/config";
 
 export default function LocaleShell({ lang }: { lang: SupportedLocale }) {

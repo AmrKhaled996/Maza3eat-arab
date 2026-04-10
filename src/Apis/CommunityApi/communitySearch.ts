@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import { axiosInstance } from "../axiosInstence";
+import { axiosInstance } from "../axiosInstance";
 
 export async function getCommunityPostsBySearch(searchTerm: string ,sortBy: string ) {
   try {
