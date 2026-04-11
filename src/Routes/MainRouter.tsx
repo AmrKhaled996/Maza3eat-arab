@@ -14,6 +14,7 @@ import AboutPage from "../Pages/About/AboutPage";
 import NotFoundPage from "../Pages/Error/NotFoundPage";
 import LocaleShell from "./LocaleShell";
 import LegacyRedirect from "./LegacyRedirect";
+import ProtectedRoute from "./ProtectedRoute";
 import { SUPPORTED_LOCALES } from "../i18n/config";
 import { localizedPath } from "../i18n/paths";
 
@@ -31,14 +32,16 @@ export default function MainRouter(): React.ReactElement {
             <Route path="login" element={<LoginPage />} />
             <Route path="community" element={<CommunityMainPage />} />
             <Route path="post/:id" element={<PostPage />} />
-            <Route path="create-post" element={<CreatePostPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="create-post" element={<CreatePostPage />} />
+              <Route path="create-q&a" element={<QndACreatePage />} />
+              <Route path="profile/:id/posts" element={<ProfilePostPage />} />
+              <Route path="profile/:id/q&a" element={<ProfileQandAPage />} />
+            </Route>
             <Route path="q&a" element={<QandAMainPage />} />
             <Route path="q&a/:id" element={<QandAPage />} />
-            <Route path="create-q&a" element={<QndACreatePage />} />
             <Route path="featured" element={<FeaturedMainPage />} />
             <Route path="about" element={<AboutPage />} />
-            <Route path="profile/:id/posts" element={<ProfilePostPage />} />
-            <Route path="profile/:id/q&a" element={<ProfileQandAPage />} />
             <Route
               path="*"
               element={<NotFoundPage />}

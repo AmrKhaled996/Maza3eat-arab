@@ -6,14 +6,17 @@ import App from "./App.tsx";
 import MainRouter from "./Routes/MainRouter.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HeadProvider } from "react-head";
+import { AuthProvider } from "./Context/Auth.tsx";
 
 const client = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={client}>
       <HeadProvider>
-        <MainRouter />
-        <App />
+        <AuthProvider>
+          <MainRouter />
+          <App />
+        </AuthProvider>
       </HeadProvider>
     </QueryClientProvider>
   </StrictMode>,
