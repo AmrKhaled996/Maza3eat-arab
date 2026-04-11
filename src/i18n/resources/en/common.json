@@ -155,6 +155,14 @@
     "searchPlaceholder": "Search for experiences..."
 
   },
+  "login": {
+    "meta": "Sign In - Maza3eat Arab",
+    "welcome": "Welcome",
+    "googleSignIn": "sign in / sign up",
+    "imageAlt": "Traveler on mountain top",
+    "redirecting": "Redirecting…",
+    "logout": "Log out"
+  },
   "FeaturedMainPage": {
     "meta": "Featured Posts - Maza3eat Arab",
     "title": "Featured Posts",
