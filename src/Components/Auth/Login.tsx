@@ -1,13 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { useLocale } from "../../i18n/useLocale";
-import { localizedPath } from "../../i18n/paths";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../Hooks/Auth";
 import { useState } from "react";
 
 export default function Login() {
   const { t } = useTranslation("common");
-  const { lang } = useLocale();
   const { login } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -23,15 +19,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col">
-      {/* Top bar */}
-      <div className="px-6 py-4">
-        <Link
-          to={localizedPath(lang, "login")}
-          className="text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors"
-        >
-          {t("login.signInSignUp")}
-        </Link>
-      </div>
 
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center px-4 pb-8">
@@ -48,44 +35,16 @@ export default function Login() {
           </div>
 
           {/* Right side — Auth content */}
-          <div className="w-full md:w-1/2 flex flex-col items-center justify-between py-12 px-8 relative overflow-hidden">
+          <div className="w-full md:w-1/2 flex flex-col items-center justify-between py-2 px-8 relative overflow-hidden">
             {/* Airplane dashed path decoration */}
-            <div className="absolute top-6 right-8 w-48 h-24 pointer-events-none">
-              <svg
-                viewBox="0 0 200 100"
-                fill="none"
-                className="w-full h-full"
-              >
-                <path
-                  d="M10 80 Q 60 10, 120 40 T 190 15"
-                  stroke="url(#dashGrad)"
-                  strokeWidth="1.5"
-                  strokeDasharray="6 4"
-                  fill="none"
-                />
-                <defs>
-                  <linearGradient
-                    id="dashGrad"
-                    x1="0"
-                    y1="0"
-                    x2="200"
-                    y2="0"
-                  >
-                    <stop offset="0%" stopColor="#2563eb" />
-                    <stop offset="100%" stopColor="#EC4899" />
-                  </linearGradient>
-                </defs>
-              </svg>
               <img
                 src="/airplane.svg"
                 alt=""
-                className="absolute -top-1 left-12 w-7 h-7 -rotate-30"
+                className="absolute right-0 top-0 w-30 h-30 pointer-events-none"
               />
-            </div>
-
             {/* Welcome text */}
-            <div className="flex flex-col items-center gap-4 mt-8">
-              <h1 className="text-4xl md:text-5xl font-extrabold gradient-text italic">
+            <div className="flex flex-col items-center gap-5 mt-8">
+              <h1 className="p-5 text-4xl md:text-5xl font-extrabold gradient-text italic">
                 {t("login.welcome")}
               </h1>
 
@@ -150,8 +109,13 @@ export default function Login() {
             </div>
 
             {/* Bottom decorative landmarks */}
-            <div className="flex items-end justify-center gap-8 w-full mt-auto pt-8">
+            <div className="flex items-end justify-center gap-12 w-full pt-8">
               <img
+                src="/Bridge.svg"
+                alt=""
+                className="h-10 opacity-80"
+              />
+                          <img
                 src="/mosque.svg"
                 alt=""
                 className="h-16 md:h-20 opacity-80"
@@ -159,7 +123,7 @@ export default function Login() {
               <img
                 src="/Bridge.svg"
                 alt=""
-                className="h-14 md:h-18 opacity-80"
+                className="h-10 opacity-80"
               />
             </div>
           </div>
