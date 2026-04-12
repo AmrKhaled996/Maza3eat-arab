@@ -149,8 +149,10 @@ export default function CreatePostPage() {
     const formData = new FormData();
     formData.append("title", title.trim());
     formData.append("content", content);
-    const tagPayload = tags.map((name) => ({ name }));
-    formData.append("tags", JSON.stringify(tagPayload));
+    // Append each tag individually for multipart/form-data format
+    tags.forEach((tag) => {
+      formData.append("tags", tag);
+    });
     previews.forEach((p) => formData.append(POST_IMAGE_FIELD, p.file));
 
     setSubmitting(true);

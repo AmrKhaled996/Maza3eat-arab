@@ -12,6 +12,7 @@ export const axiosInstance = axios.create({
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
+  _skipAuthRedirect?: boolean;
 }
 
 axiosInstance.interceptors.response.use(
@@ -21,6 +22,12 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
+      // If the request opted out of auth redirect (e.g. getMe on page load),
+      // or we're already on the login page, just reject without redirecting.
+      if (originalRequest._skipAuthRedirect || window.location.pathname.endsWith("/login")) {
+        return Promise.reject(error);
+      }
 
       try {
         console.log(import.meta.env.VITE_BACKEND_URL)

@@ -11,6 +11,7 @@ import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import type { SupportedLocale } from "../../i18n/config";
 
+import { useAuth } from "../../Hooks/Auth";
 import { Badge } from "./Tag";
 import cn from "../../utils/Cn";
 
@@ -26,6 +27,21 @@ function NavigationBar({
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
   const profileWrapRef = useRef<HTMLDivElement>(null);
+  const { user, isAuthenticated, logout } = useAuth();
+
+  // Map tier to color
+  const getTierColor = (tier: string | null): string => {
+    switch (tier) {
+      case "gold":
+        return "#FFD700";
+      case "silver":
+        return "#C0C0C0";
+      case "copper":
+        return "#B87333";
+      default:
+        return "#6B7280"; // gray for no tier
+    }
+  };
 
   const [notifCount] = useState(3);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -265,38 +281,69 @@ function NavigationBar({
           </button>
 
           <div className="relative" ref={profileWrapRef}>
-            <button
-              type="button"
-              onClick={() => setProfileOpen((o) => !o)}
-              className="rounded-full ring-2 ring-white shadow outline-2 outline-offset-0 transition-opacity hover:opacity-90"
-              style={{ outlineColor: "#FFD700" }}
-              aria-expanded={profileOpen}
-              aria-haspopup="true"
-            >
-              <img
-                src="https://i.pravatar.cc/40?img=12"
-                alt=""
-                className="h-9 w-9 rounded-full object-cover"
-              />
-            </button>
-            {profileOpen && (
-              <div
-                className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
-                role="menu"
-              >
-                <Link
-                  to={localizedPath(lang, "create-post")}
-                  role="menuitem"
-                  className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                  onClick={() => setProfileOpen(false)}
+            {isAuthenticated && user ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen((o) => !o)}
+                  className="rounded-full ring-2 ring-white shadow outline-2 outline-offset-0 transition-opacity hover:opacity-90"
+                  style={{ outlineColor: getTierColor(user.tier) }}
+                  aria-expanded={profileOpen}
+                  aria-haspopup="true"
                 >
-                  {t("createPost.menuCreatePost")}
-                </Link>
-              </div>
+                  <img
+                    src={user.avatar || "https://i.pravatar.cc/40?img=12"}
+                    alt={user.name}
+                    className="h-9 w-9 rounded-full object-cover"
+                  />
+                </button>
+                {profileOpen && (
+                  <div
+                    className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                    role="menu"
+                  >
+                    <Link
+                      to={localizedPath(lang, "create-post")}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("createPost.menuCreatePost")}
+                    </Link>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50"
+                      onClick={async () => {
+                        setProfileOpen(false);
+                        await logout();
+                        navigate(localizedPath(lang, "login"));
+                      }}
+                    >
+                      {t("login.logout")}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <Link
+                to={localizedPath(lang, "login")}
+                className={`text-sm font-semibold px-4 py-2 rounded-full transition-colors ${
+                  effectiveScrolled
+                    ? "text-primary border border-primary hover:bg-primary/5"
+                    : page === "home"
+                      ? "text-white border border-white/50 hover:bg-white/10"
+                      : "text-primary border border-primary hover:bg-primary/5"
+                }`}
+              >
+                {t("login.signInSignUp")}
+              </Link>
             )}
           </div>
 
-          <Badge tier="Gold" color=" #FFD700" />
+          {isAuthenticated && user && user.tier && (
+            <Badge tier={user.tier.charAt(0).toUpperCase() + user.tier.slice(1)} color={getTierColor(user.tier)} />
+          )}
         </div>
 
         <button
