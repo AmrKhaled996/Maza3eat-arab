@@ -5,13 +5,18 @@ import { ArrowUpRight, Heart, Plus } from "lucide-react";
 import type { Tag as TagType } from "../../Types/Tag";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
+import { localizedPath } from "../../i18n/paths";
+import { useLocale } from "../../i18n/useLocale";
+import { useTranslation } from "react-i18next";
+import cn from "../../utils/Cn";
 
 function PostCard({ post }: { post: Post }) {
   const navigate = useNavigate();
-
+    const { t } = useTranslation("common");
+    const {lang} = useLocale();
   return (
     <div
-      onClick={() => navigate(`/post/${post.id}`)}
+      onClick={() => navigate(localizedPath(lang, `post/${post.id}`))}
       className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col sm:flex-row gap-0 md:min-h-80 md:max-h-80 hover:cursor-pointer group "
     >
       {/* Image */}
@@ -36,7 +41,13 @@ function PostCard({ post }: { post: Post }) {
         dir="rtl"
       >
         {/* Author */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div 
+          onClick={(e)=> {
+            e.preventDefault()
+            e.stopPropagation()
+            navigate(localizedPath(lang,`profile/${post.author.id}`))
+          }}
+        className="flex flex-wrap items-center gap-2 mb-3">
           <img
             src={post.author.avatar}
             alt={post.author.name}
@@ -48,7 +59,7 @@ function PostCard({ post }: { post: Post }) {
           </span>
           <Badge tier={post.author.tierName} color={post.author.badgeColor} />
 
-          <span className="mr-auto text-xs text-gray-400">
+          <span className={cn(` text-xs text-gray-400` , lang === "ar" ? "mr-auto ml-2" : "ml-auto mr-2")}>
             {post?.publishDate ? FormatPublishDate(post.publishDate) : ""}
           </span>
         </div>
@@ -92,7 +103,7 @@ function PostCard({ post }: { post: Post }) {
             className="flex items-center gap-1.5 text-sm font-bold hover:opacity-75 transition-opacity"
             style={{ color: "#2563eb" }}
           >
-            {"قراءة المقال كاملاً"}{" "}
+            {t("CommunityMainPage.morePost")}
             <ArrowUpRight size={16} className=" text-primary" />
           </button>
         </div>

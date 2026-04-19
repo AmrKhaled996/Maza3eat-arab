@@ -45,7 +45,7 @@ function HeroSectionLayout() {
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
             <button
               onClick={() => navigate(localizedPath(lang, "community"))}
-              className="flex items-center gap-2.5 bg-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full shadow-lg  hover:shadow-xl hover:scale-105 transition-all"
+              className="flex items-center gap-2.5 bg-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full shadow-lg  hover:shadow-xl hover:scale-105 transition-all duration-300 hover:cursor-pointer"
             >
               <span className="text-lg gradient-text flex gap-1 items-end">
                 <CompassIcon className="text-secondary" /> {t("hero.ctaCommunity")}{" "}
@@ -54,7 +54,7 @@ function HeroSectionLayout() {
 
             <button
               onClick={() => navigate(localizedPath(lang, "q&a"))}
-              className="flex items-center gap-2.5 font-bold text-sm sm:text-base px-7 py-3.5 rounded-full border-2 border-white text-white hover:bg-white/15 hover:scale-105 transition-all backdrop-blur-sm"
+              className="flex items-center gap-2.5 font-bold text-sm sm:text-base px-7 py-3.5 rounded-full border-2 border-white text-white hover:bg-white/15 hover:scale-105 transition-all duration-300 hover:cursor-pointer backdrop-blur-sm"
             >
               <span className="text-lg  rounded-full text-secondary">
                 <CircleQuestionMarkIcon className="bg-white rounded-full p-0 m-0" />

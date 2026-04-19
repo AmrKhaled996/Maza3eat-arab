@@ -14,16 +14,15 @@ function SearchHeroSection({
   searchLoading: boolean;
   setSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const {t} = useTranslation("common");
+  const { t } = useTranslation("common");
   const { lang } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
-  const search= searchParams.get("search") || "";
+  const search = searchParams.get("search") || "";
   const [searchval, setsearchval] = useState<string>(search);
 
   const handleSearch = () => {
-  
     setSearchValue(searchval);
-   const params = new URLSearchParams(searchParams); // clone current params
+    const params = new URLSearchParams(searchParams); // clone current params
 
     const trimmed = searchval.trim();
 
@@ -34,20 +33,21 @@ function SearchHeroSection({
     }
     setSearchLoading(true);
     setSearchParams(params);
+    window.location.reload();
   };
 
   useEffect(() => {
-  setsearchval(search);
-}, [search]);
+    setsearchval(search);
+  }, [search]);
 
   return (
     <div className="h-[70vh] flex flex-col items-center justify-center ">
       {/* Hero heading */}
       <div className="text-center mb-10 ">
         <h1 className="text-4xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">
-          {t("CommunityMainPage.subtitle").split('\n')[0]}
+          {t("CommunityMainPage.subtitle").split("\n")[0]}
           <br />
-          {t("CommunityMainPage.subtitle").split('\n')[1]}
+          {t("CommunityMainPage.subtitle").split("\n")[1]}
         </h1>
       </div>
 
@@ -76,11 +76,12 @@ function SearchHeroSection({
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>)}
+              viewBox="0 0 24 24"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+          )}
         </button>
       </div>
     </div>

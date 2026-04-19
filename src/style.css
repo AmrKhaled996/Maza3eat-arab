@@ -55,13 +55,16 @@ html[dir="ltr"] {
   font-family: "Noto Kufi Arabic", sans-serif;
   user-select: none;
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 .scrollSlider {
   display: flex;
   width: max-content;
 }
-.stopScroll {
-  animation-play-state: paused !important;
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 .navApperance {
   animation: navApperance 0.5s ease-in-out;
@@ -86,11 +89,11 @@ html[dir="ltr"] {
 }
 
 html[dir="rtl"] .scrollSlider {
-  animation: scroll-rtl 30s linear infinite;
+  animation: scroll-rtl 10s linear infinite;
 }
 
 html[dir="ltr"] .scrollSlider {
-  animation: scroll-ltr 30s linear infinite;
+  animation: scroll-ltr 10s linear infinite;
 }
 @keyframes navApperance {
   0% {

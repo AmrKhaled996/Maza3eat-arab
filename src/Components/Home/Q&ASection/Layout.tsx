@@ -25,7 +25,7 @@ function HomeQandALayout({ children }: PropsWithChildren) {
           <button
             type="button"
             onClick={() => navigate(localizedPath(lang, "create-q&a"))}
-            className="flex items-center  bg-linear-to-r from-secondary to-accent gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-md hover:shadow-lg hover:opacity-90 transition-all whitespace-nowrap"
+            className="flex items-center  bg-linear-to-r from-secondary to-accent gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:cursor-pointer shadow-md hover:shadow-lg hover:opacity-90 transition-all whitespace-nowrap"
           >
             <CircleQuestionMarkIcon
               className="bg-white rounded-full p-0 m-0 text-accent"

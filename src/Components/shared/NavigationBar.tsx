@@ -57,7 +57,7 @@ function NavigationBar({
 
   const goLocale = (next: SupportedLocale) => {
     const nextPath = pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);
-    navigate(`${nextPath}${search}${hash}`);
+    navigate(`${nextPath}${search}${hash}`, { flushSync: true });
     setMenuOpen(false);
     setProfileOpen(false);
   };
@@ -86,16 +86,19 @@ function NavigationBar({
     }
 
     setSearchParams(params);
+    window.location.reload();
   };
   useEffect(() => {
     setsearchval(searchP);
   }, [searchP]);
 
   useEffect(() => {
+    const maxPageHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
     const handleScroll = () => {
       if (
         window.scrollY > 650 &&
-        window.scrollY < 2990 &&
+        maxPageHeight >= window.scrollY &&
         page &&
         page === "home"
       ) {
@@ -154,7 +157,9 @@ function NavigationBar({
           </Link>
         </div>
 
-        <div className={`hidden sm:flex lg:gap-8 items-center gap-4 group`}>
+        <div
+          className={`hidden sm:flex lg:gap-8 items-center gap-4 group mx-2`}
+        >
           <Link
             to={localizedPath(lang, "featured")}
             className={cn(
@@ -207,8 +212,10 @@ function NavigationBar({
                 lang === "ar"
                   ? "bg-primary text-white"
                   : effectiveScrolled
-                     ? "text-gray-600 hover:bg-gray-100"
-                    :page === "home" ? "text-white hover:bg-white/20":"text-slate-800 hover:bg-white/20",
+                    ? "text-gray-600 hover:bg-gray-100"
+                    : page === "home"
+                      ? "text-white hover:bg-white/20"
+                      : "text-slate-800 hover:bg-white/20",
               )}
             >
               {t("lang.shortAr")}
@@ -220,32 +227,35 @@ function NavigationBar({
                 "rounded-full px-3 py-1 transition-colors",
                 lang === "en"
                   ? "bg-primary text-white"
-                  : effectiveScrolled 
+                  : effectiveScrolled
                     ? "text-gray-600 hover:bg-gray-100"
-                    :page === "home" ? "text-white hover:bg-white/20":"text-slate-800 hover:bg-white/20",
+                    : page === "home"
+                      ? "text-white hover:bg-white/20"
+                      : "text-slate-800 hover:bg-white/20",
               )}
             >
               {t("lang.shortEn")}
             </button>
           </div>
-          {(scrolled && (page === "community" || page === "q&a" || page === "featured")) && (
-            <button
-              onClick={() => setsearchBar(!searchBar)}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="black"
-                strokeWidth="2.5"
-                viewBox="0 0 24 24"
+          {scrolled &&
+            (page === "community" || page === "q&a" || page === "featured") && (
+              <button
+                onClick={() => setsearchBar(!searchBar)}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow hover:cursor-pointer"
               >
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-            </button>
-          )}
+                <svg
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="black"
+                  strokeWidth="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+              </button>
+            )}
           {searchBar && scrolled && (
             <div className="hidden md:flex absolute top-18 left-1/2 transform -translate-x-1/2 w-full max-w-lg bg-white rounded-full p-1 text-sm text-gray-700 placeholder-gray-400 shadow-md">
               <input
@@ -286,8 +296,8 @@ function NavigationBar({
                 <button
                   type="button"
                   onClick={() => setProfileOpen((o) => !o)}
-                  className="rounded-full ring-2 ring-white shadow outline-2 outline-offset-0 transition-opacity hover:opacity-90"
-                  style={{ outlineColor: getTierColor(user.tier) }}
+                  className="rounded-full   shadow outline-2 outline-offset-0 transition-opacity hover:opacity-90 hover:cursor-pointer"
+                  style={{ outlineColor: user.tier.badgeColor }}
                   aria-expanded={profileOpen}
                   aria-haspopup="true"
                 >
@@ -328,11 +338,11 @@ function NavigationBar({
             ) : (
               <Link
                 to={localizedPath(lang, "login")}
-                className={`text-sm font-semibold px-4 py-2 rounded-full transition-colors ${
+                className={`text-xs lg:text-sm font-semibold px-4 py-2 rounded-full transition-colors line-clamp-1 max-h-fit  ${
                   effectiveScrolled
-                    ? "text-primary border border-primary hover:bg-primary/5"
+                    ? "text-white border  hover:opacity-80 bg-linear-to-r from-secondary    to-accent"
                     : page === "home"
-                      ? "text-white border border-white/50 hover:bg-white/10"
+                      ? "text-white border border-white/50 hover:bg-white/10 "
                       : "text-primary border border-primary hover:bg-primary/5"
                 }`}
               >
@@ -342,7 +352,7 @@ function NavigationBar({
           </div>
 
           {isAuthenticated && user && user.tier && (
-            <Badge tier={user.tier.charAt(0).toUpperCase() + user.tier.slice(1)} color={getTierColor(user.tier)} />
+            <Badge tier={user.tier.name} color={user.tier.badgeColor} />
           )}
         </div>
 
@@ -440,36 +450,80 @@ function NavigationBar({
           >
             {t("nav.about")}
           </Link>
-          {(scrolled && (page === "community" || page === "q&a" || page === "featured")) && (
-            <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">
-              <input
-                type="text"
-                value={searchval}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearch();
-                }}
-                onChange={(e) => setsearchval(e.target.value)}
-                placeholder="ماذا تريد أن ترى؟"
-                className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
-              />
-            </div>
-          )}
+          {scrolled &&
+            (page === "community" || page === "q&a" || page === "featured") && (
+              <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">
+                <input
+                  type="text"
+                  value={searchval}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
+                  onChange={(e) => setsearchval(e.target.value)}
+                  placeholder="ماذا تريد أن ترى؟"
+                  className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+                />
+              </div>
+            )}
 
-          <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-            <img
-              src="https://i.pravatar.cc/40?img=12"
-              alt="User"
-              className="w-8 h-8 rounded-full"
-            />
-            <span
-              className="text-xs font-bold px-3 py-1 rounded-full text-white"
-              style={{
-                background: "linear-gradient(135deg, #d97706, #f59e0b)",
-              }}
+          {isAuthenticated && user ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setProfileOpen((o) => !o)}
+                className="flex items-center justify-between transition-opacity hover:opacity-90 hover:cursor-pointer"
+                
+                aria-expanded={profileOpen}
+                aria-haspopup="true"
+              >
+                <img
+                  src={user.avatar || "https://i.pravatar.cc/40?img=12"}
+                  alt={user.name}
+                  className="h-12 w-12 rounded-full object-cover  mx-6 my-2  shadow outline-2 outline-offset-0"
+                  style={{ outlineColor: user.tier.badgeColor }}
+                />
+                
+              {isAuthenticated && user && user.tier && (
+            <Badge tier={user.tier.name} color={user.tier.badgeColor} />
+          )}
+              </button>
+              {profileOpen && (
+                <div
+                  className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                  role="menu"
+                >
+                  <Link
+                    to={localizedPath(lang, "create-post")}
+                    role="menuitem"
+                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    {t("createPost.menuCreatePost")}
+                  </Link>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50"
+                    onClick={async () => {
+                      setProfileOpen(false);
+                      await logout();
+                      navigate(localizedPath(lang, "login"));
+                    }}
+                  >
+                    {t("login.logout")}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <Link
+              to={localizedPath(lang, "login")}
+              className={`text-sm lg:text-lg font-semibold w-fit m-auto px-8 py-2 rounded-full transition-colors line-clamp-1 max-h-fit  text-white border  hover:opacity-80 bg-linear-to-r from-secondary  to-accent  to-accenttext-white  border-white/50 hover:bg-white/10 `}
             >
-              Gold
-            </span>
-          </div>
+              
+              {t("login.signInSignUp")}
+            </Link>
+          )}
         </div>
       )}
     </>

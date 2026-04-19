@@ -34,6 +34,7 @@ function SearchHeroSection({
     }
     setSearchLoading(true);
     setSearchParams(params);
+    window.location.reload();
   };
 
   useEffect(() => {

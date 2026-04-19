@@ -16,8 +16,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
-import { FormatPublishDate } from "../../../utils/DateFormater";
-import { useEffect } from "react";
+// import { FormatPublishDate } from "../../../utils/DateFormater";
+// import { useEffect } from "react";
 
 export function QuestionCard({ question }: { question: Question }) {
   const { t } = useTranslation("common");
@@ -25,9 +25,9 @@ export function QuestionCard({ question }: { question: Question }) {
   const { lang } = useLocale();
   const answerCount = question?.answersCount ?? 0;
 
-  useEffect(() => {
-    console.log("QuestionCard rendered with question:", question);
-  }, [question]);
+  // useEffect(() => {
+  //   console.log("QuestionCard rendered with question:", question);
+  // }, [question]);
 
   return (
     <div
@@ -36,7 +36,12 @@ export function QuestionCard({ question }: { question: Question }) {
     >
       <div className="p-5">
         {/* Author row */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div 
+        onClick={(e) => {
+            e.preventDefault();
+            navigate(localizedPath(lang, `profile/${question.author.id}`));
+          }}
+        className="flex flex-wrap items-center gap-2 mb-3">
           <img
             src={question?.author?.avatar}
             alt={question?.author?.name}
@@ -58,7 +63,7 @@ export function QuestionCard({ question }: { question: Question }) {
         <h3 className="text-base font-extrabold text-gray-900 mb-2 leading-snug">
           {question?.title}
         </h3>
-        <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-3">
+        <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-2 max-h-fit">
           {question?.content}
         </p>
 

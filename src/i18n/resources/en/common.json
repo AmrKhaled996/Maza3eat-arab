@@ -133,7 +133,7 @@
   "QandAMainPage": {
     "meta": "Q&A - Maza3eat Arab",
     "title": "Q&A",
-    "subtitle": "Got Travel Questions? \n We’ve Got Answers.",
+    "subtitle": "Got Travel Questions? \n We’ve Got Answers",
     "forumTitle": "Forum",
     "forumSubtitle": "Get answers from experienced travelers",
     "sortBy": "Sort by",
@@ -152,7 +152,8 @@
     "sortBy": "Sort by",
     "popular": "Most Popular",
     "latest": "Latest",
-    "searchPlaceholder": "Search for experiences..."
+    "searchPlaceholder": "Search for experiences...",
+    "morePost": "Read full post"
 
   },
   "login": {

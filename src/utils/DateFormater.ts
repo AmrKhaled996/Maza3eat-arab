@@ -1,3 +1,5 @@
+import { useLocale } from "../i18n/useLocale";
+
 interface DateTimeResult {
   date: string;
   time: string;
@@ -92,27 +94,48 @@ export const extractDateParts = (dateInput: string): object => {
  * console.log(result); // "1 Jan 2022"
  */
 export const FormatPublishDate = (dateInput: Date): string => {
+  const { lang } = useLocale();
   const formatedDate = extractDateTime(dateInput.toString()).date as string; // "2022-01-01"
   const dateObj: Date = new Date(formatedDate);
 
   const day: number = dateObj.getDate(); // Day number
-  const monthNames: string[] = [
-    "يناير",
-    "فبراير",
-    "مارس",
-    "ابريل",
-    "مايو",
-    "يونيو",
-    "يوليو",
-    "اغسطس",
-    "سيبتمبر",
-    "اكتوبر",
-    "نوفمبر",
-    "ديسمبر",
-  ];
+  if (lang == "en") {
+    const monthNames: string[] = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const month: string = monthNames[dateObj.getMonth()]; // Month short name
+    const year: number = dateObj.getFullYear(); // Year number
 
-  const month: string = monthNames[dateObj.getMonth()]; // Month short name
-  const year: number = dateObj.getFullYear(); // Year number
+    return `${day} ${month} ${year}`; // 1 Jan 2022
+  } else {
+    const monthNames: string[] = [
+      "يناير",
+      "فبراير",
+      "مارس",
+      "ابريل",
+      "مايو",
+      "يونيو",
+      "يوليو",
+      "اغسطس",
+      "سيبتمبر",
+      "اكتوبر",
+      "نوفمبر",
+      "ديسمبر",
+    ];
+    const month: string = monthNames[dateObj.getMonth()]; // Month short name
+    const year: number = dateObj.getFullYear(); // Year number
 
-  return `${day} ${month} ${year}`; // 1 Jan 2022
+    return `${day} ${month} ${year}`; // 1 Jan 2022
+  }
 };

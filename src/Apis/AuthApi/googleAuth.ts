@@ -22,7 +22,11 @@ export interface AuthUser {
   email: string;
   avatar: string;
   role: string;
-  tier: "copper" | "silver" | "gold" | null;
+  tier: {
+  name: string;
+  description: string;
+  badgeColor: string;
+  }
 }
 
 export async function getMe(): Promise<AuthUser> {

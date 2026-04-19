@@ -8,7 +8,8 @@ function FeaturedBadge() {
             <Star fill='white' size={14}/>مميز 
           </span>
         </button>
-      </div>  );
+      </div> 
+       );
 }
 
 export default FeaturedBadge;

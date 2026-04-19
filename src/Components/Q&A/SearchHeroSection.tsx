@@ -14,7 +14,6 @@ function SearchHeroSection({
   searchLoading: boolean;
   setSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const navigate = useNavigate();
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,6 +34,7 @@ function SearchHeroSection({
     }
     setSearchLoading(true);
     setSearchParams(params);
+    window.location.reload();
   };
 
   useEffect(() => {

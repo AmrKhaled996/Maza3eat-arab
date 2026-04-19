@@ -8,6 +8,7 @@ import BounceLoading from "../../Components/shared/BounceLoading";
 import { useQuestionsSearch } from "../../Hooks/Q&AHooks/useQuestionSearch";
 import { QuestionCard } from "../../Components/Q&A/QuestionCard";
 import QandAPopularQuestion from "../../Components/shared/PopularQuestion";
+import QuestionCardSkeleton from "../../Components/Q&A/QuestionCardSkeleton";
 
 function QandAMainPage() {
   const [sortBy, setSortBy] = useState("latest");
@@ -83,15 +84,16 @@ function QandAMainPage() {
           {QuestionsData.map((q: Question) => (
             <QuestionCard key={q.id} question={q} />
           ))}
-          {/* {(isLoading || isFetchingNextPage) && (
+          {(isLoading || isFetchingNextPage) && (
           <div className="flex flex-col gap-5">
-            <Questionskeleton />
-            <Questionskeleton />
-            <Questionskeleton />
+            <QuestionCardSkeleton />
+            <QuestionCardSkeleton />
+            <QuestionCardSkeleton />
+
 
             <BounceLoading />
             </div>
-        )} */}
+        )}
           <div ref={lastPost} />
         </div>
         <QandAPopularQuestion limit={10} />

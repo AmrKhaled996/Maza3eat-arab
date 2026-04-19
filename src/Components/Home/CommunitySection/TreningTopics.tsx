@@ -2,14 +2,20 @@ import { useTranslation } from "react-i18next";
 import useHomeTrendingPosts from "../../../Hooks/HomeHooks/useHomeTrending";
 import type { Tag } from "../../../Types/Tag";
 import { t } from "i18next";
+import { useNavigate } from "react-router-dom";
+import { useLocale } from "../../../i18n/useLocale";
+import { localizedPath } from "../../../i18n/paths";
 
 function PostTrendingTopicsSection({ limit }: { limit?: number }) {
+  const navigate = useNavigate(); 
+  const { t } = useTranslation();
+  const {lang} =useLocale(); 
   const {
     data: trendingTopics,
     isLoading: trendingTopicsLoading,
     error: trendingTopicsError,
-  } = useHomeTrendingPosts();
-  console.log(trendingTopics, "topics");
+  } = useHomeTrendingPosts(3);
+
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md">
       <h3 className="font-bold text-gray-900 mb-4 text-base">
@@ -20,7 +26,7 @@ function PostTrendingTopicsSection({ limit }: { limit?: number }) {
           {trendingTopics.map((tag: Tag) => (
             <div
               key={tag.name}
-              onClick={() => {}}
+              onClick={() => {navigate(localizedPath(lang, "community?search=" + tag.name))}}
               className="flex items-center justify-between cursor-pointer group p-4 bg-slate-100 rounded-2xl hover:bg-slate-200/80 transition-colors duration-300"
             >
               <span className="text-sm font-semibold transition-colors">

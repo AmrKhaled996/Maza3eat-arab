@@ -51,7 +51,7 @@ function HomeFeatuerdPostsCard(props: Post) {
         <h3 className="text-base font-bold text-gray-900 mb-1 leading-snug">
           {post.title}
         </h3>
-        <p className="text-xs text-gray-500 mb-3 line-clamp-1 flex-1">
+        <p className="text-xs text-gray-500 mb-3 line-clamp-1 flex-1 max-h-fit ">
           {post?.content}
         </p>
         <div className="flex items-center gap-4 text-xs ">

@@ -5,9 +5,10 @@ import type { Question } from "../../../Types/Question";
 import useHomeQuestions from "../../../Hooks/HomeHooks/useHomeQuestion";
 import QandAPopularQuestion from "../../shared/PopularQuestion";
 import HomeQandAPostsSectionMoreButton from "./MoreButton";
+import QuestionCardSkeleton from "../../Q&A/QuestionCardSkeleton";
 
 export default function QAForum() {
-  const { data: questions } = useHomeQuestions();
+  const { data: questions , isLoading } = useHomeQuestions();
 
   return (
     <HomeQandALayout>
@@ -18,6 +19,8 @@ export default function QAForum() {
           {questions?.map((q: Question) => (
             <QuestionCard key={q.id} question={q} />
           ))}
+           {isLoading && Array.from({ length: 2 }).map((_, index) => <QuestionCardSkeleton key={index} />)} 
+           
         </div>
 
         {/* Sidebar */}

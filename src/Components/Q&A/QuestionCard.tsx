@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
+import { localizedPath } from "../../i18n/paths";
+import cn from "../../utils/Cn";
 
 export function QuestionCard({ question }: { question: Question }) {
   const navigate = useNavigate();
@@ -25,12 +27,19 @@ export function QuestionCard({ question }: { question: Question }) {
 
   return (
     <div
-      onClick={() => navigate(`/q&a/${question.id}`)}
+      onClick={() => navigate(localizedPath(lang, `q&a/${question.id}`))}
       className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 overflow-hidden pb-2 hover:cursor-pointer"
     >
       <div className="p-5">
         {/* Author row */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(localizedPath(lang, `profile/${question.author.id}`));
+          }}
+          className="flex flex-wrap items-center gap-2 mb-3"
+        >
           <img
             src={question?.author?.avatar}
             alt={question?.author?.name}
@@ -45,8 +54,15 @@ export function QuestionCard({ question }: { question: Question }) {
             tier={question?.author?.tierName}
           />
           <ContactButton />
-          <span className="ml-auto text-xs text-gray-400 whitespace-nowrap">
-            {FormatPublishDate(question?.publishDate)}
+          <span
+            className={cn(
+              ` text-xs text-gray-400`,
+              lang === "ar" ? "mr-auto ml-2" : "ml-auto mr-2",
+            )}
+          >
+            {question?.publishDate
+              ? FormatPublishDate(question.publishDate)
+              : ""}
           </span>
         </div>
 
@@ -73,7 +89,9 @@ export function QuestionCard({ question }: { question: Question }) {
           </button>
           <span className="flex items-center gap-1.5">
             <MessageCircle size={16} color="#4B5563" />
-            <span className="font-medium">{t("home.answerCount", { count: answerCount })}</span>
+            <span className="font-medium">
+              {t("home.answerCount", { count: answerCount })}
+            </span>
           </span>
         </div>
       </div>
@@ -139,7 +157,8 @@ export function QuestionCard({ question }: { question: Question }) {
         </div> */}
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" />{t("home.viewAnswers", { count: answerCount })}
+          <ArrowRight className="w-4 h-4" />
+          {t("home.viewAnswers", { count: answerCount })}
         </button>
       </div>
     </div>
