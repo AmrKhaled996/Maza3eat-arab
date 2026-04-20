@@ -8,13 +8,10 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
-  Bold,
   Camera,
   ChevronLeft,
   ChevronRight,
   FilePlus2,
-  Italic,
-  List,
   Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -27,52 +24,40 @@ import {
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 const MAX_IMAGES = 6;
 
 type PreviewItem = { file: File; url: string };
 
-function wrapSelection(
-  el: HTMLTextAreaElement,
-  before: string,
-  after: string,
-) {
-  const start = el.selectionStart;
-  const end = el.selectionEnd;
-  const value = el.value;
-  const selected = value.slice(start, end);
-  const next = `${value.slice(0, start)}${before}${selected}${after}${value.slice(end)}`;
-  el.value = next;
-  el.focus();
-  el.setSelectionRange(
-    start + before.length,
-    start + before.length + selected.length,
-  );
-  if (!selected) {
-    el.setSelectionRange(start + before.length, start + before.length);
-  }
-}
+const modules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ direction: "rtl" }, { align: [] }],
+    ["link", "clean"],
+  ],
+};
 
-function prefixLines(el: HTMLTextAreaElement, prefix: string) {
-  const start = el.selectionStart;
-  const end = el.selectionEnd;
-  const value = el.value;
-  const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-  const block = value.slice(lineStart, end);
-  const lines = block.split("\n");
-  const nextBlock = lines.map((l) => `${prefix}${l}`).join("\n");
-  const next = `${value.slice(0, lineStart)}${nextBlock}${value.slice(end)}`;
-  el.value = next;
-  el.focus();
-  el.setSelectionRange(lineStart, lineStart + nextBlock.length);
-}
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "list",
+  "link",
+  "direction",
+  "align",
+];
 
 export default function CreatePostPage() {
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const navigate = useNavigate();
   const fileInputId = useId();
-  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -141,18 +126,17 @@ export default function CreatePostPage() {
       setError(t("createPost.errorMinImages"));
       return;
     }
-    if (!title.trim() || !content.trim()) {
+    const cleanContent = content.trim();
+    if (!title.trim() || !cleanContent || cleanContent === "<p><br></p>") {
       setError(t("createPost.errorRequired"));
       return;
     }
 
     const formData = new FormData();
     formData.append("title", title.trim());
-    formData.append("content", content);
-    // Append each tag individually for multipart/form-data format
-    tags.forEach((tag) => {
-      formData.append("tags", tag);
-    });
+    formData.append("content", cleanContent);
+    // Send tags as JSON array
+    formData.append("tags", JSON.stringify(tags));
     previews.forEach((p) => formData.append(POST_IMAGE_FIELD, p.file));
 
     setSubmitting(true);
@@ -299,57 +283,18 @@ export default function CreatePostPage() {
             />
           </div>
 
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <label className="text-sm font-bold text-gray-800">
-                {t("createPost.contentLabel")}
-              </label>
-              <div className="flex gap-1 rounded-lg border border-gray-200 bg-gray-50 p-0.5">
-                <button
-                  type="button"
-                  className="rounded p-1.5 text-gray-600 hover:bg-white"
-                  onClick={() => {
-                    const el = contentRef.current;
-                    if (el) wrapSelection(el, "**", "**");
-                    setContent(contentRef.current?.value ?? content);
-                  }}
-                  aria-label="Bold"
-                >
-                  <Bold className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  className="rounded p-1.5 text-gray-600 hover:bg-white"
-                  onClick={() => {
-                    const el = contentRef.current;
-                    if (el) wrapSelection(el, "_", "_");
-                    setContent(contentRef.current?.value ?? content);
-                  }}
-                  aria-label="Italic"
-                >
-                  <Italic className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  className="rounded p-1.5 text-gray-600 hover:bg-white"
-                  onClick={() => {
-                    const el = contentRef.current;
-                    if (el) prefixLines(el, "- ");
-                    setContent(contentRef.current?.value ?? content);
-                  }}
-                  aria-label="List"
-                >
-                  <List className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <textarea
-              ref={contentRef}
+          <div className="quill-container">
+            <label className="mb-2 block text-sm font-bold text-gray-800">
+              {t("createPost.contentLabel")}
+            </label>
+            <ReactQuill
+              theme="snow"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={10}
+              onChange={setContent}
+              modules={modules}
+              formats={formats}
               placeholder={t("createPost.contentPlaceholder")}
-              className="w-full resize-y rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="rounded-xl bg-white"
             />
           </div>
 
