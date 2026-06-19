@@ -40,10 +40,10 @@ function Footer() {
       </video>
       <footer className="absolute object-cover bottom-0 z-20 w-full  text-gray-200 px-8 py-8">
         <div className="bg-transparent text-slate-800 py-6 text-center z-10  h-full p-auto w-full my-30 md:my-20 flex flex-col items-center justify-center">
-          <p className="text-5xl text-white font-bold">
+          <p className="footer-tagline text-white font-bold text-safe">
             {t("footer.taglineTitle")}
           </p>
-          <p className="text-2xl text-white/80 mt-8">
+          <p className="text-lg sm:text-xl md:text-2xl text-white/80 mt-8 text-safe">
             {t("footer.taglineSubtitle")}
           </p>
         </div>

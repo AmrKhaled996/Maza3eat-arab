@@ -45,17 +45,61 @@
 
 html[dir="rtl"] {
   direction: rtl;
+  font-size: 16px;
 }
 
 html[dir="ltr"] {
   direction: ltr;
+  /* Latin glyphs in Noto Kufi Arabic are visually taller than Arabic glyphs
+     at the same CSS size. Scale down the base so English text doesn't overflow
+     containers designed for Arabic. */
+  font-size: 14.5px;
 }
+
 * {
   direction: inherit;
   font-family: "Noto Kufi Arabic", sans-serif;
   user-select: none;
   box-sizing: border-box;
   scroll-behavior: smooth;
+}
+
+/* ── Fluid typography helpers ────────────────────────────── */
+.text-fluid-hero {
+  font-size: clamp(1.75rem, 4vw + 0.5rem, 3.75rem);
+}
+.text-fluid-section {
+  font-size: clamp(1.25rem, 2.5vw + 0.25rem, 2rem);
+}
+.text-fluid-card-title {
+  font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.25rem);
+}
+.text-fluid-body {
+  font-size: clamp(0.8rem, 1vw + 0.25rem, 1rem);
+}
+
+/* ── Overflow safety ─────────────────────────────────────── */
+.text-safe {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* ── LTR-specific text scale adjustments for components ── */
+html[dir="ltr"] .nav-link-text {
+  font-size: 0.85rem;
+}
+html[dir="ltr"] .hero-cta-text {
+  font-size: 0.95em;
+}
+html[dir="ltr"] .text-fluid-hero {
+  font-size: clamp(1.5rem, 3.5vw + 0.5rem, 2.75rem);
+}
+html[dir="ltr"] .footer-tagline {
+  font-size: clamp(1.5rem, 3vw + 0.5rem, 3rem);
+}
+html[dir="rtl"] .footer-tagline {
+  font-size: clamp(1.75rem, 3.5vw + 0.5rem, 3.25rem);
 }
 .scrollSlider {
   display: flex;

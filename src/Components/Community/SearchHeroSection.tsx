@@ -44,7 +44,7 @@ function SearchHeroSection({
     <div className="h-[70vh] flex flex-col items-center justify-center ">
       {/* Hero heading */}
       <div className="text-center mb-10 ">
-        <h1 className="text-4xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">
+        <h1 className="text-fluid-hero font-extrabold text-gray-900 leading-tight mb-3 text-safe">
           {t("CommunityMainPage.subtitle").split("\n")[0]}
           <br />
           {t("CommunityMainPage.subtitle").split("\n")[1]}

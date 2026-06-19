@@ -12,11 +12,11 @@ export default function StoryMissionVision() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="text-primary" size={24} />
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+            <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
               {t("about.ourStoryTitle")}
             </h2>
           </div>
-          <p className="text-gray-600 leading-relaxed text-[15px]">
+          <p className="text-gray-600 leading-relaxed text-[15px] text-safe">
             {t("about.ourStoryText")}
           </p>
         </div>
@@ -25,11 +25,11 @@ export default function StoryMissionVision() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Target className="text-secondary" size={24} />
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+            <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
               {t("about.ourMissionTitle")}
             </h2>
           </div>
-          <p className="text-gray-600 leading-relaxed text-[15px] mb-4">
+          <p className="text-gray-600 leading-relaxed text-[15px] mb-4 text-safe">
             {t("about.ourMissionText")}
           </p>
           <ul className="space-y-2">
@@ -52,7 +52,7 @@ export default function StoryMissionVision() {
             key={n}
             className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm hover:shadow-md transition-shadow"
           >
-            <p className="text-3xl md:text-4xl font-black gradient-text">
+            <p className="text-2xl md:text-3xl font-black gradient-text text-safe">
               {t(`about.stat${n}Value`)}
             </p>
             <p className="text-gray-500 text-sm mt-1 font-medium">
@@ -66,11 +66,11 @@ export default function StoryMissionVision() {
       <div className="max-w-3xl mx-auto text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Eye className="text-accent" size={24} />
-          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+          <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
             {t("about.ourVisionTitle")}
           </h2>
         </div>
-        <p className="text-gray-600 leading-relaxed text-[15px]">
+        <p className="text-gray-600 leading-relaxed text-[15px] text-safe">
           {t("about.ourVisionText")}
         </p>
       </div>

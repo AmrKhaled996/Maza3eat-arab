@@ -16,7 +16,7 @@ function SectionHeader({
   return (
     <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5">
       <div>
-        <h2 className="text-3xl font-extrabold text-gray-900">
+        <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
           {t("CommunityMainPage.communityTitle")}
         </h2>
         <p className="text-sm text-gray-500 mt-2">

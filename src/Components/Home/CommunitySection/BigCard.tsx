@@ -48,10 +48,10 @@ function HomeCommunitySectionBigCard(props: Post) {
             color={post?.author?.badgeColor}
           />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2 leading-snug">
+        <h2 className="text-fluid-card-title font-bold text-gray-900 mb-2 leading-snug line-clamp-2 text-safe">
           {post?.title}
         </h2>
-        <p className="text-sm text-gray-500 max line-clamp-2 leading-relaxed mb-4">
+        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4 text-safe">
           {post?.content}
         </p>
         <div className="flex items-center gap-4 text-sm text-gray-500">

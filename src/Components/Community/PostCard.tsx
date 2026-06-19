@@ -30,7 +30,7 @@ function PostCard({ post }: { post: Post }) {
   return (
     <div
       onClick={() => navigate(localizedPath(lang, `post/${post.id}`))}
-      className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col sm:flex-row gap-0 md:min-h-80 md:max-h-80 hover:cursor-pointer group "
+      className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col sm:flex-row gap-0 md:min-h-80 md:max-h-80 hover:cursor-pointer group"
     >
       {/* Image */}
       <div className="relative sm:w-52 md:w-80 shrink-0 overflow-hidden group-hover:scale-103 transition-transform duration-700 ease-in-out">
@@ -78,7 +78,7 @@ function PostCard({ post }: { post: Post }) {
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-extrabold text-gray-900 mb-2 leading-snug">
+        <h3 className="text-base sm:text-lg font-extrabold text-gray-900 mb-2 leading-snug line-clamp-2 text-safe">
           {post.title}
         </h3>
 
@@ -89,7 +89,7 @@ function PostCard({ post }: { post: Post }) {
           ))}
         </div>
 
-        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 overflow-hidden my-4  px-2">
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 overflow-hidden my-4 px-2 text-safe">
           {stripHtml(post.content || "")}
         </p>
 

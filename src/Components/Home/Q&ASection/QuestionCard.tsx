@@ -60,10 +60,10 @@ export function QuestionCard({ question }: { question: Question }) {
         </div>
 
         {/* Question */}
-        <h3 className="text-base font-extrabold text-gray-900 mb-2 leading-snug">
+        <h3 className="text-base font-extrabold text-gray-900 mb-2 leading-snug line-clamp-2 text-safe">
           {question?.title}
         </h3>
-        <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-2 max-h-fit">
+        <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-2 max-h-fit text-safe">
           {question?.content}
         </p>
 

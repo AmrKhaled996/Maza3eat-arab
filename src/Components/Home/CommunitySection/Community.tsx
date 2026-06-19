@@ -18,7 +18,7 @@ function CommunitySection() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left — Featured + small cards */}
         <div className="md:col-span-2 flex flex-col gap-6">
-          {posts && <HomeCommunitySectionBigCard {...posts[0]} />}
+          {posts && posts.length > 0 && <HomeCommunitySectionBigCard {...posts[0]} />}
           {isLoading && <HomeCommunitySectionBigCardSkeleton />}
         </div>
 

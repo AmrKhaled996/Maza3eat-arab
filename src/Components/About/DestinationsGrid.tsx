@@ -50,7 +50,7 @@ export default function DestinationsGrid() {
               <span className="flex items-center gap-1 text-white/80 text-xs mb-1">
                 <MapPin size={12} /> {d.location}
               </span>
-              <h3 className="text-white font-bold text-lg drop-shadow">
+              <h3 className="text-white font-bold text-base sm:text-lg drop-shadow text-safe">
                 {t(`about.${d.key}`)}
               </h3>
             </div>

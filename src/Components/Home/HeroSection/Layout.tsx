@@ -32,12 +32,12 @@ function HeroSectionLayout() {
 
         {/* Content */}
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto flex flex-col items-center gap-6">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight drop-shadow-lg">
+          <h1 className="text-fluid-hero font-black text-white leading-tight drop-shadow-lg text-safe">
             {t("hero.titleLine1")} <br />
-            <span className="whitespace-nowrap">{t("hero.titleLine2")}</span>
+            <span>{t("hero.titleLine2")}</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/85 max-w-xl leading-relaxed drop-shadow">
+          <p className="text-fluid-body text-white/85 max-w-xl leading-relaxed drop-shadow text-safe">
             {t("hero.subtitle")}
           </p>
 
@@ -47,7 +47,7 @@ function HeroSectionLayout() {
               onClick={() => navigate(localizedPath(lang, "community"))}
               className="flex items-center gap-2.5 bg-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-full shadow-lg  hover:shadow-xl hover:scale-105 transition-all duration-300 hover:cursor-pointer"
             >
-              <span className="text-lg gradient-text flex gap-1 items-end">
+              <span className="text-base sm:text-lg gradient-text flex gap-1 items-end hero-cta-text">
                 <CompassIcon className="text-secondary" /> {t("hero.ctaCommunity")}{" "}
               </span>
             </button>

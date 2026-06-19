@@ -17,11 +17,11 @@ export default function FAQSection() {
       <div className="text-center mb-10">
         <div className="flex items-center justify-center gap-2 mb-2">
           <MessageCircleQuestion className="text-primary" size={28} />
-          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+          <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
             {t("about.faqTitle")}
           </h2>
         </div>
-        <p className="text-gray-500 text-[15px] max-w-lg mx-auto">
+        <p className="text-gray-500 text-[15px] max-w-lg mx-auto text-safe">
           {t("about.faqSubtitle")}
         </p>
       </div>
@@ -44,7 +44,7 @@ export default function FAQSection() {
                 onClick={() => toggle(n)}
                 className="flex w-full items-center justify-between gap-4 px-6 py-5 text-start"
               >
-                <span className="font-semibold text-gray-800 text-[15px]">
+                <span className="font-semibold text-gray-800 text-[15px] text-safe">
                   {t(`about.faq${n}Q`)}
                 </span>
                 <span
@@ -65,7 +65,7 @@ export default function FAQSection() {
                   isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0",
                 )}
               >
-                <p className="px-6 pb-5 text-gray-500 text-sm leading-relaxed">
+                <p className="px-6 pb-5 text-gray-500 text-sm leading-relaxed text-safe">
                   {t(`about.faq${n}A`)}
                 </p>
               </div>

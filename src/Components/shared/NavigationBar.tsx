@@ -151,7 +151,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "featured")}
             className={cn(
-              ` text-md font-semibold  group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
+              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
               handlePage("featured"),
             )}
           >
@@ -160,7 +160,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "community")}
             className={cn(
-              ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("community"),
             )}
           >
@@ -169,7 +169,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "q&a")}
             className={cn(
-              ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
             )}
           >
@@ -178,7 +178,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "about")}
             className={cn(
-              ` text-md font-semibold  group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("about"),
             )}
           >
