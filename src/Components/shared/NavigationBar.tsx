@@ -12,6 +12,7 @@ import { localizedPath } from "../../i18n/paths";
 import type { SupportedLocale } from "../../i18n/config";
 
 import { useAuth } from "../../Hooks/Auth";
+import { useNotifications } from "../../Hooks/useNotifications";
 import { Badge } from "./Tag";
 import cn from "../../utils/Cn";
 
@@ -29,21 +30,8 @@ function NavigationBar({
   const profileWrapRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, logout } = useAuth();
 
-  // Map tier to color
-  const getTierColor = (tier: string | null): string => {
-    switch (tier) {
-      case "gold":
-        return "#FFD700";
-      case "silver":
-        return "#C0C0C0";
-      case "copper":
-        return "#B87333";
-      default:
-        return "#6B7280"; // gray for no tier
-    }
-  };
 
-  const [notifCount] = useState(3);
+  const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
@@ -270,25 +258,26 @@ function NavigationBar({
               />
             </div>
           )}
-          <button
+          <Link
+            to={localizedPath(lang, "notifications")}
             className={`relative ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
           >
             <svg
               width="24"
               height="24"
               fill="none"
-              stroke="black"
+              stroke="currentColor"
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            {notifCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute -top-1 -inset-e-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {notifCount}
+                {unreadCount}
               </span>
             )}
-          </button>
+          </Link>
 
           <div className="relative" ref={profileWrapRef}>
             {isAuthenticated && user ? (
@@ -445,11 +434,37 @@ function NavigationBar({
           </Link>
           <Link
             to={localizedPath(lang, "about")}
-            className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5 pb-3"
+            className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5"
             onClick={() => setMenuOpen(false)}
           >
             {t("nav.about")}
           </Link>
+          {isAuthenticated && (
+            <Link
+              to={localizedPath(lang, "notifications")}
+              className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors py-1.5 flex items-center justify-between pb-3"
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className="flex items-center gap-2">
+                <svg
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span>{lang === "ar" ? "الإشعارات" : "Notifications"}</span>
+              </span>
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
           {scrolled &&
             (page === "community" || page === "q&a" || page === "featured") && (
               <div className=" w-full p-2 mb-2 rounded-full  text-sm text-gray-700 placeholder-gray-400 ">

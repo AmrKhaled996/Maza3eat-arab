@@ -12,6 +12,8 @@ import ProfilePostPage from "../Pages/Profile/ProfilePostPage";
 import FeaturedMainPage from "../Pages/Community/FeaturedMainPage";
 import AboutPage from "../Pages/About/AboutPage";
 import NotFoundPage from "../Pages/Error/NotFoundPage";
+import NotificationsPage from "../Pages/Notifications/NotificationsPage";
+import NotificationDetailPage from "../Pages/Notifications/NotificationDetailPage";
 import LocaleShell from "./LocaleShell";
 import LegacyRedirect from "./LegacyRedirect";
 import ProtectedRoute from "./ProtectedRoute";
@@ -37,6 +39,8 @@ export default function MainRouter(): React.ReactElement {
               <Route path="create-q&a" element={<QndACreatePage />} />
               <Route path="profile/:id/posts" element={<ProfilePostPage />} />
               <Route path="profile/:id/q&a" element={<ProfileQandAPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="notifications/:id" element={<NotificationDetailPage />} />
             </Route>
             <Route path="q&a" element={<QandAMainPage />} />
             <Route path="q&a/:id" element={<QandAPage />} />
