@@ -11,6 +11,19 @@ import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
 
+function stripHtml(html: string) {
+  if (!html) return "";
+  let text = html.replace(/<[^>]*>/g, "");
+  text = text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  return text;
+}
+
 function PostCard({ post }: { post: Post }) {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
@@ -85,9 +98,8 @@ function PostCard({ post }: { post: Post }) {
           ))}
         </div>
 
-        {/* Body */}
         <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 overflow-hidden my-4  px-2">
-          {post.content}
+          {stripHtml(post.content || "")}
         </p>
 
         {/* Footer */}

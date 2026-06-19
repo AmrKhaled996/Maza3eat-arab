@@ -63,6 +63,9 @@
     "publishing": "جاري النشر…",
     "errorMinImages": "يلزم صورة واحدة على الأقل.",
     "errorRequired": "يرجى إدخال العنوان ونص المنشور.",
+    "errorMinTags": "يرجى إضافة وسم واحد على الأقل.",
+    "errorMaxTags": "يرجى إضافة 10 وسوم كحد أقصى.",
+    "errorTagLength": "يجب أن يكون طول كل وسم بين 3 و 30 حرفًا.",
     "menuCreatePost": "إنشاء منشور"
   },
   "footer": {
@@ -174,6 +177,34 @@
     "popular": "الأكثر شيوعاً",
     "latest": "الأحدث",
     "searchPlaceholder": "ابحث عن منشورات..."
+  },
+  "createQuestion": {
+    "back": "رجوع",
+    "titleLabel": "عنوان السؤال",
+    "titlePlaceholder": "مثال: ما هي أفضل الأنشطة العائلية في دبي خلال فصل الشتاء؟",
+    "titleHelp": "اجعل العنوان واضحاً وموجزاً حتى يفهم الآخرون سؤالك بسرعة.",
+    "contentLabel": "اشرح سؤالك",
+    "contentPlaceholder": "اكتب كل ما يتعلق بسؤالك هنا (التوقيت، الميزانية، عدد الأشخاص...)",
+    "tagsLabel": "وسوم سؤالك",
+    "tagPlaceholder": "اكتب وسماً ثم اضغط Enter",
+    "addTag": "+ إضافة وسم",
+    "removeTag": "إزالة الوسم",
+    "publish": "نشر السؤال",
+    "publishing": "جاري النشر...",
+    "errorRequired": "يرجى إدخال العنوان وتفاصيل السؤال.",
+    "errorMinTags": "يرجى إضافة وسم واحد على الأقل."
+  },
+  "QandAPage": {
+    "answersHeading": "{{count}} إجابة",
+    "answersHeading_one": "إجابة واحدة",
+    "answersHeading_other": "{{count}} إجابات",
+    "sortBy": "ترتيب حسب",
+    "mostLiked": "الأكثر إعجاباً",
+    "oldest": "الأقدم",
+    "newest": "الأحدث",
+    "writeAnswerPlaceholder": "اكتب إجابة...",
+    "postAnswerButton": "نشر",
+    "postingAnswerButton": "جاري النشر...",
+    "noAnswersFallback": "كن أول من يجيب على هذا السؤال!"
   }
-
 }

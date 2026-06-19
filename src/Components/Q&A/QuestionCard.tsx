@@ -19,6 +19,19 @@ import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
 
+function stripHtml(html: string) {
+  if (!html) return "";
+  let text = html.replace(/<[^>]*>/g, "");
+  text = text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  return text;
+}
+
 export function QuestionCard({ question }: { question: Question }) {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
@@ -71,7 +84,7 @@ export function QuestionCard({ question }: { question: Question }) {
           {question?.title}
         </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-3">
-          {question?.content}
+          {stripHtml(question?.content || "")}
         </p>
 
         {/* Tags */}

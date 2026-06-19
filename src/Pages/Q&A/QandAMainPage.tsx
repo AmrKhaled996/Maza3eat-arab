@@ -22,7 +22,6 @@ function QandAMainPage() {
   const {
     data,
     isLoading,
-    error,
     isFetchingNextPage,
     fetchNextPage,
     isFetching,

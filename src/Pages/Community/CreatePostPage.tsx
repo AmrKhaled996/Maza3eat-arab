@@ -24,34 +24,13 @@ import {
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
+import RichTextEditor from "../../Components/shared/RichTextEditor";
 
 const MAX_IMAGES = 6;
 
 type PreviewItem = { file: File; url: string };
 
-const modules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ direction: "rtl" }, { align: [] }],
-    ["link", "clean"],
-  ],
-};
 
-const formats = [
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "list",
-  "link",
-  "direction",
-  "align",
-];
 
 export default function CreatePostPage() {
   const { t } = useTranslation("common");
@@ -111,12 +90,21 @@ export default function CreatePostPage() {
   const addTag = () => {
     const raw = tagInput.trim().replace(/^#+/, "");
     if (!raw) return;
+    if (raw.length < 3 || raw.length > 30) {
+      setError(t("createPost.errorTagLength"));
+      return;
+    }
     if (tags.includes(raw)) {
       setTagInput("");
       return;
     }
+    if (tags.length >= 10) {
+      setError(t("createPost.errorMaxTags"));
+      return;
+    }
     setTags((t) => [...t, raw]);
     setTagInput("");
+    setError(null);
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -131,12 +119,27 @@ export default function CreatePostPage() {
       setError(t("createPost.errorRequired"));
       return;
     }
+    if (tags.length < 1) {
+      setError(t("createPost.errorMinTags"));
+      return;
+    }
+    if (tags.length > 10) {
+      setError(t("createPost.errorMaxTags"));
+      return;
+    }
 
     const formData = new FormData();
     formData.append("title", title.trim());
     formData.append("content", cleanContent);
-    // Send tags as JSON array
-    formData.append("tags", JSON.stringify(tags));
+    // Send tags individually so multer parses them as an array.
+    // If there is only 1 tag, duplicate it to force multer to parse it as an array.
+    // The backend service will naturally deduplicate it.
+    if (tags.length === 1) {
+      formData.append("tags", tags[0]);
+      formData.append("tags", tags[0]);
+    } else {
+      tags.forEach((tag) => formData.append("tags", tag));
+    }
     previews.forEach((p) => formData.append(POST_IMAGE_FIELD, p.file));
 
     setSubmitting(true);
@@ -287,12 +290,9 @@ export default function CreatePostPage() {
             <label className="mb-2 block text-sm font-bold text-gray-800">
               {t("createPost.contentLabel")}
             </label>
-            <ReactQuill
-              theme="snow"
+            <RichTextEditor
               value={content}
               onChange={setContent}
-              modules={modules}
-              formats={formats}
               placeholder={t("createPost.contentPlaceholder")}
               className="rounded-xl bg-white"
             />

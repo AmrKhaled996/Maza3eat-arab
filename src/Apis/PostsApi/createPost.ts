@@ -24,7 +24,13 @@ export async function createPost(formData: FormData) {
 }
 
 export function getCreatePostErrorMessage(error: unknown): string {
-  const ax = error as AxiosError<{ message?: string }>;
+  const ax = error as AxiosError<{ message?: string; errors?: Record<string, string> }>;
+  if (ax.response?.data?.errors) {
+    const errList = Object.entries(ax.response.data.errors)
+      .map(([field, msg]) => `${field}: ${msg}`)
+      .join(", ");
+    return `${ax.response.data.message || "Validation failed"}: ${errList}`;
+  }
   return (
     ax.response?.data?.message ||
     ax.message ||

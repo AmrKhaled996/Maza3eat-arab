@@ -76,8 +76,8 @@ export default function PostPage() {
             <PostContent post={post} hideTitle />
 
             {/* Interactions */}
-                      <PostInteractions post={post} />
-                        
+            <PostInteractions post={post} />
+
           </div>
 
           {/* Right Sidebar - Date (col-span-3) */}
@@ -91,9 +91,9 @@ export default function PostPage() {
                   </p>
                 </div>
               </div>
-                      )}
-                {/* Advertisement */}
-            <Advertisement />      
+            )}
+            {/* Advertisement */}
+            <Advertisement className="sticky top-40" />
           </div>
         </div>
       </div>

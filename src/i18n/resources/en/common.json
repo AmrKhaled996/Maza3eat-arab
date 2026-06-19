@@ -63,6 +63,9 @@
     "publishing": "Publishing…",
     "errorMinImages": "At least one image is required.",
     "errorRequired": "Please enter a title and the post body.",
+    "errorMinTags": "Please add at least one tag.",
+    "errorMaxTags": "Please add at most 10 tags.",
+    "errorTagLength": "Each tag must be between 3 and 30 characters.",
     "menuCreatePost": "Create post"
   },
   "footer": {
@@ -174,5 +177,34 @@
     "popular": "Most Popular",
     "latest": "Latest",
     "searchPlaceholder": "Search for posts..."
+  },
+  "createQuestion": {
+    "back": "Back",
+    "titleLabel": "Question Title",
+    "titlePlaceholder": "Example: What are the best family activities in Dubai during winter?",
+    "titleHelp": "Keep the title clear and concise so others can understand your question quickly.",
+    "contentLabel": "Explain your question",
+    "contentPlaceholder": "Write everything related to your question here (timing, budget, number of people...)",
+    "tagsLabel": "Tags your Question",
+    "tagPlaceholder": "Type a tag and press Enter",
+    "addTag": "+ Add tag",
+    "removeTag": "Remove tag",
+    "publish": "Post Question",
+    "publishing": "Posting...",
+    "errorRequired": "Please enter a title and the question body.",
+    "errorMinTags": "Please add at least one tag."
+  },
+  "QandAPage": {
+    "answersHeading": "{{count}} Answers",
+    "answersHeading_one": "1 Answer",
+    "answersHeading_other": "{{count}} Answers",
+    "sortBy": "Sort by",
+    "mostLiked": "Most Liked",
+    "oldest": "Oldest",
+    "newest": "Newest",
+    "writeAnswerPlaceholder": "Write an answer...",
+    "postAnswerButton": "Post",
+    "postingAnswerButton": "Posting...",
+    "noAnswersFallback": "Be the first to answer this question!"
   }
 }

@@ -1,4 +1,4 @@
-import { useLocale } from "../i18n/useLocale";
+import { getLocale } from "../i18n/useLocale";
 
 interface DateTimeResult {
   date: string;
@@ -94,7 +94,7 @@ export const extractDateParts = (dateInput: string): object => {
  * console.log(result); // "1 Jan 2022"
  */
 export const FormatPublishDate = (dateInput: Date): string => {
-  const { lang } = useLocale();
+  const lang = getLocale();
   const formatedDate = extractDateTime(dateInput.toString()).date as string; // "2022-01-01"
   const dateObj: Date = new Date(formatedDate);
 

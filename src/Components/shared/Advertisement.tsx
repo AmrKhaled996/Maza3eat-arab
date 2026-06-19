@@ -1,9 +1,9 @@
 import { ArrowUpRight } from "lucide-react";
 
 
-function HomeCommunitySectionAdd() {
+function HomeCommunitySectionAdd({ className }: { className?: string }) {
   return (
-    <div className="rounded-2xl p-5 text-white shadow-md relative overflow-hidden bg-linear-to-br secondary-gradient ">
+    <div className={`rounded-2xl p-5 text-white shadow-md relative overflow-hidden bg-linear-to-br secondary-gradient ${className}`}>
       <span className="text-[10px] font-semibold uppercase text-white  mb-4 block ">
         مدفوع
       </span>

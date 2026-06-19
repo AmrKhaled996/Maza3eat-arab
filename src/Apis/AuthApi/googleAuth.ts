@@ -31,7 +31,7 @@ export interface AuthUser {
 
 export async function getMe(): Promise<AuthUser> {
   const response = await axiosInstance.get<{ status: string; data: AuthUser }>(
-    "/auth/me",
+    "/users/me",
     {
       _skipAuthRedirect: true,
     } as never
