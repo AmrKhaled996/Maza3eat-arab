@@ -47,7 +47,7 @@ function PostCard({ post }: { post: Post }) {
             e.stopPropagation()
             navigate(localizedPath(lang,`profile/${post.author.id}`))
           }}
-        className="flex flex-wrap items-center gap-2 mb-3">
+          className="flex flex-wrap items-center gap-2 mb-3">
           <img
             src={post.author.avatar}
             alt={post.author.name}

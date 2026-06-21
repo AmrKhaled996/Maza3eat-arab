@@ -8,6 +8,7 @@ import PostInteractions from "../../Components/Community/PostDetail/PostInteract
 import Advertisement from "../../Components/shared/Advertisement";
 import { Loader, ArrowLeft, Calendar } from "lucide-react";
 import { FormatPublishDate } from "../../utils/DateFormater";
+import CommentsSection from "../../Components/Comments/MainContainer";
 
 export default function PostPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,8 +36,12 @@ export default function PostPage() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Post Not Found</h1>
-            <p className="text-gray-600">The post you're looking for doesn't exist or has been deleted.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Post Not Found
+            </h1>
+            <p className="text-gray-600">
+              The post you're looking for doesn't exist or has been deleted.
+            </p>
           </div>
         </div>
       </div>
@@ -76,8 +81,7 @@ export default function PostPage() {
             <PostContent post={post} hideTitle />
 
             {/* Interactions */}
-                      <PostInteractions post={post} />
-                        
+            <PostInteractions post={post} />
           </div>
 
           {/* Right Sidebar - Date (col-span-3) */}
@@ -91,11 +95,12 @@ export default function PostPage() {
                   </p>
                 </div>
               </div>
-                      )}
-                {/* Advertisement */}
-            <Advertisement />      
+            )}
+            {/* Advertisement */}
+            <Advertisement />
           </div>
         </div>
+        <CommentsSection />
       </div>
     </div>
   );
