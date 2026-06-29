@@ -5,9 +5,12 @@ export type NotificationType =
   | "COMMENT"
   | "COMMENT_REPLY"
   | "ANSWER_REPLY"
-  | "POST_APPROVE"
-  | "QUESTION_APPROVE"
-  | "ADMIN_ANNOUNCE";
+  | "COMMENT_REPLY_REPLY"
+  | "ANSWER_REPLY_REPLY"
+  | "POST_APPROVAL"
+  | "QUESTION_APPROVAL"
+  | "POST_REJECTION"
+  | "QUESTION_REJECTION";
 
 export interface NotificationSender {
   id: string;

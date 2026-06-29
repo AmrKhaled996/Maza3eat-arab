@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNotifications } from "../../Hooks/useNotifications";
+import { fetchNotificationById } from "../../Apis/NotificationApi";
 import { useTranslation } from "react-i18next";
 import NavigationBar from "../../Components/shared/NavigationBar";
-import { ArrowLeft, ArrowRight, Calendar, Shield, Megaphone, CheckCircle2, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Shield, CheckCircle2, ExternalLink } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
+import type { Notification } from "../../Types/Notification";
 
 // Simple custom markdown parser to convert basic md syntax to JSX
 function parseMarkdown(text: string) {
@@ -103,14 +105,66 @@ export default function NotificationDetailPage() {
   const { t } = useTranslation("common");
   const { notifications, markAsRead } = useNotifications();
 
-  const notification = notifications.find((n) => n.id === id);
+  // First try the cached list, then fall back to a direct API call
+  const cachedNotification = notifications.find((n) => n.id === id);
+  const [notification, setNotification] = useState<Notification | null>(
+    cachedNotification ?? null
+  );
+  const [isLoadingDetail, setIsLoadingDetail] = useState(!cachedNotification);
 
-  // Automatically mark notification as read when viewed
+  // If not in cache, fetch from API
   useEffect(() => {
-    if (notification && !notification.isRead) {
-      markAsRead(notification.id);
+    if (cachedNotification) {
+      setNotification(cachedNotification);
+      setIsLoadingDetail(false);
+      return;
     }
-  }, [notification, markAsRead]);
+    if (!id) return;
+
+    setIsLoadingDetail(true);
+    fetchNotificationById(id).then((raw) => {
+      if (!raw) {
+        setIsLoadingDetail(false);
+        return;
+      }
+      // The detail endpoint returns rich data; build a minimal Notification
+      // from the common fields that are always present.
+      const mapped: Notification = {
+        id: id,
+        type: (raw.type as Notification["type"]) ?? "ANSWER_REPLY",
+        isRead: true, // server marks it read on fetch
+        createdAt:
+          (raw.createdAt as string) ??
+          (raw.lastActivityAt as string) ??
+          new Date().toISOString(),
+        title: (raw.title as string) ?? undefined,
+        body: (raw.body as string) ?? undefined,
+        resourceId: (raw.resourceId as string) ?? undefined,
+      };
+      setNotification(mapped);
+      setIsLoadingDetail(false);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // If notification was in cache and unread, mark it read optimistically
+  useEffect(() => {
+    if (cachedNotification && !cachedNotification.isRead) {
+      markAsRead(cachedNotification.id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cachedNotification?.id]);
+
+  if (isLoadingDetail) {
+    return (
+      <div className="min-h-screen pb-16 bg-gray-50/50">
+        <NavigationBar page="notifications" solidNav />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 md:pt-28 text-center text-gray-400">
+          {lang === "ar" ? "جارٍ التحميل..." : "Loading…"}
+        </div>
+      </div>
+    );
+  }
 
   if (!notification) {
     return (
@@ -139,16 +193,17 @@ export default function NotificationDetailPage() {
   // Helper for layout styles based on notification type
   const getTypeConfig = () => {
     switch (notification.type) {
-      case "ADMIN_ANNOUNCE":
+      case "POST_REJECTION":
+      case "QUESTION_REJECTION":
         return {
-          icon: <Megaphone className="h-6 w-6 text-white" />,
+          icon: <Shield className="h-6 w-6 text-white" />,
           bgColor: "bg-red-500",
           lightBg: "bg-red-50",
           textColor: "text-red-700",
-          badgeKey: "notifications.urgent",
+          badgeKey: "notifications.official",
         };
-      case "POST_APPROVE":
-      case "QUESTION_APPROVE":
+      case "POST_APPROVAL":
+      case "QUESTION_APPROVAL":
         return {
           icon: <CheckCircle2 className="h-6 w-6 text-white" />,
           bgColor: "bg-green-500",
@@ -171,10 +226,10 @@ export default function NotificationDetailPage() {
 
   // Route target for the see it now action
   const getActionRoute = () => {
-    if (notification.type === "POST_APPROVE" && notification.resourceId) {
+    if (notification.type === "POST_APPROVAL" && notification.resourceId) {
       return localizedPath(lang, `post/${notification.resourceId}`);
     }
-    if (notification.type === "QUESTION_APPROVE" && notification.resourceId) {
+    if (notification.type === "QUESTION_APPROVAL" && notification.resourceId) {
       return localizedPath(lang, `q&a/${notification.resourceId}`);
     }
     return null;
@@ -220,9 +275,9 @@ export default function NotificationDetailPage() {
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <div className={`p-2.5 rounded-2xl ${config.lightBg} flex items-center justify-center`}>
-                  {notification.type === "ADMIN_ANNOUNCE" ? (
-                    <Megaphone className="h-5 w-5 text-red-500" />
-                  ) : notification.type.includes("APPROVE") ? (
+                  {(notification.type === "POST_REJECTION" || notification.type === "QUESTION_REJECTION") ? (
+                    <Shield className="h-5 w-5 text-red-500" />
+                  ) : notification.type.includes("APPROVAL") ? (
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
                   ) : (
                     <Shield className="h-5 w-5 text-blue-500" />
@@ -258,9 +313,25 @@ export default function NotificationDetailPage() {
                 parseMarkdown(notification.body)
               ) : (
                 <p className="text-lg leading-relaxed text-gray-600">
-                  {lang === "ar" 
-                    ? `تمت الموافقة على ${notification.type === "POST_APPROVE" ? "منشورك" : "سؤالك"} بنجاح من قبل فريق الإدارة. يمكنك الآن الاطلاع عليه والتفاعل مع الأعضاء.`
-                    : `Your ${notification.type === "POST_APPROVE" ? "post" : "question"} has been successfully approved by the administration team. You can view it now and interact with other members.`
+                  {lang === "ar"
+                    ? notification.type === "POST_APPROVAL"
+                      ? "تمت الموافقة على منشورك بنجاح من قبل فريق الإدارة. يمكنك الآن الاطلاع عليه والتفاعل مع الأعضاء."
+                      : notification.type === "QUESTION_APPROVAL"
+                      ? "تمت الموافقة على سؤالك بنجاح من قبل فريق الإدارة."
+                      : notification.type === "POST_REJECTION"
+                      ? "تم رفض منشورك من قبل فريق الإدارة."
+                      : notification.type === "QUESTION_REJECTION"
+                      ? "تم رفض سؤالك من قبل فريق الإدارة."
+                      : "لديك إشعار جديد."
+                    : notification.type === "POST_APPROVAL"
+                    ? "Your post has been successfully approved by the administration team. You can view it now and interact with other members."
+                    : notification.type === "QUESTION_APPROVAL"
+                    ? "Your question has been successfully approved by the administration team."
+                    : notification.type === "POST_REJECTION"
+                    ? "Your post was rejected by the administration team."
+                    : notification.type === "QUESTION_REJECTION"
+                    ? "Your question was rejected by the administration team."
+                    : "You have a new notification."
                   }
                 </p>
               )}

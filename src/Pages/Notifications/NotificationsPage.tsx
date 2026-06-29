@@ -6,6 +6,7 @@ import NavigationBar from "../../Components/shared/NavigationBar";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import type { Notification, ContactRequest } from "../../Types/Notification";
+import { fetchContactRequestById } from "../../Apis/ContactRequestApi";
 import Skeleton from "../../Components/shared/Skeleton";
 import {
   Heart,
@@ -18,11 +19,10 @@ import {
   Phone,
   Mail,
   ExternalLink,
-  Trash2,
   RefreshCw,
-  Info,
   Clock,
   Compass,
+  Info,
 } from "lucide-react";
 
 export default function NotificationsPage() {
@@ -36,11 +36,14 @@ export default function NotificationsPage() {
     isLoading,
     unreadCount,
     markAsRead,
-    markAllAsRead,
     respondToContactRequest,
-    clearAllState,
-    resetAllState,
+    refetch,
   } = useNotifications();
+
+  // Contact method modal state for accepting requests
+  const [acceptModalReq, setAcceptModalReq] = useState<ContactRequest | null>(null);
+  const [contactMethodType, setContactMethodType] = useState<"PHONE" | "EMAIL" | "WHATSAPP">("PHONE");
+  const [contactMethodValue, setContactMethodValue] = useState("");
 
   // Active tab state: 'notifications' | 'contacts'
   const [activeTab, setActiveTab] = useState<"notifications" | "contacts">("notifications");
@@ -93,18 +96,21 @@ export default function NotificationsPage() {
         };
       case "COMMENT":
       case "COMMENT_REPLY":
+      case "COMMENT_REPLY_REPLY":
       case "ANSWER_REPLY":
+      case "ANSWER_REPLY_REPLY":
         return {
           icon: <MessageCircle className="h-3 w-3 text-blue-500 fill-white" />,
           bgColor: "bg-blue-50 ring-4 ring-white",
         };
-      case "POST_APPROVE":
-      case "QUESTION_APPROVE":
+      case "POST_APPROVAL":
+      case "QUESTION_APPROVAL":
         return {
           icon: <ShieldCheck className="h-3 w-3 text-emerald-600" />,
           bgColor: "bg-emerald-50 ring-4 ring-white",
         };
-      case "ADMIN_ANNOUNCE":
+      case "POST_REJECTION":
+      case "QUESTION_REJECTION":
         return {
           icon: <ShieldAlert className="h-3 w-3 text-red-600" />,
           bgColor: "bg-red-50 ring-4 ring-white",
@@ -154,16 +160,15 @@ export default function NotificationsPage() {
             </span>
           );
         case "COMMENT_REPLY":
-          if (n.title === "REPLY_TO_REPLY") {
-            return (
-              <span>
-                ردت <strong className="font-extrabold text-gray-900">{senderName}</strong> على ردك
-              </span>
-            );
-          }
           return (
             <span>
-              ردت <strong className="font-extrabold text-gray-900">{senderName}</strong> على تعليقك
+              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على تعليقك
+            </span>
+          );
+        case "COMMENT_REPLY_REPLY":
+          return (
+            <span>
+              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على ردك
             </span>
           );
         case "ANSWER_REPLY":
@@ -172,17 +177,20 @@ export default function NotificationsPage() {
               رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على إجابتك
             </span>
           );
-        case "POST_APPROVE":
-          return <span>تمت الموافقة على منشورك من قبل الإدارة — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
-        case "QUESTION_APPROVE":
-          return <span>تمت الموافقة على سؤالك — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
-        case "ADMIN_ANNOUNCE":
+        case "ANSWER_REPLY_REPLY":
           return (
             <span>
-              إعلان هام: <strong className="font-extrabold text-gray-900">{n.title}</strong> —{" "}
-              <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span>
+              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على ردك على إجابة
             </span>
           );
+        case "POST_APPROVAL":
+          return <span>تمت الموافقة على منشورك من قبل الإدارة — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "QUESTION_APPROVAL":
+          return <span>تمت الموافقة على سؤالك — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "POST_REJECTION":
+          return <span>تم رفض منشورك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "QUESTION_REJECTION":
+          return <span>تم رفض سؤالك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
         default:
           return <span>إشعار جديد</span>;
       }
@@ -217,35 +225,37 @@ export default function NotificationsPage() {
             </span>
           );
         case "COMMENT_REPLY":
-          if (n.title === "REPLY_TO_REPLY") {
-            return (
-              <span>
-                <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your reply
-              </span>
-            );
-          }
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied on your comment
+              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your comment
+            </span>
+          );
+        case "COMMENT_REPLY_REPLY":
+          return (
+            <span>
+              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your reply
             </span>
           );
         case "ANSWER_REPLY":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied on your answer
+              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your answer
             </span>
           );
-        case "POST_APPROVE":
-          return <span>Your post has been approved by admin — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
-        case "QUESTION_APPROVE":
-          return <span>Your question has been approved — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
-        case "ADMIN_ANNOUNCE":
+        case "ANSWER_REPLY_REPLY":
           return (
             <span>
-              Announcement: <strong className="font-extrabold text-gray-900">{n.title}</strong> —{" "}
-              <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span>
+              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your answer reply
             </span>
           );
+        case "POST_APPROVAL":
+          return <span>Your post has been approved by admin — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "QUESTION_APPROVAL":
+          return <span>Your question has been approved — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "POST_REJECTION":
+          return <span>Your post was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "QUESTION_REJECTION":
+          return <span>Your question was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
         default:
           return <span>New notification</span>;
       }
@@ -257,18 +267,8 @@ export default function NotificationsPage() {
       await markAsRead(n.id);
     }
 
-    // Direct routing based on notification details
-    if (n.type === "ADMIN_ANNOUNCE") {
-      navigate(localizedPath(lang, `notifications/${n.id}`));
-    } else if (n.type === "POST_APPROVE" || n.type === "POST_LIKE" || n.type === "COMMENT" || n.type === "COMMENT_REPLY") {
-      if (n.resourceId) {
-        navigate(localizedPath(lang, `post/${n.resourceId}`));
-      }
-    } else if (n.type === "QUESTION_APPROVE" || n.type === "QUESTION_LIKE" || n.type === "ANSWER" || n.type === "ANSWER_REPLY") {
-      if (n.resourceId) {
-        navigate(localizedPath(lang, `q&a/${n.resourceId}`));
-      }
-    }
+    // Navigate to the notification detail for all types (server marks it read)
+    navigate(localizedPath(lang, `notifications/${n.id}`));
   };
 
   return (
@@ -323,19 +323,6 @@ export default function NotificationsPage() {
         {activeTab === "notifications" && (
           <div className="space-y-4">
             
-            {/* Action Row */}
-            {notifications.length > 0 && (
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => markAllAsRead()}
-                  className="text-xs font-bold text-primary hover:underline hover:cursor-pointer flex items-center gap-1.5"
-                >
-                  <Check className="h-3.5 w-3.5" />
-                  <span>{lang === "ar" ? "تحديد الكل كمقروء" : "Mark all as read"}</span>
-                </button>
-              </div>
-            )}
-
             {/* List View */}
             {isLoading ? (
               // Skeletons list
@@ -409,8 +396,14 @@ export default function NotificationsPage() {
                             </span>
                           )}
                           {!n.sender && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100">
-                              {n.type === "ADMIN_ANNOUNCE" ? t("notifications.urgent") : t("notifications.official")}
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                              n.type === "POST_REJECTION" || n.type === "QUESTION_REJECTION"
+                                ? "bg-red-50 text-red-600 border-red-100"
+                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                            }`}>
+                              {n.type === "POST_REJECTION" || n.type === "QUESTION_REJECTION"
+                                ? (lang === "ar" ? "مرفوض" : "Rejected")
+                                : t("notifications.official")}
                             </span>
                           )}
                           <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -517,7 +510,14 @@ export default function NotificationsPage() {
 
                         {req.direction === "SENT" && req.status === "ACCEPTED" && (
                           <button
-                            onClick={() => setContactInfoModalReq(req)}
+                            onClick={async () => {
+                              const detailed = await fetchContactRequestById(req.id);
+                              if (detailed) {
+                                setContactInfoModalReq(detailed);
+                              } else {
+                                setContactInfoModalReq(req);
+                              }
+                            }}
                             className="text-xs font-bold text-emerald-600 hover:underline hover:cursor-pointer flex items-center gap-1"
                           >
                             <Check className="h-3 w-3" />
@@ -547,28 +547,15 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* Debug / Testing Tools Widget */}
-        <div className="mt-12 p-4 bg-gray-100/60 rounded-2xl border border-gray-200/50 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
-          <div className="flex items-center gap-1.5 font-medium">
-            <Info className="h-3.5 w-3.5 text-gray-400" />
-            <span>بيانات تجريبية / Sandbox Tools:</span>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => resetAllState()}
-              className="px-3 py-1.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 hover:cursor-pointer flex items-center gap-1 transition-all"
-            >
-              <RefreshCw className="h-3 w-3" />
-              <span>إعادة تعيين / Reset</span>
-            </button>
-            <button
-              onClick={() => clearAllState()}
-              className="px-3 py-1.5 bg-red-50 border border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-100/80 hover:cursor-pointer flex items-center gap-1 transition-all"
-            >
-              <Trash2 className="h-3 w-3" />
-              <span>مسح الكل / Empty</span>
-            </button>
-          </div>
+        {/* Refresh button */}
+        <div className="mt-10 flex justify-center">
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-white border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 hover:cursor-pointer flex items-center gap-2 transition-all text-sm shadow-sm"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>{lang === "ar" ? "تحديث" : "Refresh"}</span>
+          </button>
         </div>
       </div>
 
@@ -603,9 +590,12 @@ export default function NotificationsPage() {
 
               <div className="flex gap-3 mt-4">
                 <button
-                  onClick={async () => {
-                    await respondToContactRequest({ id: reasonModalReq.id, action: "ACCEPTED" });
+                  onClick={() => {
+                    // Move to accept modal to collect contact info
+                    setAcceptModalReq(reasonModalReq);
                     setReasonModalReq(null);
+                    setContactMethodType("PHONE");
+                    setContactMethodValue("");
                   }}
                   className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
                 >
@@ -694,6 +684,86 @@ export default function NotificationsPage() {
                 <button
                   onClick={() => setContactInfoModalReq(null)}
                   className="w-full py-3 border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition-all hover:cursor-pointer"
+                >
+                  {t("notifications.close")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: Accept Contact Request – collect contact info */}
+      {acceptModalReq && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative animate-scale-up">
+            <button
+              onClick={() => setAcceptModalReq(null)}
+              className="absolute top-4 inset-e-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="p-6 pt-8">
+              <h3 className="text-lg font-extrabold text-gray-900 mb-1 text-center">
+                {lang === "ar" ? "شارك معلومات التواصل" : "Share Contact Info"}
+              </h3>
+              <p className="text-sm text-gray-400 text-center mb-6">
+                {lang === "ar"
+                  ? "أضف طريقة التواصل التي ستشاركها مع الطرف الآخر"
+                  : "Choose how you'd like to be contacted"}
+              </p>
+
+              {/* Contact method type selector */}
+              <div className="flex gap-2 mb-4">
+                {(["PHONE", "EMAIL", "WHATSAPP"] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setContactMethodType(type)}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all hover:cursor-pointer ${
+                      contactMethodType === type
+                        ? "bg-primary text-white border-primary"
+                        : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    {type === "PHONE" ? "📞 Phone" : type === "EMAIL" ? "✉️ Email" : "💬 WhatsApp"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Contact value input */}
+              <input
+                type={contactMethodType === "EMAIL" ? "email" : "tel"}
+                placeholder={
+                  contactMethodType === "EMAIL"
+                    ? "you@example.com"
+                    : "+201234567890"
+                }
+                value={contactMethodValue}
+                onChange={(e) => setContactMethodValue(e.target.value)}
+                className="w-full mb-6 p-3 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  disabled={!contactMethodValue.trim()}
+                  onClick={async () => {
+                    if (!contactMethodValue.trim()) return;
+                    await respondToContactRequest({
+                      id: acceptModalReq.id,
+                      action: "ACCEPTED",
+                      contactMethod: { type: contactMethodType, value: contactMethodValue.trim() },
+                    });
+                    setAcceptModalReq(null);
+                    setContactMethodValue("");
+                  }}
+                  className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
+                >
+                  {t("notifications.accept")}
+                </button>
+                <button
+                  onClick={() => setAcceptModalReq(null)}
+                  className="flex-1 py-3.5 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold rounded-2xl border border-gray-200 hover:cursor-pointer"
                 >
                   {t("notifications.close")}
                 </button>

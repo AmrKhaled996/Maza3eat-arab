@@ -142,7 +142,7 @@ export default function QandAPage() {
                           {question.author.tierName}
                         </span>
                       )}
-                      <ContactButton />
+                      <ContactButton receiverId={question.author.id} />
                     </div>
                     <span className="text-xs text-gray-400">
                       {FormatPublishDate(question.publishDate)}
@@ -338,7 +338,7 @@ function AnswerCard({
                   {answer.author.tierName}
                 </span>
               )}
-              <ContactButton />
+              <ContactButton receiverId={answer.author.id} />
             </div>
             <span className="text-[10px] text-gray-400">
               {FormatPublishDate(answer.createdAt)}

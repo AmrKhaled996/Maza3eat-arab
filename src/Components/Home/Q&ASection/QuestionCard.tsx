@@ -55,7 +55,9 @@ export function QuestionCard({ question }: { question: Question }) {
             color={question?.author?.badgeColor}
             tier={question?.author?.tierName}
           />
-          <ContactButton />
+          <span onClick={(e) => e.stopPropagation()}>
+            <ContactButton receiverId={question.author.id} />
+          </span>
           
         </div>
 
@@ -121,7 +123,9 @@ export function QuestionCard({ question }: { question: Question }) {
               color={question?.topAnswer?.author?.tier?.badgeColor as string}
               tier={question?.topAnswer?.author?.tier?.name as string}
             />
-            <ContactButton />
+              <span onClick={(e) => e.stopPropagation()}>
+                <ContactButton receiverId={question.author.id} />
+              </span>
 
             <span className="text-[11px] font-bold bg-[#22C55E] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
               <Check className="w-4 h-4" /> {t("home.bestAnswer")}
