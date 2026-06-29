@@ -34,8 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await getMe();
       console.log("me",me)
       setUser(me);
-    } catch {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setUser(null);
+      if (error?.response?.status === 403) {
+        window.location.href = `/${localStorage.getItem("maza3eat-locale") || "en"}/banned`;
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../Pages/Auth/LoginPage";
+import BannedPage from "../Pages/Auth/BannedPage";
 import HomePage from "../Pages/Home/HomePage";
 import ProfileQandAPage from "../Pages/Profile/ProfileQandAPage";
 import PostPage from "../Pages/Community/PostPage";
@@ -32,6 +33,7 @@ export default function MainRouter(): React.ReactElement {
           <Route key={lang} path={`/${lang}`} element={<LocaleShell lang={lang} />}>
             <Route index element={<HomePage />} />
             <Route path="login" element={<LoginPage />} />
+            <Route path="banned" element={<BannedPage />} />
             <Route path="community" element={<CommunityMainPage />} />
             <Route path="post/:id" element={<PostPage />} />
             <Route element={<ProtectedRoute />}>

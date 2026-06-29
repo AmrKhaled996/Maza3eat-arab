@@ -31,9 +31,18 @@ interface NotificationListResponse {
   };
 }
 
+interface UnreadCountData {
+  count: number;
+  isCapped: boolean;
+}
+
 interface UnreadCountResponse {
   status: string;
-  data: { count: number; isCapped: boolean };
+  data: {
+    total: UnreadCountData;
+    notifications: UnreadCountData;
+    contactRequests: UnreadCountData;
+  };
 }
 
 interface NotificationDetailResponse {
@@ -93,11 +102,12 @@ export async function fetchNotifications(cursor: string | null = null): Promise<
 
 /**
  * Fetch the unread notification + contact-request count for the current user.
- * Returns { count, isCapped } where count is capped at 99.
+ * Returns { total, notifications, contactRequests }.
  */
 export async function fetchUnreadCount(): Promise<{
-  count: number;
-  isCapped: boolean;
+  total: { count: number; isCapped: boolean };
+  notifications: { count: number; isCapped: boolean };
+  contactRequests: { count: number; isCapped: boolean };
 }> {
   const { data } = await axiosInstance.get<UnreadCountResponse>(
     "/notifications/unread-count"

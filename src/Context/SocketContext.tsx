@@ -17,8 +17,9 @@ export const SOCKET_EVENTS = {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface NotificationCountPayload {
-  count: number;
-  isCapped: boolean;
+  total: { count: number; isCapped: boolean };
+  notifications: { count: number; isCapped: boolean };
+  contactRequests: { count: number; isCapped: boolean };
 }
 
 interface SocketContextType {
@@ -53,7 +54,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsConnected(false);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLiveCount(null);
       }
       return;
@@ -100,9 +103,17 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       }
     );
 
+    // ── Listen for force logout ──────────────────────────────────────────────
+    socket.on(SOCKET_EVENTS.FORCE_LOGOUT, () => {
+      console.warn("[Socket] Received auth:force-logout. Redirecting to banned page.");
+      // We can trigger a full redirect to handle clearing session
+      window.location.href = `/${localStorage.getItem("maza3eat-locale") || "en"}/banned`;
+    });
+
     // Cleanup on unmount or when auth changes
     return () => {
       socket.off(SOCKET_EVENTS.NOTIFICATION_COUNT);
+      socket.off(SOCKET_EVENTS.FORCE_LOGOUT);
       socket.disconnect();
       socketRef.current = null;
     };

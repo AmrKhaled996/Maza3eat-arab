@@ -23,6 +23,8 @@ import {
   Clock,
   Compass,
   Info,
+  MoreHorizontal,
+  Flag,
 } from "lucide-react";
 
 export default function NotificationsPage() {
@@ -42,8 +44,10 @@ export default function NotificationsPage() {
 
   // Contact method modal state for accepting requests
   const [acceptModalReq, setAcceptModalReq] = useState<ContactRequest | null>(null);
-  const [contactMethodType, setContactMethodType] = useState<"PHONE" | "EMAIL" | "WHATSAPP">("PHONE");
+  const [contactMethodType, setContactMethodType] = useState<"FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL">("WHATSAPP");
   const [contactMethodValue, setContactMethodValue] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
+  const [isReportMenuOpen, setIsReportMenuOpen] = useState(false);
 
   // Active tab state: 'notifications' | 'contacts'
   const [activeTab, setActiveTab] = useState<"notifications" | "contacts">("notifications");
@@ -277,20 +281,9 @@ export default function NotificationsPage() {
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
         
-        {/* Loooogooo Box Mockup Header */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="bg-white px-8 py-5 rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex items-center gap-2">
-            <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-              <path
-                d="M14 2L17.5 7.5L24 6L22 12.5L28 16L22 19.5L24 26L17.5 24.5L14 30L10.5 24.5L4 26L6 19.5L0 16L6 12.5L4 6L10.5 7.5Z"
-                fill="#2563eb"
-              />
-            </svg>
-            <span className="font-extrabold text-xl tracking-tight text-blue-600">Loooogooo</span>
-          </div>
-
+        <div className="sticky top-24 z-10 mb-8 pt-6 flex flex-col items-center">
           {/* Dynamic Tabs Pills Container */}
-          <div className="w-full mt-6 bg-gray-100/80 p-1 rounded-2xl flex gap-1 border border-gray-200/50">
+          <div className="w-full bg-gray-100/80 p-1 rounded-2xl flex gap-1 border border-gray-200/50 backdrop-blur-md shadow-sm">
             <button
               onClick={() => setActiveTab("notifications")}
               className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${
@@ -300,9 +293,9 @@ export default function NotificationsPage() {
               }`}
             >
               {t("notifications.tabNotifications")}
-              {unreadCount > 0 && (
+              {unreadCount.notifications.count > 0 && (
                 <span className="ms-2 bg-primary text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
-                  {unreadCount}
+                  {unreadCount.notifications.count}
                 </span>
               )}
             </button>
@@ -315,6 +308,11 @@ export default function NotificationsPage() {
               }`}
             >
               {t("notifications.tabContactRequests")}
+              {unreadCount.contactRequests.count > 0 && (
+                <span className="ms-2 bg-primary text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                  {unreadCount.contactRequests.count}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -362,7 +360,7 @@ export default function NotificationsPage() {
                       key={n.id}
                       onClick={() => handleNotificationClick(n)}
                       className={`p-5 flex gap-4 transition-all hover:bg-gray-50/50 hover:cursor-pointer items-start relative ${
-                        !n.isRead ? "bg-blue-50/20" : ""
+                        !n.isRead ? "bg-blue-50/50" : ""
                       }`}
                     >
                       {/* Left side: Avatar + type badge */}
@@ -563,12 +561,51 @@ export default function NotificationsPage() {
       {reasonModalReq && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in">
           <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative animate-scale-up">
-            <button
-              onClick={() => setReasonModalReq(null)}
-              className="absolute top-4 inset-e-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="absolute top-4 inset-e-4 flex items-center gap-1">
+              <div className="relative">
+                <button
+                  onClick={() => setIsReportMenuOpen(!isReportMenuOpen)}
+                  className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                </button>
+                {isReportMenuOpen && (
+                  <div className="absolute top-full mt-1 end-0 w-52 bg-white border border-gray-100 rounded-xl shadow-lg py-1.5 z-10 animate-fade-in">
+                    <button
+                      onClick={async () => {
+                        setIsReporting(true);
+                        try {
+                          const { reportContactRequest } = await import('../../Apis/ContactRequestApi');
+                          await reportContactRequest(reasonModalReq.id, "Inappropriate contact request message");
+                          alert(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
+                          setReasonModalReq(null);
+                        } catch (err: any) {
+                          const msg = err?.response?.data?.message || (lang === "ar" ? "فشل الإبلاغ" : "Failed to report");
+                          alert(msg);
+                        } finally {
+                          setIsReporting(false);
+                          setIsReportMenuOpen(false);
+                        }
+                      }}
+                      disabled={isReporting}
+                      className="w-full text-start px-4 py-2.5 text-sm text-red-600 font-semibold hover:bg-red-50 flex items-center gap-2 hover:cursor-pointer transition-colors"
+                    >
+                      <Flag className="h-4 w-4" />
+                      {isReporting ? "..." : (lang === "ar" ? "إبلاغ عن هذا الطلب" : "Report this request")}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setReasonModalReq(null);
+                  setIsReportMenuOpen(false);
+                }}
+                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
             <div className="p-6 pt-8 text-center">
               <img
@@ -588,28 +625,29 @@ export default function NotificationsPage() {
                 {reasonModalReq.reason}
               </div>
 
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={() => {
-                    // Move to accept modal to collect contact info
-                    setAcceptModalReq(reasonModalReq);
-                    setReasonModalReq(null);
-                    setContactMethodType("PHONE");
-                    setContactMethodValue("");
-                  }}
-                  className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
-                >
-                  {t("notifications.accept")}
-                </button>
-                <button
-                  onClick={async () => {
-                    await respondToContactRequest({ id: reasonModalReq.id, action: "DECLINED" });
-                    setReasonModalReq(null);
-                  }}
-                  className="flex-1 py-3.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl border border-red-100 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
-                >
-                  {t("notifications.decline")}
-                </button>
+              <div className="flex flex-col gap-3 mt-4">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setAcceptModalReq(reasonModalReq);
+                      setReasonModalReq(null);
+                      setContactMethodType("WHATSAPP");
+                      setContactMethodValue("");
+                    }}
+                    className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
+                  >
+                    {t("notifications.accept")}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await respondToContactRequest({ id: reasonModalReq.id, action: "DECLINED" });
+                      setReasonModalReq(null);
+                    }}
+                    className="flex-1 py-3.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl border border-red-100 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
+                  >
+                    {t("notifications.decline")}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -716,28 +754,33 @@ export default function NotificationsPage() {
 
               {/* Contact method type selector */}
               <div className="flex gap-2 mb-4">
-                {(["PHONE", "EMAIL", "WHATSAPP"] as const).map((type) => (
+                {(["FACEBOOK", "WHATSAPP", "INSTAGRAM", "EMAIL"] as const).map((type) => (
                   <button
                     key={type}
-                    onClick={() => setContactMethodType(type)}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all hover:cursor-pointer ${
+                    onClick={() => {
+                      setContactMethodType(type);
+                      setContactMethodValue("");
+                    }}
+                    className={`flex-1 py-2 text-[10px] font-bold rounded-xl border transition-all hover:cursor-pointer ${
                       contactMethodType === type
                         ? "bg-primary text-white border-primary"
                         : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
                     }`}
                   >
-                    {type === "PHONE" ? "📞 Phone" : type === "EMAIL" ? "✉️ Email" : "💬 WhatsApp"}
+                    {type === "FACEBOOK" ? "📘 Facebook" : type === "EMAIL" ? "✉️ Email" : type === "WHATSAPP" ? "💬 WhatsApp" : "📸 Instagram"}
                   </button>
                 ))}
               </div>
 
               {/* Contact value input */}
               <input
-                type={contactMethodType === "EMAIL" ? "email" : "tel"}
+                type={contactMethodType === "EMAIL" ? "email" : contactMethodType === "WHATSAPP" ? "tel" : "url"}
                 placeholder={
                   contactMethodType === "EMAIL"
                     ? "you@example.com"
-                    : "+201234567890"
+                    : contactMethodType === "WHATSAPP"
+                    ? "+201234567890"
+                    : "https://..."
                 }
                 value={contactMethodValue}
                 onChange={(e) => setContactMethodValue(e.target.value)}
@@ -746,7 +789,12 @@ export default function NotificationsPage() {
 
               <div className="flex gap-3">
                 <button
-                  disabled={!contactMethodValue.trim()}
+                  disabled={
+                    !contactMethodValue.trim() ||
+                    (contactMethodType === "EMAIL" && !/^\S+@\S+\.\S+$/.test(contactMethodValue)) ||
+                    (contactMethodType === "WHATSAPP" && !/^\+?\d{10,15}$/.test(contactMethodValue)) ||
+                    ((contactMethodType === "FACEBOOK" || contactMethodType === "INSTAGRAM") && !/^https?:\/\/.+/.test(contactMethodValue))
+                  }
                   onClick={async () => {
                     if (!contactMethodValue.trim()) return;
                     await respondToContactRequest({

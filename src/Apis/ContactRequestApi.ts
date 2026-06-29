@@ -1,5 +1,5 @@
 import { axiosInstance } from "./axiosInstance";
-import type { ContactRequest } from "../Types/Notification";
+import type { ContactRequest, ContactRequestInfo } from "../Types/Notification";
 
 // ─── Raw backend shapes ───────────────────────────────────────────────────────
 
@@ -86,6 +86,10 @@ export function mapDetailedContactRequest(raw: any, currentUserId?: string): Con
   } else if (contactType === "WHATSAPP") {
     contactInfo.phone = decryptedValue;
     contactInfo.whatsapp = decryptedValue;
+  } else if (contactType === "FACEBOOK") {
+    contactInfo.facebook = decryptedValue;
+  } else if (contactType === "INSTAGRAM") {
+    contactInfo.instagram = decryptedValue;
   }
 
   // The "other" user is whoever is not the requester or receiver depending on direction
@@ -166,13 +170,13 @@ export async function createContactRequest(
  *
  * @param id          - Contact request ID
  * @param status      - "ACCEPTED" | "DECLINED"
- * @param type        - contact method type: "PHONE" | "EMAIL" | "WHATSAPP" (required on ACCEPTED)
+ * @param type        - contact method type: "FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL" (required on ACCEPTED)
  * @param contactInfo - actual value e.g. "+201234567890" (required on ACCEPTED)
  */
 export async function respondToContactRequest(
   id: string,
   status: "ACCEPTED" | "DECLINED",
-  type?: "PHONE" | "EMAIL" | "WHATSAPP",
+  type?: "FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL",
   contactInfo?: string
 ): Promise<Record<string, unknown>> {
   const body: Record<string, unknown> = { status };
@@ -204,4 +208,18 @@ export async function fetchContactRequestById(
   } catch {
     return null;
   }
+}
+
+/**
+ * Report a contact request.
+ */
+export async function reportContactRequest(
+  contactRequestId: string,
+  reason: string
+): Promise<void> {
+  await axiosInstance.post("/reports", {
+    targetId: contactRequestId,
+    targetType: "CONTACT_REQUEST",
+    reason,
+  });
 }

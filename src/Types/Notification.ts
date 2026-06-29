@@ -42,6 +42,8 @@ export interface ContactRequestInfo {
   phone?: string;
   email?: string;
   whatsapp?: string;
+  facebook?: string;
+  instagram?: string;
 }
 
 export interface ContactRequest {
