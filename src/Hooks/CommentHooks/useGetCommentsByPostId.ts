@@ -1,13 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { getCommentsByPostId } from "../../Apis/CommentsApi/Comment";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getCommentsByPostId, getCommentsByPostIdWithCursor } from "../../Apis/CommentsApi/Comment";
 
 
 
-function useGetCommentsByPostId( postId: string) {
-    return  useQuery({
+function useGetCommentsByPostId( postId: string ,cursor:string ="") {
+    return  useInfiniteQuery({
         queryKey: ["get-post-comment"],
-        queryFn: () => getCommentsByPostId(postId)
-    })
+        queryFn: ({ pageParam = cursor }) =>{
+  
+      if(pageParam){
+        return getCommentsByPostIdWithCursor(postId, pageParam);
+      }
+      return  getCommentsByPostId(postId)},
+    initialPageParam: cursor,
+    getNextPageParam: (lastPage) => lastPage?.nextCursor,
+  });
+
 }
 
 export default useGetCommentsByPostId;

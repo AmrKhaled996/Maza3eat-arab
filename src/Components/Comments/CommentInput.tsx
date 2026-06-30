@@ -9,7 +9,7 @@ function CommentInput() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { id: postIdparam } = useParams<{ id: string }>();
   const { user } = useAuth();
-  console.log("id", postIdparam);
+ 
 
   const handleComment = async () => {
     const content = commentValue.trim();

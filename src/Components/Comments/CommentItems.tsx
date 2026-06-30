@@ -11,97 +11,64 @@ import ReplyItem from "./ReplyItem";
 import type { Reply as ReplyType } from "../../Types/Reply";
 import { createReplyToComment } from "../../Apis/CommentsApi/CommentReplies";
 import useGetCommentsReplies from "../../Hooks/CommentHooks/useGetCommentReplies";
+import { likeToComment, UnlikeToComment } from "../../Apis/CommentsApi/Comment";
 
-export default function CommentItem({
-  comment,
-  depth,
-}: {
-  comment: Comment;
-  depth: number;
-}) {
+export default function CommentItem({ comment }: { comment: Comment }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
-  const [liked, setLiked] = useState(false);
+
+  const [liked, setLiked] = useState(comment?.likedByMe);
   const [likes, setLikes] = useState(comment?.likesCount);
+  const [isLiking, setIsLiking] = useState(false);
+
   const [showReplies, setShowReplies] = useState(false);
 
   const [replying, setReplying] = useState(false);
   const [replyInputValue, setreplyInputValue] = useState("");
   const [replyHeights, setreplyHeights] = useState<number[]>([0]);
-  const replysRef = useRef<HTMLDivElement[]>([]);
-  const [replies, setReplies] = useState<ReplyType[]>([
-    // {
-    //   id: "4c9ec43e-991b-4292-b3ed-48e9343579e0",
-    //   postId: "67f528b9-54cf-4c65-ac8d-00ca143186d9",
-    //   authorId: "01ba7079-7d55-4749-8764-64de5bc3c99c",
-    //   content:
-    //     "It is an Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laborum ea architecto vel maxime impedit quidem dignissimos, aperiam harum in, quo itaque asperiores atque at laboriosam molestiae veniam praesentium quibusdam voluptas. place!6",
-    //   likesCount: 29,
-    //   repliesCount: 16,
-    //   createdAt: new Date(),
-    //   author: {
-    //     id: "01ba7079-7d55-4749-8764-64de5bc3c99c",
-    //     name: "Ali Magdy",
-    //     avatar: "https://i.pravatar.cc/40?img=1",
-    //     tierName: "silver",
-    //     badgeColor: "#7a6d6dff",
-    //   },
-    //   likedByMe: false,
-    // },
-    // {
-    //   id: "4c9ec43e-991b-4252-b3ed-48e9343579e0",
-    //   postId: "67f528b9-54cf-4c65-ac8d-00ca143186d9",
-    //   authorId: "01ba7079-7d55-4749-8764-64de5bc3c99c",
-    //   content: "It is an amazing place!6",
-    //   likesCount: 29,
-    //   repliesCount: 16,
-    //   createdAt: new Date(),
-    //   author: {
-    //     id: "01ba7059-7d55-4749-8764-64de5bc3c99c",
-    //     name: "Ali Magdy",
-    //     avatar: "https://i.pravatar.cc/40?img=1",
-    //     tierName: "silver",
-    //     badgeColor: "#7a6d6dff",
-    //   },
-    //   likedByMe: false,
-    // },
-    // {
-    //   id: "4c9ec43e-191b-4252-b3ed-48e9343579e0",
-    //   postId: "67f528b9-54cf-4c65-ac8d-00ca143186d9",
-    //   authorId: "01ba7079-7d55-4749-8764-64de5bc3c99c",
-    //   content:
-    //     "It is an amazing place!6 Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis in tempora non vel! Dolorum eius modi, sit natus ut consequatur, id necessitatibus ullam harum illum dolore perferendis culpa magnam. Officia. ",
-    //   likesCount: 29,
-    //   repliesCount: 16,
-    //   createdAt: new Date(),
-    //   author: {
-    //     id: "01ba7059-7d55-4749-8764-64de5bc3c99c",
-    //     name: "Ali Magdy",
-    //     avatar: "https://i.pravatar.cc/40?img=1",
-    //     tierName: "silver",
-    //     badgeColor: "#7a6d6dff",
-    //   },
-    //   likedByMe: false,
-    // },
-  ]);
+  const repliesRef = useRef<HTMLDivElement[]>([]);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [replies, setReplies] = useState<ReplyType[]>([]);
+  const [hasMoreReplies, setHasMoreReplies] = useState(false);
+  const [nextCursor, setNextCursor] = useState("");
+
+  const lastReplyRef = useRef<HTMLDivElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: repliesResponse, isLoading } = useGetCommentsReplies(
-    comment?.id,
-  );
+  const {
+    data,
+    isLoading,
+    error,
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes((c) => (liked ? c - 1 : c + 1));
+    isFetching,
+    refetch,
+  } = useGetCommentsReplies(comment?.id, nextCursor);
+
+  const handleLike = async () => {
+    if (!comment?.id || isLiking) return;
+
+    setIsLiking(true);
+
+    const wasLiked = liked;
+    const previousLikes = likes;
+
+    setLiked(!wasLiked);
+    setLikes(previousLikes + (wasLiked ? -1 : 1));
+
+    try {
+      if (wasLiked) {
+        await UnlikeToComment(comment.id);
+      } else {
+        await likeToComment(comment.id);
+      }
+    } catch (error) {
+      setLiked(wasLiked);
+      setLikes(previousLikes);
+    } finally {
+      setIsLiking(false);
+    }
   };
-
-  // const addElement = (element: HTMLDivElement|null) => {
-  //   setReplysElement((ele) =>
-  //     [...(ele || []), element].filter((e): e is HTMLDivElement => e !== null),
-  //   );
-  // };
-
   const handleReplying = async () => {
     const content = replyInputValue.trim();
 
@@ -120,10 +87,10 @@ export default function CommentItem({
     try {
       setIsSubmitting(true);
 
-      await createReplyToComment(content, comment?.id);
+      const response = await createReplyToComment(content, comment?.id);
 
       setreplyInputValue("");
-      setReplies((prev) => [...prev, repliesResponse?.data.data.replies]);
+      setReplies((prev) => [...prev, response?.data?.data]);
     } catch (error) {
       console.error(error);
       console.error("Failed to create comment");
@@ -132,31 +99,76 @@ export default function CommentItem({
     }
   };
 
-  useEffect(() => {
-    console.log("replies" + replysRef);
-    const prefixSums = replysRef?.current.reduce(
-      (acc: number[], curr: HTMLDivElement) => {
-        acc.push(
-          acc.length
-            ? acc[acc.length - 1] + curr.offsetHeight
-            : curr.offsetHeight,
-        );
-        return acc;
-      },
-      [],
-    );
-    replysRef?.current.map((r, i) => console.log("top of reply:", r.offsetTop));
-    setreplyHeights((prev) => [...prev, ...prefixSums.slice(0, -1)]);
-  }, [replysRef, showReplies, replies]);
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver((entries) => {
+  //     if (entries[0].isIntersecting) {
+  //       console.log("intersecting");
+  //       fetchNextPage();
+  //     }
+  //   });
+
+  //   if (lastReplyRef.current) observer.observe(lastReplyRef.current);
+
+  //   return () => {
+  //     if (lastReplyRef.current) observer.unobserve(lastReplyRef.current);
+  //   };
+  // }, [fetchNextPage]);
+
+  const recomputeHeights = () => {
+    if (!rootRef.current) return;
+    const parentRect = rootRef.current!.offsetTop;
+
+    const tops = repliesRef.current.map((reply) => {
+      return reply.offsetTop - parentRect;
+    });
+
+    setreplyHeights(tops);
+  };
 
   useEffect(() => {
-    if (repliesResponse?.data) {
-      setReplies(repliesResponse.data.data.replies);
+    const observer = new ResizeObserver(() => {
+      recomputeHeights();
+    });
+
+    repliesRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [replies, showReplies, repliesRef, replying]);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      recomputeHeights();
+    });
+
+    observer.observe(rootRef.current);
+
+    return () => observer.disconnect();
+  }, [rootRef, replying]);
+
+  // useEffect(() => {
+  //   if (data) {
+  //     const allReplies = data.pages.flatMap((page: any) => page?.replies);
+  //     setReplies(allReplies);
+  //     // console.log("loading");
+  //     if (isFetching) {
+  //       console.log("loading");
+  //     }
+  //   }
+  // }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      setReplies((prev) => [...prev, ...data?.replies]);
+      setNextCursor(data?.nextCursor);
+      setHasMoreReplies(data?.hasMore);
     }
-  }, [repliesResponse]);
-
+  }, [data]);
   return (
-    <div className="flex max-w-2xl  " dir="rtl">
+    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
       <div className="relative w-9 ml-4">
         <img
           src={comment?.author?.avatar}
@@ -172,22 +184,21 @@ export default function CommentItem({
                 className="absolute  bg-[#B4B8C0] left-1/2 -translate-x-1/2 w-[1.5px] -z-10"
                 style={{
                   top: "36px",
-                  height: `${replyHeights?.[replyHeights?.length - 1]}px`,
+                  height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
                 }}
               ></div>
-              {replysRef.current.map((replyHeight, index) => {
-                console.log("first", replyHeight.offsetHeight);
+              {replyHeights?.map((replyHeight, index) => {
                 return (
                   <svg
                     key={index}
                     width={41}
-                    height="114"
-                    viewBox="0 0 41 114"
+                    height={repliesRef.current[index]?.offsetHeight}
+                    // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className={` ${lang == "ar" ? "-scale-x-100 " : " "}  -left-1/2 translate-x-[0.75px] w-full absolute  -z-10`}
                     style={{
-                      top: `${replyHeights[index] + 26}px`,
+                      top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
                   >
                     <path
@@ -283,33 +294,51 @@ export default function CommentItem({
         {/* replies */}
         {replies && replies.length > 0 && (
           <>
-            {!showReplies && (
+            {!showReplies && comment.repliesCount > 0 && (
               <button
                 onClick={() => {
                   setShowReplies(true);
-                  console.log(
-                    "height:" + replyHeights,
-                    "replies:" + replysRef.current,
-                  );
                 }}
                 className="text-slate-600 font-semibold mt-3"
               >
-                عرض المزيد
+                {comment?.repliesCount} عرض المزيد
               </button>
             )}
 
             {showReplies && (
               <div className="mt-3  ">
-                {replies?.map((r, index) => (
-                  <div
-                    ref={(element) => {
-                      if (element) replysRef.current[index] = element;
-                    }}
-                    key={r.id}
-                  >
-                    <ReplyItem key={r.id} reply={r} depth={depth} />
-                  </div>
-                ))}
+                {replies?.map((r, index) => {
+                  return (
+                    <div
+                      ref={(element) => {
+                        if (element) repliesRef.current[index] = element;
+                      }}
+                      key={r.id}
+                    >
+                      <ReplyItem key={r.id} reply={r} />
+                    </div>
+                  );
+                })}
+                {/* {isFetchingNextPage && <SkeletonComment indent={true} />} */}
+                {/* <div ref={lastReplyRef} className="w-full h-2"></div> */}
+                {hasMoreReplies && (
+                  <>
+                    {isFetching ? (
+                      <div className="w-full flex justify-center">
+                        <LoaderIcon className="animate-spin" />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          refetch();
+                        }}
+                        className="text-slate-600 font-semibold mt-3"
+                      >
+                        عرض المزيد
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </>

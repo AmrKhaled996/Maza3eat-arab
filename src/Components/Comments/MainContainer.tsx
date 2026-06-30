@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Comment } from "../../Types/Comment";
 import CommentInput from "./CommentInput";
 import CommentItem from "./CommentItems";
 import { useParams } from "react-router-dom";
 import useGetCommentsByPostId from "../../Hooks/CommentHooks/useGetCommentsByPostId";
+import { useAuth } from "../../Context/Auth";
 
 // const commentsData: Comment[] = [
 //   {
@@ -94,12 +95,21 @@ import useGetCommentsByPostId from "../../Hooks/CommentHooks/useGetCommentsByPos
 // ];
 export default function CommentsSection() {
   const [comments, setComments] = useState<Comment[]>([]);
+  const { user } = useAuth();
   const { id: postIdparam } = useParams<{ id: string }>();
+  const lastCommentRef = useRef<HTMLDivElement>(null);
 
   if (!postIdparam) return null;
 
-  const { data: postCommentsResponse, isLoading } =
-    useGetCommentsByPostId(postIdparam);
+  const {
+    data,
+    isLoading,
+    error,
+    isFetchingNextPage,
+    fetchNextPage,
+    isFetching,
+    refetch,
+  } = useGetCommentsByPostId(postIdparam);
 
   // const handleAddComment = (text: string) => {
   //   const newComment: Comment = {
@@ -117,23 +127,55 @@ export default function CommentsSection() {
 
   // setComments((prev) => [newComment, ...prev]);
   // };
+  // useEffect(() => {
+  //   if (postCommentsResponse?.data) {
+  //     setComments(postCommentsResponse.data.data.comments);
+  //   }
+  // }, [postCommentsResponse]);
+
   useEffect(() => {
-    if (postCommentsResponse?.data) {
-      setComments(postCommentsResponse.data.data.comments);
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        console.log("is fetching comments");
+        fetchNextPage();
+      }
+    });
+
+    if (lastCommentRef.current) observer.observe(lastCommentRef.current);
+
+    return () => {
+      if (lastCommentRef.current) observer.unobserve(lastCommentRef.current);
+    };
+  }, [fetchNextPage]);
+
+  useEffect(() => {
+    if (data) {
+      const allComments = data.pages.flatMap((page: any) => page?.comments);
+      setComments(allComments);
+      console.log("loading");
+      if (isFetching) {
+      }
     }
-  }, [postCommentsResponse]);
+  }, [data]);
 
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">
-      <CommentInput />
+      {user && <CommentInput />}
+
       <div className="flex flex-col gap-5 max-w-2xl">
-        {isLoading
-          ? Array.from({ length: 5 }).map((_, index) => (
-              <SkeletonComment key={index} />
-            ))
-          : comments?.map((c) => (
-              <CommentItem key={c.id} comment={c} depth={0} />
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonComment key={index} />
+          ))
+        ) : (
+          <div>
+            {comments?.map((c) => (
+              <CommentItem key={c.id} comment={c} />
             ))}
+            {isFetchingNextPage && <SkeletonComment indent />}
+            <div ref={lastCommentRef} className="w-full h-2"></div>
+          </div>
+        )}
       </div>
     </div>
   );

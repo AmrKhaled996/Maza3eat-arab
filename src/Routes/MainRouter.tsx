@@ -17,6 +17,7 @@ import LegacyRedirect from "./LegacyRedirect";
 import ProtectedRoute from "./ProtectedRoute";
 import { SUPPORTED_LOCALES } from "../i18n/config";
 import { localizedPath } from "../i18n/paths";
+import RepliesThreadPage from "../Pages/Comments/RepliesThreadPage";
 
 export default function MainRouter(): React.ReactElement {
   return (
@@ -42,6 +43,7 @@ export default function MainRouter(): React.ReactElement {
             <Route path="q&a/:id" element={<QandAPage />} />
             <Route path="featured" element={<FeaturedMainPage />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="replies/:id" element={<RepliesThreadPage />} />
             <Route
               path="*"
               element={<NotFoundPage />}

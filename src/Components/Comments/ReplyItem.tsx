@@ -7,98 +7,70 @@ import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 
 import type { Reply as ReplyType } from "../../Types/Reply";
-import { createReplyToReply } from "../../Apis/CommentsApi/CommentReplies";
+import { createReplyToReply, likeToReply, UnlikeToReply } from "../../Apis/CommentsApi/CommentReplies";
 import useGetReplyReplies from "../../Hooks/CommentHooks/useGetReplyReplies";
+import { useNavigate } from "react-router-dom";
+import { localizedPath } from "../../i18n/paths";
 
 export default function ReplyItem({
   reply,
-  depth,
+
+  showRepliesFlag = false,
 }: {
   reply: ReplyType;
-  depth: number;
+
+  showRepliesFlag?: boolean;
 }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
+  const navigate = useNavigate()
+
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(reply?.likesCount);
-  const [showReplies, setShowReplies] = useState(false);
+  const [showReplies, setShowReplies] = useState(showRepliesFlag);
 
   const [replying, setReplying] = useState(false);
   const [replyInputValue, setreplyInputValue] = useState("");
   const [replyHeights, setreplyHeights] = useState<number[]>([0]);
   const repliesRef = useRef<HTMLDivElement[]>([]);
-  const [replies, setReplies] = useState<ReplyType[]>([
-    // {
-    //   id: "0dd78c6c-4797-4851-80ce-04551898ec77",
-    //   commentId: "66954a43-36bb-4124-9ef5-2d1ceb14ea18",
-    //   content: "this is second reply on this comment",
-    //   likesCount: 0,
-    //   depth: "0",
-    //   path: "1",
-    //   createdAt: new Date(),
-    //   author: {
-    //     id: "d3d6f592-69a9-4b93-823e-cbd8e0f81f7b",
-    //     name: "Ali Magdy",
-    //     avatar:
-    //       "https://lh3.googleusercontent.com/a/ACg8ocIae5etiTmWvSfoWULlWBVEj5b8vKs2PsUs4bID0axMZkIsNBE=s96-c",
-    //     tier: {
-    //       id: 1,
-    //       name: "Basic",
-    //       badgeColor: "#ffff",
-    //     },
-    //   },
-    //   hasReplies: false,
-    //   likedByMe: false,
-    //   permissions: {
-    //     canDelete: false,
-    //     canReport: true,
-    //   },
-    // },
-    // {
-    //   id: "7c26a7ec-c237-4e23-b9c8-f7554938faa5",
-    //   commentId: "66954a43-36bb-4124-9ef5-2d1ceb14ea18",
-    //   content: "this is second reply on this comment",
-    //   likesCount: 1,
-    //   depth: "0",
-    //   path: "2",
-    //   createdAt: new Date(),
-    //   author: {
-    //     id: "d3d6f592-69a9-4b93-823e-cbd8e0f81f7b",
-    //     name: "Ali Magdy",
-    //     avatar:
-    //       "https://lh3.googleusercontent.com/a/ACg8ocIae5etiTmWvSfoWULlWBVEj5b8vKs2PsUs4bID0axMZkIsNBE=s96-c",
-    //     tier: {
-    //       id: 1,
-    //       name: "Basic",
-    //       badgeColor: "#ffff",
-    //     },
-    //   },
-    //   hasReplies: false,
-    //   likedByMe: true,
-    //   permissions: {
-    //     canDelete: true,
-    //     canReport: false,
-    //   },
-    // },
-  ]);
+  const lastReplyRef = useRef<HTMLDivElement>(null);
+  const [replies, setReplies] = useState<ReplyType[]>([]);
 
+  const [hasMoreReplies, setHasMoreReplies] = useState(false);
+  const [nextCursor, setNextCursor] = useState("");
+
+  const rootRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: repliesResponse, isLoading } = useGetReplyReplies(reply?.id);
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes((c) => (liked ? c - 1 : c + 1));
+  const {
+    data,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+  } = useGetReplyReplies(reply?.id, nextCursor);
+
+
+  const handleLike = async () => {
+    if (!reply?.id) return;
+    try {
+      setLiked(!liked);
+      setLikes((c) => (liked ? c - 1 : c + 1));
+      if (liked) {
+        await UnlikeToReply(reply?.id);
+      } else {
+        await likeToReply(reply?.id);
+      }
+    } catch (error) {
+      setLiked(!liked);
+      setLikes((c) => (liked ? c - 1 : c + 1));
+      console.error(error);
+    }
   };
 
-  // const addElement = (element: HTMLDivElement|null) => {
-  //   setReplysElement((ele) =>
-  //     [...(ele || []), element].filter((e): e is HTMLDivElement => e !== null),
-  //   );
-  // };
 
-
-
+/** */
   const handleReplying = async () => {
     const content = replyInputValue.trim();
 
@@ -117,8 +89,8 @@ export default function ReplyItem({
     try {
       setIsSubmitting(true);
 
-     const response = await createReplyToReply(content, reply?.id);
-      console.log("the new reply:",response)
+      const response = await createReplyToReply(content, reply?.id);
+
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
     } catch (error) {
@@ -126,67 +98,105 @@ export default function ReplyItem({
       console.error("Failed to create reply");
     } finally {
       setIsSubmitting(false);
+      setReplying(false);
     }
   };
 
+/* handle overflow replies*/
+
+  const handleShowReplies = () => {
+    if(replies[0]?.depth % 3 === 0)
+      navigate(localizedPath(lang, `replies/${reply?.id}`),{state: {reply: reply}});
+    if (showReplies) return;
+    setShowReplies(true);
+  };
+
+  const recomputeHeights = () => {
+    if (!rootRef.current) return;
+    const parentRect = rootRef.current!.offsetTop;
+
+    const tops = repliesRef.current.map((reply) => {
+
+      return reply.offsetTop - parentRect;
+    });
+
+    setreplyHeights(tops);
+  };
+
   useEffect(() => {
-    const prefixSums = repliesRef?.current.reduce(
-      (acc: number[], curr: HTMLDivElement) => {
-        acc.push(
-          acc.length
-            ? acc[acc.length - 1] + curr.offsetHeight
-            : curr.offsetHeight,
-        );
-        return acc;
-      },
-      [],
-    );
-    repliesRef?.current.map((r, i) =>
-      console.log("top of reply:", r.offsetTop),
-    );
-    setreplyHeights((prev) => [...prev, ...prefixSums.slice(0, -1)]);
-  }, [repliesRef, showReplies, replies]);
+    const observer = new ResizeObserver(() => {
+      recomputeHeights();
+    });
 
-    useEffect(() => {
-      if (repliesResponse?.data) {
-        console.log("repliesResponse", repliesResponse);
-        setReplies(repliesResponse.data.data.replies);
-      }
-    }, [repliesResponse]);
+    repliesRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
 
+    return () => observer.disconnect();
+  }, [replies, showReplies, repliesRef, replying]);
+
+  useEffect(() => {
+
+    if (!rootRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      recomputeHeights();
+    });
+
+    observer.observe(rootRef.current);
+
+    return () => observer.disconnect();
+  }, [rootRef, replying]);
+
+  // useEffect(() => {
+  //   if (data) {
+  //     const replies = data.pages.flatMap((page: any) => page.replies);
+  //     setReplies(replies);
+  //     console.log("loading");
+  //     if (isFetching) {
+  //     }
+  //   }
+  // }, [data]);
+  useEffect(() => {
+    if (data) {
+
+      setReplies(data?.replies);
+      setNextCursor(data?.nextCursor);
+      setHasMoreReplies(data?.hasMore);
+    }
+  },[data])
   return (
-    <div className="flex max-w-2xl  " dir="rtl">
+    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
       <div className="relative w-9 ml-4">
         <img
           src={reply?.author?.avatar}
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ml-4"
+          className="w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ml-4"
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />
 
         <div className="w-fit">
-          {showReplies && (
+          {showReplies && !isFetching && (
             <>
               {" "}
               <div
-                className="absolute  bg-[#B4B8C0] left-1/2 -translate-x-1/2 w-[1.5px] -z-10"
+                className="absolute  bg-[#B4B8C0] left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                 style={{
                   top: "36px",
-                  height: `${replyHeights?.[replyHeights?.length - 1]}px`,
+                  height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
                 }}
               ></div>
-              {repliesRef.current.map((replyHeight, index) => {
-                console.log("first", replyHeight.getBoundingClientRect());
+              {replyHeights?.map((replyHeight, index) => {
                 return (
                   <svg
                     key={index}
                     width={41}
-                    height="114"
-                    viewBox="0 0 41 114"
+                    height={repliesRef.current[index]?.offsetHeight}
+                    // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className={` ${lang == "ar" ? "-scale-x-100 " : " "}  -left-1/2 translate-x-[0.75px] w-full absolute  -z-10`}
                     style={{
-                      top: `${replyHeights[index] + 26}px`,
+                      top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
                   >
                     <path
@@ -194,7 +204,7 @@ export default function ReplyItem({
                       stroke="#B4B8C0"
                       strokeWidth={1.5}
                       vectorEffect="non-scaling-stroke"
-                      className="absolute"
+                      className="absolute stroke-[#B4B8C0]  w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                     />
                   </svg>
                 );
@@ -218,13 +228,13 @@ export default function ReplyItem({
             </span>
           </div>
 
-          <p className="text-sm text-gray-600 overflow-[break-word] ">
+          <p className="text-sm text-gray-600 wrap-anywhere whitespace-pre-wrap ">
             {reply?.content}
           </p>
         </div>
 
         {/* actions */}
-        <div className="flex gap-4 mt-2 mx-2 text-xs">
+        <div className="flex gap-4 mt-2 mx-2 text-xs mb-2">
           <button
             onClick={() => {
               handleLike();
@@ -284,31 +294,39 @@ export default function ReplyItem({
           <>
             {!showReplies && (
               <button
-                onClick={() => {
-                  setShowReplies(true);
-                  console.log(
-                    "height:" + replyHeights,
-                    "replies:" + repliesRef.current,
-                  );
-                }}
-                className="text-slate-600 font-semibold mt-3"
+                onClick={() => handleShowReplies()}
+                className="text-slate-600 font-semibold mt-3  mb-3"
               >
-                عرض المزيد
+                {replies?.length} ردود
               </button>
             )}
 
             {showReplies && (
               <div className="mt-3  ">
-                {replies?.map((r, index) => (
-                  <div
-                    ref={(element) => {
-                      if (element) repliesRef.current[index] = element;
-                    }}
-                    key={r.id}
-                  >
-                    <ReplyItem key={r.id} reply={r} depth={depth} />
+                {isFetching ? (
+                  <div className="w-full flex justify-center">
+                    <LoaderIcon className="animate-spin" />
                   </div>
-                ))}
+                ) : (
+                  replies?.map((r, index) => (
+                    <div
+                      ref={(element) => {
+                        if (element) repliesRef.current[index] = element;
+                      }}
+                      key={r.id}
+                    >
+                      <ReplyItem key={r.id} reply={r}  />
+                    </div>
+                  ))
+                )}
+                {hasMoreReplies && (
+                  <button
+                    onClick={() => handleShowReplies()}
+                    className="text-slate-600 font-semibold mt-3  mb-3"
+                  >
+                    عرض المزيد
+                  </button>
+                )}
               </div>
             )}
           </>

@@ -1,6 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
 
-
 function HomeCommunitySectionAdd() {
   return (
     <div className="rounded-2xl p-5 text-white shadow-md relative overflow-hidden bg-linear-to-br secondary-gradient ">

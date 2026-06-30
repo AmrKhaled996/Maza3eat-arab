@@ -21,7 +21,7 @@ export interface Reply {
   commentId: string;
   content: string;
   likesCount: number;
-  depth: string;
+  depth: number;
   path: string;
   createdAt: Date;
   author: Author;
