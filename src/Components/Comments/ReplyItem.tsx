@@ -2,15 +2,23 @@ import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "../shared/Tag";
 import { FormatPublishDate } from "../../utils/DateFormater";
-import { Heart, LoaderIcon, Reply } from "lucide-react";
+import { Heart, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 
 import type { Reply as ReplyType } from "../../Types/Reply";
-import { createReplyToReply, likeToReply, UnlikeToReply } from "../../Apis/CommentsApi/CommentReplies";
+import {
+  createReplyToReply,
+  deleteReply,
+  likeToReply,
+  reportReply,
+  UnlikeToReply,
+} from "../../Apis/CommentsApi/CommentReplies";
 import useGetReplyReplies from "../../Hooks/CommentHooks/useGetReplyReplies";
 import { useNavigate } from "react-router-dom";
 import { localizedPath } from "../../i18n/paths";
+import DeleteThreadDialog from "./DeleteItemDialog";
+import ReportDialog from "./ReportDialog";
 
 export default function ReplyItem({
   reply,
@@ -23,10 +31,14 @@ export default function ReplyItem({
 }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(reply?.likesCount);
+  const [isLiking, setIsLiking] = useState(false);
+
+  const [openMoreMenu, setOpenMoreMenu] = useState(false);
+
   const [showReplies, setShowReplies] = useState(showRepliesFlag);
 
   const [replying, setReplying] = useState(false);
@@ -42,35 +54,47 @@ export default function ReplyItem({
   const rootRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const timeoutRef = useRef<number | null>(null);
 
-  const {
-    data,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-  } = useGetReplyReplies(reply?.id, nextCursor);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const [openReportDialog, setOpenReportDialog] = useState(false);
+  const [reportValue, setReportValue] = useState("spam");
+  const [isReporting, setIsReporting] = useState(false);
+  const [reportingError, setReportingError] = useState("");
+
+  const { data, isLoading, error, isFetching, refetch } = useGetReplyReplies(
+    reply?.id,
+    nextCursor,
+  );
 
   const handleLike = async () => {
-    if (!reply?.id) return;
+    if (!reply?.id || isLiking) return;
+
+    setIsLiking(true);
+
+    const wasLiked = liked;
+    const previousLikes = likes;
+
+    setLiked(!wasLiked);
+    setLikes(previousLikes + (wasLiked ? -1 : 1));
+
     try {
-      setLiked(!liked);
-      setLikes((c) => (liked ? c - 1 : c + 1));
-      if (liked) {
-        await UnlikeToReply(reply?.id);
+      if (wasLiked) {
+        await UnlikeToReply(reply.id);
       } else {
-        await likeToReply(reply?.id);
+        await likeToReply(reply.id);
       }
     } catch (error) {
-      setLiked(!liked);
-      setLikes((c) => (liked ? c - 1 : c + 1));
-      console.error(error);
+      setLiked(wasLiked);
+      setLikes(previousLikes);
+    } finally {
+      setIsLiking(false);
     }
   };
 
-
-/** */
+  /** */
   const handleReplying = async () => {
     const content = replyInputValue.trim();
 
@@ -102,11 +126,66 @@ export default function ReplyItem({
     }
   };
 
-/* handle overflow replies*/
+  const handleDelete = async () => {
+    if (!reply?.id || isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+
+      await deleteReply(reply.id);
+
+      setOpenDeleteDialog(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const MAX_REPORT_LENGTH = 200;
+
+  const handleReport = async () => {
+    if (!reply?.id) return;
+
+    if (isReporting) return;
+
+    const reason = reportValue.trim();
+
+    if (!reason) {
+      setReportingError("Please enter a reason.");
+      return;
+    }
+
+    if (reason.length > MAX_REPORT_LENGTH) {
+      setReportingError(`Maximum ${MAX_REPORT_LENGTH} characters.`);
+      return;
+    }
+
+    try {
+      setIsReporting(true);
+
+      await reportReply(reply.id, reason);
+      console.log(
+        "the report is reported with id:",
+        reply.id,
+        "reason:",
+        reason,
+      );
+      setReportingError("");
+      setOpenReportDialog(false);
+    } catch (err) {
+      console.error(err);
+      setReportingError("Failed to submit report.");
+    }
+  };
+
+  /* handle overflow replies*/
 
   const handleShowReplies = () => {
-    if(replies[0]?.depth % 3 === 0)
-      navigate(localizedPath(lang, `replies/${reply?.id}`),{state: {reply: reply}});
+    if (replies[0]?.depth % 3 === 0)
+      navigate(localizedPath(lang, `replies/${reply?.id}`), {
+        state: { reply: reply, postId:data.postId },
+      });
     if (showReplies) return;
     setShowReplies(true);
   };
@@ -116,7 +195,6 @@ export default function ReplyItem({
     const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
-
       return reply.offsetTop - parentRect;
     });
 
@@ -136,7 +214,6 @@ export default function ReplyItem({
   }, [replies, showReplies, repliesRef, replying]);
 
   useEffect(() => {
-
     if (!rootRef.current) return;
 
     const observer = new ResizeObserver(() => {
@@ -159,33 +236,32 @@ export default function ReplyItem({
   // }, [data]);
   useEffect(() => {
     if (data) {
-
       setReplies(data?.replies);
       setNextCursor(data?.nextCursor);
       setHasMoreReplies(data?.hasMore);
     }
-  },[data])
+  }, [data]);
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
-      <div className="relative w-9 ml-4">
+      <div className={`relative w-9  ${lang === "ar"?"ml-4":"mr-4"} group`}>
         <img
           src={reply?.author?.avatar}
-          className="w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ml-4"
+          className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ${lang === "ar"?"ml-4":"mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />
 
-        <div className="w-fit">
+        <div className="w-fit group">
           {showReplies && !isFetching && (
             <>
               {" "}
               <div
-                className="absolute  bg-[#B4B8C0] left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                 style={{
                   top: "36px",
                   height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
                 }}
-              ></div>
-              {replyHeights?.map((replyHeight, index) => {
+              />
+              {replyHeights?.map((_, index) => {
                 return (
                   <svg
                     key={index}
@@ -194,17 +270,17 @@ export default function ReplyItem({
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className={` ${lang == "ar" ? "-scale-x-100 " : " "}  -left-1/2 translate-x-[0.75px] w-full absolute  -z-10`}
+                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : "-right-1/2 -translate-x-[0.75px] "} text-[#B4B8C0] group-hover:text-blue-400   w-full absolute  -z-10`}
                     style={{
                       top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
                   >
                     <path
                       d="M0.75 0 V80 C0 103 11.4952 110 40.75 113"
-                      stroke="#B4B8C0"
+                      stroke="currentColor"
                       strokeWidth={1.5}
                       vectorEffect="non-scaling-stroke"
-                      className="absolute stroke-[#B4B8C0]  w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                     />
                   </svg>
                 );
@@ -255,16 +331,59 @@ export default function ReplyItem({
             onClick={() => {
               setReplying(!replying);
             }}
-            className="flex items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200"
+            className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
           >
-            <Reply className="h-5 w-5 text-gray-600 group-hover:text-blue-500 " />
+            <Reply className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `} />
             رد
           </button>
+          <div className="relative inline-block">
+            {(reply?.permissions?.canDelete ||
+              reply?.permissions?.canReport) && (
+              <button
+                onClick={() => setOpenMoreMenu((o) => !o)}
+                onBlur={() => {
+                  timeoutRef.current = window.setTimeout(() => {
+                    setOpenMoreMenu(false);
+                  }, 300);
+                }}
+                onFocus={() => {
+                  if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                  }
+                }}
+                className=" rounded-full hover:bg-gray-100 hover:cursor-pointer"
+              >
+                <MoreHorizontal className="h-4 w-4 text-gray-600" />
+              </button>
+            )}
+
+            {openMoreMenu && (
+              <div className="absolute right-0 bottom-full mb-2 w-40 rounded-lg  bg-white shadow-lg">
+                {reply?.permissions?.canReport && (
+                  <button
+                    onClick={() => setOpenReportDialog(true)}
+                    className="block w-full px-4 py-2 hover:bg-gray-100 hover:cursor-pointer"
+                  >
+                    Report
+                  </button>
+                )}
+
+                {reply?.permissions?.canDelete && (
+                  <button
+                    onClick={() => setOpenDeleteDialog(true)}
+                    className="block w-full px-4 py-2 text-red-600 hover:bg-red-50 hover:cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* reply input */}
         {replying && (
-          <div className="flex gap-2 mt-2  rounded-full">
+          <div className="flex gap-2 mt-2 mb-2  rounded-full">
             <textarea
               value={replyInputValue}
               onChange={(e) => {
@@ -315,7 +434,7 @@ export default function ReplyItem({
                       }}
                       key={r.id}
                     >
-                      <ReplyItem key={r.id} reply={r}  />
+                      <ReplyItem key={r.id} reply={r} />
                     </div>
                   ))
                 )}
@@ -332,6 +451,27 @@ export default function ReplyItem({
           </>
         )}
       </div>
+      {openDeleteDialog && (
+        <DeleteThreadDialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          onConfirm={() => {
+            handleDelete();
+          }}
+        />
+      )}
+      {openReportDialog && (
+        <ReportDialog
+          open={openReportDialog}
+          onClose={() => setOpenReportDialog(false)}
+          onConfirm={() => {
+            handleReport();
+          }}
+          setReportReason={setReportValue}
+          reportReason={reportValue}
+          errorMessage={reportingError}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Comment } from "../../Types/Comment";
+import type { Comment as CommentType } from "../../Types/Comment";
 import CommentInput from "./CommentInput";
 import CommentItem from "./CommentItems";
 import { useParams } from "react-router-dom";
@@ -94,7 +94,8 @@ import { useAuth } from "../../Context/Auth";
 //   },
 // ];
 export default function CommentsSection() {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
+  // const [newComment, setNewComment] = useState<Comment>();
   const { user } = useAuth();
   const { id: postIdparam } = useParams<{ id: string }>();
   const lastCommentRef = useRef<HTMLDivElement>(null);
@@ -133,6 +134,9 @@ export default function CommentsSection() {
   //   }
   // }, [postCommentsResponse]);
 
+  const handleAddComment = (comment: CommentType) => {
+    setComments((prev) => [comment, ...prev]);
+  };
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
@@ -160,7 +164,11 @@ export default function CommentsSection() {
 
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">
-      {user && <CommentInput />}
+      {user && (
+        <div className="w-full">
+          <CommentInput onAddComment={handleAddComment} />
+        </div>
+      )}
 
       <div className="flex flex-col gap-5 max-w-2xl">
         {isLoading ? (
@@ -184,7 +192,7 @@ export default function CommentsSection() {
 function SkeletonComment({ indent = false }) {
   return (
     <div className={`flex gap-3 animate-pulse ${indent ? "mr-10" : ""}`}>
-      <div className="w-9 h-9 rounded-full bg-gray-200 flex-shrink-0" />
+      <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="flex gap-2 items-center">
           <div className="h-3 w-24 bg-gray-200 rounded-full" />

@@ -4,11 +4,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { Reply } from "../../Types/Reply";
 import HomeQandAPostsAdvertisement from "../../Components/Home/Q&ASection/Advertisement";
 import QandAPopularQuestion from "../../Components/shared/PopularQuestion";
+import NavigationBar from "../../Components/shared/NavigationBar";
+import { localizedPath } from "../../i18n/paths";
+import { useLocale } from "../../i18n/useLocale";
+import { useTranslation } from "react-i18next";
 
 function RepliesThreadPage() {
+
+    const { lang } = useLocale();
+    const { t } = useTranslation();
+
   const { state } = useLocation();
   const navigate = useNavigate();
   const reply:Reply = state.reply;
+  const postId = state.postId;
   // const reply = {
   //   id: "0dd78c6c-4797-4851-80ce-04551898ec77",
   //   commentId: "66954a43-36bb-4124-9ef5-2d1ceb14ea18",
@@ -41,8 +50,9 @@ function RepliesThreadPage() {
   return (
 
       <div className="min-h-screen  max-w-7xl mx-auto">
+        <NavigationBar page="" solidNav={true} />
         {/* ================= Page ================= */}
-        <main className="mx-auto max-w-362.5 px-6 py-6">
+        <main className="mx-auto max-w-362.5 px-6 py-6 mt-12">
           <div className="grid grid-cols-12 gap-4">
             {/* ================= Left Side ================= */}
             <section className="col-span-12 xl:col-span-7">
@@ -55,7 +65,9 @@ function RepliesThreadPage() {
                   <ArrowLeft className="h-5 w-5" />
                 </button>
               {/* Show Discussion */}
-                <button className="rounded-full bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer  px-4 py-1 text-sm font-medium \ m-auto flex gap-2">
+                <button 
+                onClick={()=>{navigate(localizedPath(lang, `post/${postId}`))}}
+                className="rounded-full bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer  px-4 py-1 text-sm font-medium \ m-auto flex gap-2">
                   Show Full Discussion <ArrowUpRight className="ml-2 h-4 w-4" />
                 </button>
               </div>

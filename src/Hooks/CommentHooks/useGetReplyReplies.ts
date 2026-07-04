@@ -4,26 +4,6 @@ import {
   getReplyRepliesWithCursor,
 } from "../../Apis/CommentsApi/CommentReplies";
 
-// function useGetReplysReplys(replyId: string) {
-//   return useQuery({
-//     queryKey: ,
-//     queryFn: () => getReplyReplies(replyId),
-//   });
-// }
-
-// function useGetReplysReplys(replyId: string, cursor: string = "") {
-//   return useInfiniteQuery({
-//     queryKey: ["get-reply-replies", replyId],
-//     queryFn: ({ pageParam = cursor }) => {
-//       if (pageParam) {
-//         return getReplyRepliesWithCursor(replyId, pageParam);
-//       }
-//       return getReplyReplies(replyId);
-//     },
-//     initialPageParam: cursor,
-//     getNextPageParam: (lastPage) => lastPage?.nextCursor,
-//   });
-// }
 
 function useGetReplysReplys(replyId: string, cursor: string = "") {
   return useQuery({
@@ -34,9 +14,10 @@ function useGetReplysReplys(replyId: string, cursor: string = "") {
       }
       return getReplyReplies(replyId);
     },
-    // initialPageParam: cursor,
-    // getNextPageParam: (lastPage) => lastPage?.nextCursor,
-    refetchOnWindowFocus: false,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false
   });
 }
 export default useGetReplysReplys;

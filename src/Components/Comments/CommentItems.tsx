@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Comment } from "../../Types/Comment";
 import { Badge } from "../shared/Tag";
 import { FormatPublishDate } from "../../utils/DateFormater";
-import { Heart, LoaderIcon, Reply } from "lucide-react";
+import { Heart, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 
@@ -11,7 +11,15 @@ import ReplyItem from "./ReplyItem";
 import type { Reply as ReplyType } from "../../Types/Reply";
 import { createReplyToComment } from "../../Apis/CommentsApi/CommentReplies";
 import useGetCommentsReplies from "../../Hooks/CommentHooks/useGetCommentReplies";
-import { likeToComment, UnlikeToComment } from "../../Apis/CommentsApi/Comment";
+import {
+  deleteComment,
+  likeToComment,
+  reportComment,
+  UnlikeToComment,
+} from "../../Apis/CommentsApi/Comment";
+import DeleteThreadDialog from "./DeleteItemDialog";
+import ReportDialog from "./ReportDialog";
+import { useParams } from "react-router-dom";
 
 export default function CommentItem({ comment }: { comment: Comment }) {
   const { lang } = useLocale();
@@ -20,6 +28,8 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const [liked, setLiked] = useState(comment?.likedByMe);
   const [likes, setLikes] = useState(comment?.likesCount);
   const [isLiking, setIsLiking] = useState(false);
+
+  const [openMoreMenu, setOpenMoreMenu] = useState(false);
 
   const [showReplies, setShowReplies] = useState(false);
 
@@ -32,9 +42,21 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const [hasMoreReplies, setHasMoreReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
 
-  const lastReplyRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [openReportDialog, setOpenReportDialog] = useState(false);
+  const [reportValue, setReportValue] = useState("spam");
+  const [isReporting, setIsReporting] = useState(false);
+  const [reportingError, setReportingError] = useState("");
+
+  const { id: postIdparam } = useParams<{ id: string }>();
+
+  if (!postIdparam) return null;
 
   const {
     data,
@@ -99,20 +121,56 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     }
   };
 
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver((entries) => {
-  //     if (entries[0].isIntersecting) {
-  //       console.log("intersecting");
-  //       fetchNextPage();
-  //     }
-  //   });
+  const handleDelete = async () => {
+    if (!postIdparam || !comment?.id || isDeleting) return;
 
-  //   if (lastReplyRef.current) observer.observe(lastReplyRef.current);
+    try {
+      setIsDeleting(true);
 
-  //   return () => {
-  //     if (lastReplyRef.current) observer.unobserve(lastReplyRef.current);
-  //   };
-  // }, [fetchNextPage]);
+      await deleteComment(postIdparam, comment.id);
+
+      setOpenDeleteDialog(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const MAX_REPORT_LENGTH = 200;
+
+  const handleReport = async () => {
+    if (!comment?.id) return;
+
+    if (isReporting) return;
+
+    const reason = reportValue.trim();
+
+    if (!reason) {
+      setReportingError("Please enter a reason.");
+      return;
+    }
+
+    if (reason.length > MAX_REPORT_LENGTH) {
+      setReportingError(`Maximum ${MAX_REPORT_LENGTH} characters.`);
+      return;
+    }
+
+    try {
+      setIsReporting(true);
+
+      await reportComment(comment.id, reason);
+      console.log("the report is reported with id:",comment.id,"reason:",reason )
+      setReportingError("");
+      setOpenReportDialog(false);
+    } catch (err) {
+      console.error(err);
+      setReportingError("Failed to submit report.");
+    }
+    finally {
+      setIsReporting(false);
+    }
+  };
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
@@ -149,17 +207,6 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     return () => observer.disconnect();
   }, [rootRef, replying]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     const allReplies = data.pages.flatMap((page: any) => page?.replies);
-  //     setReplies(allReplies);
-  //     // console.log("loading");
-  //     if (isFetching) {
-  //       console.log("loading");
-  //     }
-  //   }
-  // }, [data]);
-
   useEffect(() => {
     if (data) {
       setReplies((prev) => [...prev, ...data?.replies]);
@@ -168,26 +215,26 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     }
   }, [data]);
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
-      <div className="relative w-9 ml-4">
+    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={comment?.id}>
+      <div className={`relative w-9 mx-4 ${lang === "ar"?"ml-4":"mr-4"} group`}>
         <img
           src={comment?.author?.avatar}
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ml-4"
+          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2"
           style={{ outlineColor: comment?.author?.tier.badgeColor }}
         />
 
-        <div className="w-fit">
+        <div className="w-fit ">
           {showReplies && (
             <>
               {" "}
               <div
-                className="absolute  bg-[#B4B8C0] left-1/2 -translate-x-1/2 w-[1.5px] -z-10"
+                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 transition-colors duration-300 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                 style={{
                   top: "36px",
                   height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
                 }}
-              ></div>
-              {replyHeights?.map((replyHeight, index) => {
+              />
+              {replyHeights?.map((_, index) => {
                 return (
                   <svg
                     key={index}
@@ -196,17 +243,17 @@ export default function CommentItem({ comment }: { comment: Comment }) {
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className={` ${lang == "ar" ? "-scale-x-100 " : " "}  -left-1/2 translate-x-[0.75px] w-full absolute  -z-10`}
+                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : " -right-1/2 -translate-x-[0.75px]"} text-[#B4B8C0] group-hover:text-blue-400 w-full absolute  transition-colors duration-300 -z-10`}
                     style={{
                       top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
                   >
                     <path
                       d="M0.75 0 V80 C0 103 11.4952 110 40.75 113"
-                      stroke="#B4B8C0"
+                      stroke="currentColor"
                       strokeWidth={1.5}
                       vectorEffect="non-scaling-stroke"
-                      className="absolute"
+                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
                     />
                   </svg>
                 );
@@ -236,7 +283,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
         </div>
 
         {/* actions */}
-        <div className="flex gap-4 mt-2 mx-2 text-xs">
+        <div className="flex gap-4 mt-2 mx-2 mb-2 text-xs">
           <button
             onClick={() => {
               handleLike();
@@ -257,16 +304,59 @@ export default function CommentItem({ comment }: { comment: Comment }) {
             onClick={() => {
               setReplying(!replying);
             }}
-            className="flex items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200"
+            className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
           >
-            <Reply className="h-5 w-5 text-gray-600 group-hover:text-blue-500 " />
+            <Reply className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `} />
             رد
           </button>
+          <div className="relative inline-block">
+            {(comment?.permissions?.canDelete ||
+              comment?.permissions?.canReport) && (
+              <button
+                onClick={() => setOpenMoreMenu((o) => !o)}
+                onBlur={() => {
+                  timeoutRef.current = window.setTimeout(() => {
+                    setOpenMoreMenu(false);
+                  }, 300);
+                }}
+                onFocus={() => {
+                  if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                  }
+                }}
+                className=" rounded-full hover:bg-gray-100 hover:cursor-pointer"
+              >
+                <MoreHorizontal className="h-4 w-4 text-gray-600" />
+              </button>
+            )}
+
+            {openMoreMenu && (
+              <div className="absolute right-0 bottom-full  border border-gray-200 rounded-xl mb-2 w-40 bg-white shadow-lg">
+                {comment?.permissions?.canReport && (
+                  <button
+                    onClick={() => setOpenReportDialog(true)}
+                    className="block w-full px-4 py-2  hover:bg-gray-100 hover:cursor-pointer"
+                  >
+                    Report
+                  </button>
+                )}
+
+                {comment?.permissions?.canDelete && (
+                  <button
+                    onClick={() => setOpenDeleteDialog(true)}
+                    className="block w-full px-4 py-2 text-red-600 hover:bg-red-50 hover:cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* reply input */}
         {replying && (
-          <div className="flex gap-2 mt-2  rounded-full">
+          <div className="flex gap-2 mt-2 mb-2 rounded-full">
             <textarea
               value={replyInputValue}
               onChange={(e) => {
@@ -299,7 +389,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
                 onClick={() => {
                   setShowReplies(true);
                 }}
-                className="text-slate-600 font-semibold mt-3"
+                className="text-slate-600 font-semibold mt-3 mb-2"
               >
                 {comment?.repliesCount} عرض المزيد
               </button>
@@ -344,6 +434,27 @@ export default function CommentItem({ comment }: { comment: Comment }) {
           </>
         )}
       </div>
+      {openDeleteDialog && (
+        <DeleteThreadDialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          onConfirm={() => {
+            handleDelete();
+          }}
+        />
+      )}
+      {openReportDialog && (
+        <ReportDialog
+          open={openReportDialog}
+          onClose={() => setOpenReportDialog(false)}
+          onConfirm={() => {
+            handleReport();
+          }}
+          setReportReason={setReportValue}
+          reportReason={reportValue}
+          errorMessage={reportingError}
+        />
+      )}
     </div>
   );
 }

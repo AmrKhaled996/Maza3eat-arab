@@ -57,9 +57,9 @@ export async function getCommentRepliesWithCursor(
   cursor: string,
 ) {
   try {
-    const response = await axiosInstance.get(
-      `/comments/${commentId}/replies`,{params:{cursor:cursor}}
-    );
+    const response = await axiosInstance.get(`/comments/${commentId}/replies`, {
+      params: { cursor: cursor },
+    });
 
     return response.data.data;
   } catch (error) {
@@ -88,7 +88,39 @@ export async function getCommentReplies(commentId: string) {
   }
 }
 
-export async function likeToComment( commentId: string) {
+export async function deleteComment(postId: string, commentId: string) {
+  try {
+    return axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error delete comment:",
+      axiosError.response?.data || axiosError.message,
+    );
+
+    throw error;
+  }
+}
+
+export async function reportComment(commentId: string, reason: string) {
+  try {
+    return axiosInstance.post(`/reports/`, {
+      targetId: commentId,
+      targetType: "COMMENT",
+      reason,
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error report comment:",
+      axiosError.response?.data || axiosError.message,
+    );
+
+    throw error;
+  }
+}
+
+export async function likeToComment(commentId: string) {
   try {
     return axiosInstance.post(`/comments/${commentId}/like`);
   } catch (error) {
@@ -101,7 +133,7 @@ export async function likeToComment( commentId: string) {
     throw error;
   }
 }
-export async function UnlikeToComment( commentId: string) {
+export async function UnlikeToComment(commentId: string) {
   try {
     return axiosInstance.delete(`/comments/${commentId}/like`);
   } catch (error) {
@@ -114,4 +146,3 @@ export async function UnlikeToComment( commentId: string) {
     throw error;
   }
 }
-

@@ -67,6 +67,34 @@ export async function getReplyReplies(replyId: string) {
     throw error;
   }
 }
+export async function deleteReply(replyId: string) {
+  try {
+    return axiosInstance.delete(`/replies/${replyId}`);
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error delete reply:",
+      axiosError.response?.data || axiosError.message,
+    );
+
+    throw error;
+  }
+}
+
+export async function reportReply(replyId: string, reason: string) {
+  
+  try {
+    return axiosInstance.post(`/reports/`, { targetId:replyId,targetType:"REPLY", reason:reason });
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error report comment:",
+      axiosError.response?.data || axiosError.message,
+    );
+
+    throw error;
+  }
+}
 
 export async function likeToReply(replyId: string) {
   try {

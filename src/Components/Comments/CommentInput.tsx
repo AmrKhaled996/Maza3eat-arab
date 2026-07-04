@@ -3,8 +3,9 @@ import { createComment } from "../../Apis/CommentsApi/Comment";
 import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../Context/Auth";
 import { LoaderIcon } from "lucide-react";
+import type { Comment } from "../../Types/Comment";
 
-function CommentInput() {
+function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
   const [commentValue, setCommentValue] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { id: postIdparam } = useParams<{ id: string }>();
@@ -29,8 +30,9 @@ function CommentInput() {
     try {
       setIsSubmitting(true);
 
-      await createComment(content, postIdparam);
-
+      const response = await createComment(content, postIdparam);
+      console.log("the response", response);
+      onAddComment(response?.data?.data);
       setCommentValue("");
     } catch (error) {
       console.error(error);
@@ -41,7 +43,7 @@ function CommentInput() {
   };
 
   return (
-    <div className="flex items-center gap-3 mb-8 bg-white rounded-2xl p-3 ">
+    <div className="flex items-center max-w-xl justify-center mx-auto gap-3 mb-8 bg-white rounded-2xl p-3 w-full ">
       <img
         src={user?.avatar}
         alt={user?.name}
@@ -55,7 +57,7 @@ function CommentInput() {
         }}
         onKeyDown={(e) => e.key === "Enter" && handleComment()}
         placeholder="اكتب تعليقاً..."
-        className="flex-1 text-sm  focus:outline-none text-gray-700 placeholder-gray-400 rounded-full border-2 bg-gray-50 border-gray-200 px-4 py-2"
+        className="w-full max-w-xl rounded-full border-2 border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
       />
       <button
         onClick={() => handleComment()}
