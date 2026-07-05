@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Dialog from "../shared/DialogContainer";
 
@@ -24,8 +23,9 @@ export default function ReportDialog({
 }: ReportDialogProps) {
   const { t } = useTranslation();
 
-  const [reason, setReason] = useState<ReportReason>("spam");
+  const isOther = !["spam", "harassment", "hate", "misinformation"].includes(reportReason);
 
+  const isSubmitDisabled = isOther && (!reportReason.trim() || reportReason === "other");
 
   const handleSubmit = () => {
     onConfirm();
@@ -74,20 +74,20 @@ export default function ReportDialog({
               <input
                 type="radio"
                 name="report-reason"
-                checked={reportReason === item.value}
-                onChange={() =>{ setReportReason(item.value)}}
+                checked={item.value === "other" ? isOther : reportReason === item.value}
+                onChange={() => { setReportReason(item.value); }}
               />
 
               <span>{item.label}</span>
             </label>
 
-            {item.value === "other" && reportReason === "other" && (
+            {item.value === "other" && isOther && (
               <textarea
-                value={reportReason}
+                value={reportReason === "other" ? "" : reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
                 placeholder={t("report.otherPlaceholder", "Tell us more...")}
                 rows={3}
-                className="mt-2 w-full rounded-lg border p-3 text-sm outline-none focus:border-primary"
+                className="mt-2 w-full rounded-lg border p-3 text-sm outline-none focus:border-primary text-gray-700"
               />
             )}
           </div>
@@ -104,8 +104,8 @@ export default function ReportDialog({
 
         <button
           onClick={handleSubmit}
-          disabled={reportReason === "other" && !reportReason.trim()}
-          className={`${reportReason === "other" && !reportReason.trim() ? "disabled:cursor-not-allowed disabled:bg-slate-400 opacity-30" : `bg-red-500`} rounded px-4 py-2 text-white`}
+          disabled={isSubmitDisabled}
+          className={`${isSubmitDisabled ? "disabled:cursor-not-allowed disabled:bg-slate-400 opacity-30" : "bg-red-500"} rounded px-4 py-2 text-white`}
         >
           {t("report.submit", "Submit Report")}
         </button>

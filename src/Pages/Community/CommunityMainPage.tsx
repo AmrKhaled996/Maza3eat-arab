@@ -22,7 +22,6 @@ export default function CommunityMainPage() {
   const {
     data,
     isLoading,
-    error,
     isFetchingNextPage,
     fetchNextPage,
     isFetching,

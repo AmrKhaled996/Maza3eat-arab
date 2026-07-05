@@ -4,8 +4,10 @@ import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../Context/Auth";
 import { LoaderIcon } from "lucide-react";
 import type { Comment } from "../../Types/Comment";
+import { useTranslation } from "react-i18next";
 
 function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
+  const { t } = useTranslation();
   const [commentValue, setCommentValue] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { id: postIdparam } = useParams<{ id: string }>();
@@ -56,7 +58,7 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
           setCommentValue(e.target.value);
         }}
         onKeyDown={(e) => e.key === "Enter" && handleComment()}
-        placeholder="اكتب تعليقاً..."
+        placeholder={t("comments.placeholder")}
         className="w-full max-w-xl rounded-full border-2 border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
       />
       <button
@@ -69,7 +71,7 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
             <LoaderIcon className="animate-spin" />
           </>
         ) : (
-          " نشر "
+          t("comments.publish")
         )}
       </button>
     </div>

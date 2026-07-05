@@ -174,5 +174,52 @@
     "popular": "Most Popular",
     "latest": "Latest",
     "searchPlaceholder": "Search for posts..."
+  },
+  "common": {
+    "actions": {
+      "cancel": "Cancel"
+    }
+  },
+  "confirm": {
+    "deleteEvent": {
+      "title": "Delete Comment",
+      "message": "Are you sure you want to delete this comment? This action cannot be undone.",
+      "deleteButton": "Delete"
+    }
+  },
+  "report": {
+    "title": "Report",
+    "description": "Why are you reporting this content?",
+    "otherPlaceholder": "Tell us more...",
+    "submit": "Submit Report",
+    "reasons": {
+      "spam": "Spam",
+      "harassment": "Harassment or bullying",
+      "hate": "Hate speech",
+      "misinformation": "False information",
+      "other": "Other"
+    }
+  },
+  "comments": {
+    "placeholder": "Write a comment...",
+    "writeReplyPlaceholder": "Write...",
+    "publish": "Publish",
+    "reply": "Reply",
+    "report": "Report",
+    "delete": "Delete",
+    "viewMoreReplies": "Show {{count}} replies",
+    "repliesCount": "{{count}} replies",
+    "showMore": "Show more",
+    "errors": {
+      "enterReason": "Please enter a reason.",
+      "maxChars": "Maximum {{count}} characters.",
+      "failedReport": "Failed to submit report."
+    },
+    "showDiscussion": "Show Full Discussion"
+
+    
+
   }
+
+
 }

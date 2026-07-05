@@ -180,10 +180,15 @@ export default function CommentsSection() {
             {comments?.map((c) => (
               <CommentItem key={c.id} comment={c} />
             ))}
-            {isFetchingNextPage && <SkeletonComment indent />}
-            <div ref={lastCommentRef} className="w-full h-2"></div>
           </div>
         )}
+        {isFetchingNextPage && <div className="flex flex-col gap-3 animate-pulse">
+          <SkeletonComment indent />
+          <SkeletonComment indent />
+          <SkeletonComment indent />
+          </div>
+          }
+        <div ref={lastCommentRef} className="w-full h-3"></div>
       </div>
     </div>
   );

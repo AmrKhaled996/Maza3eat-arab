@@ -15,10 +15,11 @@ import {
   UnlikeToReply,
 } from "../../Apis/CommentsApi/CommentReplies";
 import useGetReplyReplies from "../../Hooks/CommentHooks/useGetReplyReplies";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { localizedPath } from "../../i18n/paths";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
+import cn from "../../utils/Cn";
 
 export default function ReplyItem({
   reply,
@@ -45,11 +46,16 @@ export default function ReplyItem({
   const [replyInputValue, setreplyInputValue] = useState("");
   const [replyHeights, setreplyHeights] = useState<number[]>([0]);
   const repliesRef = useRef<HTMLDivElement[]>([]);
-  const lastReplyRef = useRef<HTMLDivElement>(null);
+  // const lastReplyRef = useRef<HTMLDivElement>(null);
   const [replies, setReplies] = useState<ReplyType[]>([]);
 
   const [hasMoreReplies, setHasMoreReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
+
+  const [IsHighligthed, setIsHighligthed] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  const HighlightedCommentID = searchParams.get("highlighted");
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,10 +70,18 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isLoading, error, isFetching, refetch } = useGetReplyReplies(
-    reply?.id,
-    nextCursor,
-  );
+  const { data, isFetching } = useGetReplyReplies(reply?.id, nextCursor);
+
+  const Highlight = () => {
+    console.log("url", HighlightedCommentID, "comment", reply.id);
+    if (reply?.id === HighlightedCommentID) {
+      // setIsHighligthed(true);
+      return "border-blue-300 bg-sky-100";
+    } else {
+      // setIsHighligthed(false);
+      return "border-[#E5E7EB] bg-[#f7f7f7]";
+    }
+  };
 
   const handleLike = async () => {
     if (!reply?.id || isLiking) return;
@@ -152,12 +166,14 @@ export default function ReplyItem({
     const reason = reportValue.trim();
 
     if (!reason) {
-      setReportingError("Please enter a reason.");
+      setReportingError(t("comments.errors.enterReason"));
       return;
     }
 
     if (reason.length > MAX_REPORT_LENGTH) {
-      setReportingError(`Maximum ${MAX_REPORT_LENGTH} characters.`);
+      setReportingError(
+        t("comments.errors.maxChars", { count: MAX_REPORT_LENGTH }),
+      );
       return;
     }
 
@@ -175,7 +191,7 @@ export default function ReplyItem({
       setOpenReportDialog(false);
     } catch (err) {
       console.error(err);
-      setReportingError("Failed to submit report.");
+      setReportingError(t("comments.errors.failedReport"));
     }
   };
 
@@ -184,7 +200,7 @@ export default function ReplyItem({
   const handleShowReplies = () => {
     if (replies[0]?.depth % 3 === 0)
       navigate(localizedPath(lang, `replies/${reply?.id}`), {
-        state: { reply: reply, postId:data.postId },
+        state: { reply: reply, postId: data.postId },
       });
     if (showReplies) return;
     setShowReplies(true);
@@ -241,12 +257,18 @@ export default function ReplyItem({
       setHasMoreReplies(data?.hasMore);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (HighlightedCommentID === reply?.id) {
+      setIsHighligthed(true);
+    }
+  }, []);
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
-      <div className={`relative w-9  ${lang === "ar"?"ml-4":"mr-4"} group`}>
+      <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
         <img
           src={reply?.author?.avatar}
-          className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ${lang === "ar"?"ml-4":"mr-4"}`}
+          className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ${lang === "ar" ? "ml-4" : "mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />
 
@@ -290,9 +312,17 @@ export default function ReplyItem({
         </div>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 relative">
+        {IsHighligthed && (
+          <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />
+        )}
         {/* bubble */}
-        <div className="bg-[#f7f7f7] border border-[#E5E7EB] rounded-2xl px-4 py-3 shadow-sm  w-full">
+        <div
+          className={cn(
+            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
+            Highlight(),
+          )}
+        >
           <div className="flex gap-2 items-center">
             <span className="font-bold">{reply?.author?.name}</span>
             <Badge
@@ -333,8 +363,10 @@ export default function ReplyItem({
             }}
             className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
           >
-            <Reply className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `} />
-            رد
+            <Reply
+              className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
+            />
+            {t("comments.reply")}
           </button>
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
@@ -364,7 +396,7 @@ export default function ReplyItem({
                     onClick={() => setOpenReportDialog(true)}
                     className="block w-full px-4 py-2 hover:bg-gray-100 hover:cursor-pointer"
                   >
-                    Report
+                    {t("comments.report")}
                   </button>
                 )}
 
@@ -373,7 +405,7 @@ export default function ReplyItem({
                     onClick={() => setOpenDeleteDialog(true)}
                     className="block w-full px-4 py-2 text-red-600 hover:bg-red-50 hover:cursor-pointer"
                   >
-                    Delete
+                    {t("comments.delete")}
                   </button>
                 )}
               </div>
@@ -390,7 +422,7 @@ export default function ReplyItem({
                 setreplyInputValue(e.target.value);
               }}
               onKeyDown={(e) => e.key === "Enter" && {}}
-              placeholder="اكتب..."
+              placeholder={t("comments.writeReplyPlaceholder")}
               className="flex-1 border border-slate-400 rounded-full px-3 py-2 text-sm focus:border-primary focus:outline-primary text-gray-700 placeholder-gray-400 resize-none min-h-5 h-10 scrollbar-hide line-clamp-3"
             />
             <button
@@ -402,7 +434,7 @@ export default function ReplyItem({
                   <LoaderIcon className="animate-spin" />
                 </>
               ) : (
-                " نشر "
+                t("comments.publish")
               )}
             </button>
           </div>
@@ -416,14 +448,14 @@ export default function ReplyItem({
                 onClick={() => handleShowReplies()}
                 className="text-slate-600 font-semibold mt-3  mb-3"
               >
-                {replies?.length} ردود
+                {t("comments.repliesCount", { count: replies?.length })}
               </button>
             )}
 
             {showReplies && (
               <div className="mt-3  ">
                 {isFetching ? (
-                  <div className="w-full flex justify-center">
+                  <div className="w-full flex justify-center my-2">
                     <LoaderIcon className="animate-spin" />
                   </div>
                 ) : (
@@ -443,7 +475,7 @@ export default function ReplyItem({
                     onClick={() => handleShowReplies()}
                     className="text-slate-600 font-semibold mt-3  mb-3"
                   >
-                    عرض المزيد
+                    {t("comments.showMore")}
                   </button>
                 )}
               </div>
@@ -472,22 +504,6 @@ export default function ReplyItem({
           errorMessage={reportingError}
         />
       )}
-    </div>
-  );
-}
-
-function SkeletonReply({ indent = false }) {
-  return (
-    <div className={`flex gap-3 animate-pulse ${indent ? "mr-10" : ""}`}>
-      <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="flex gap-2 items-center">
-          <div className="h-3 w-24 bg-gray-200 rounded-full" />
-          <div className="h-3 w-12 bg-gray-200 rounded-full" />
-        </div>
-        <div className="h-3 w-full bg-gray-200 rounded-full" />
-        <div className="h-3 w-3/4 bg-gray-200 rounded-full" />
-      </div>
     </div>
   );
 }
