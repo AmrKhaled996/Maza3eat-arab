@@ -3,15 +3,15 @@ import { getCommentsByPostId, getCommentsByPostIdWithCursor } from "../../Apis/C
 
 
 
-function useGetCommentsByPostId( postId: string ,cursor:string ="") {
+function useGetCommentsByPostId( postId: string ,cursor:string ="" , excludeCommentId?: string) {
     return  useInfiniteQuery({
         queryKey: ["get-post-comment"],
         queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){
-        return getCommentsByPostIdWithCursor(postId, pageParam);
+        return getCommentsByPostIdWithCursor(postId, pageParam ,excludeCommentId);
       }
-      return  getCommentsByPostId(postId)},
+      return  getCommentsByPostId(postId ,excludeCommentId)} ,
     initialPageParam: cursor,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
   });

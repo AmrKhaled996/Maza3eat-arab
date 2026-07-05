@@ -1,13 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getReplyReplies,
-  getReplyRepliesWithCursor,
-} from "../../Apis/CommentsApi/CommentReplies";
+import { getReplyReplies, getReplyRepliesWithCursor } from "../../Apis/AnswersApi/AnswerReplies";
+
 
 
 function useGetReplysReplys(replyId: string, cursor: string = "") {
   return useQuery({
-    queryKey: ["get-reply-replies", replyId],
+    queryKey: ["get-answer-reply-replies", replyId],
     queryFn: () => {
       if (cursor) {
         return getReplyRepliesWithCursor(replyId, cursor);

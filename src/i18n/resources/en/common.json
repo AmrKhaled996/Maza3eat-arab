@@ -219,6 +219,26 @@
 
     
 
+  },
+  "answers": {
+    "placeholder": "Write an answer...",
+    "writeReplyPlaceholder": "Write...",
+    "publish": "Publish",
+    "reply": "Reply",
+    "report": "Report",
+    "delete": "Delete",
+    "viewMoreReplies": "Show {{count}} replies",
+    "repliesCount": "{{count}} replies",
+    "showMore": "Show more",
+    "errors": {
+      "enterReason": "Please enter a reason.",
+      "maxChars": "Maximum {{count}} characters.",
+      "failedReport": "Failed to submit report."
+    },
+    "showDiscussion": "Show Full Discussion"
+
+    
+
   }
 
 

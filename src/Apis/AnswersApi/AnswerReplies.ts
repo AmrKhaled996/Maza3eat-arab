@@ -1,9 +1,9 @@
 import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 
-export async function createReplyToComment(content: string, commentId: string) {
+export async function createReplyToAnswer(content: string, answerId: string) {
   try {
-    return axiosInstance.post(`/comments/${commentId}/replies`, { content });
+    return axiosInstance.post(`/answers/${answerId}/replies`, { content });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
@@ -16,7 +16,9 @@ export async function createReplyToComment(content: string, commentId: string) {
 }
 export async function createReplyToReply(content: string, replyId: string) {
   try {
-    return axiosInstance.post(`/replies/${replyId}/replies`, { content });
+    return axiosInstance.post(`/answer-replies/${replyId}/replies`, {
+      content,
+    });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
@@ -29,7 +31,7 @@ export async function createReplyToReply(content: string, replyId: string) {
 }
 
 // export async function getReplyReplies(replyId: string) {
-//   return axiosInstance.get(`/replies/${replyId}/replies`);
+//   return axiosInstance.get(`/answer-replies/${replyId}/replies`);
 // }
 
 export async function getReplyRepliesWithCursor(
@@ -37,9 +39,12 @@ export async function getReplyRepliesWithCursor(
   cursor: string,
 ) {
   try {
-    const response = await axiosInstance.get(`/replies/${replyId}/replies`, {
-      params: { cursor: cursor },
-    });
+    const response = await axiosInstance.get(
+      `/answer-replies/${replyId}/replies`,
+      {
+        params: { cursor: cursor },
+      },
+    );
 
     return response.data.data;
   } catch (error) {
@@ -54,7 +59,9 @@ export async function getReplyRepliesWithCursor(
 }
 export async function getReplyReplies(replyId: string) {
   try {
-    const response = await axiosInstance.get(`/replies/${replyId}/replies`);
+    const response = await axiosInstance.get(
+      `/answer-replies/${replyId}/replies`,
+    );
 
     return response.data.data;
   } catch (error) {
@@ -69,7 +76,7 @@ export async function getReplyReplies(replyId: string) {
 }
 export async function deleteReply(replyId: string) {
   try {
-    return axiosInstance.delete(`/replies/${replyId}`);
+    return axiosInstance.delete(`/answer-replies/${replyId}`);
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
@@ -82,9 +89,12 @@ export async function deleteReply(replyId: string) {
 }
 
 export async function reportReply(replyId: string, reason: string) {
-  
   try {
-    return axiosInstance.post(`/reports/`, { targetId:replyId,targetType:"COMMENT_REPLY", reason:reason });
+    return axiosInstance.post(`/reports/`, {
+      targetId: replyId,
+      targetType: "ANSWER_REPLY",
+      reason: reason,
+    });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
@@ -98,7 +108,7 @@ export async function reportReply(replyId: string, reason: string) {
 
 export async function likeToReply(replyId: string) {
   try {
-    return axiosInstance.post(`/replies/${replyId}/like`);
+    return axiosInstance.post(`/answer-replies/${replyId}/like`);
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
@@ -111,7 +121,7 @@ export async function likeToReply(replyId: string) {
 }
 export async function unlikeToReply(replyId: string) {
   try {
-    return axiosInstance.delete(`/replies/${replyId}/like`);
+    return axiosInstance.delete(`/answer-replies/${replyId}/like`);
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(

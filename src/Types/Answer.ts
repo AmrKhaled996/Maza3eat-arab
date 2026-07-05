@@ -1,21 +1,7 @@
 import type { Reply } from "./Reply";
 
-
-export interface Comment {
-  id: string;
-  postId: string;
-  content: string;
-  likesCount: number;
-  repliesCount: number;
-  createdAt: Date;
-  author: Author;
-  likedByMe: boolean;
-  permissions: Permissions,
-  replies?: Reply[];
-}
-
 export interface Tier {
-  id: string;
+  id: number;
   name: string;
   badgeColor: string;
 }
@@ -30,4 +16,17 @@ export interface Author {
 export interface Permissions {
   canDelete: boolean;
   canReport: boolean;
+}
+
+export interface Answer {
+  id: string;
+  questionId: string;
+  content: string;
+  totalVoteValue: number;
+  repliesCount: number;
+  createdAt: Date;
+  author: Author;
+  myVote: -1 | 0 | 1;
+  permissions: Permissions;
+  replies?: Reply[]
 }

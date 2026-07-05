@@ -1,13 +1,13 @@
 import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 
-export async function createComment(content: string, postId: string) {
+export async function createAnswers(content: string, questionId: string) {
   try {
-    return axiosInstance.post(`/posts/${postId}/comments`, { content });
+    return axiosInstance.post(`/questions/${questionId}/answers`, { content });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error create comment:",
+      "Error create answer:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -15,23 +15,20 @@ export async function createComment(content: string, postId: string) {
   }
 }
 
-export async function getCommentsByPostIdWithCursor(
-  postId: string,
+export async function getAnswersByQuestionIdWithCursor(
+  questionId: string,
   cursor: string,
-  excludeCommentId?: string
 ) {
   try {
     const response = await axiosInstance.get(
-      `/posts/${postId}/comments`,{
-        params: { cursor: cursor , excludeCommentId: excludeCommentId },
-      }
+      `/questions/${questionId}/answers?&cursor=${cursor}`,
     );
 
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error fetching comments to post:",
+      "Error fetching answers to post:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -39,17 +36,15 @@ export async function getCommentsByPostIdWithCursor(
   }
 }
 
-export async function getCommentsByPostId(postId: string ,excludeCommentId?: string) {
+export async function getAnswersByQuestionId(questionId: string) {
   try {
-    const response = await axiosInstance.get(`/posts/${postId}/comments`,{
-      params: { excludeCommentId: excludeCommentId },
-    });
+    const response = await axiosInstance.get(`/questions/${questionId}/answers`);
 
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error fetching comments to post:",
+      "Error fetching answers to post:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -57,12 +52,12 @@ export async function getCommentsByPostId(postId: string ,excludeCommentId?: str
   }
 }
 
-export async function getCommentRepliesWithCursor(
-  commentId: string,
+export async function getAnswerRepliesWithCursor(
+  answersId: string,
   cursor: string,
 ) {
   try {
-    const response = await axiosInstance.get(`/comments/${commentId}/replies`, {
+    const response = await axiosInstance.get(`/answers/${answersId}/replies`, {
       params: { cursor: cursor },
     });
 
@@ -70,22 +65,22 @@ export async function getCommentRepliesWithCursor(
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error fetching comment replies:",
+      "Error fetching answer replies:",
       axiosError.response?.data || axiosError.message,
     );
 
     throw error;
   }
 }
-export async function getCommentReplies(commentId: string) {
+export async function getAnswerReplies(answersId: string) {
   try {
-    const response = await axiosInstance.get(`/comments/${commentId}/replies`);
+    const response = await axiosInstance.get(`/answers/${answersId}/replies`);
 
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error fetching comment replies:",
+      "Error fetching answer replies:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -93,13 +88,13 @@ export async function getCommentReplies(commentId: string) {
   }
 }
 
-export async function deleteComment(postId: string, commentId: string) {
+export async function deleteAnswers(questionId: string, answersId: string) {
   try {
-    return axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
+    return axiosInstance.delete(`/questions/${questionId}/answers/${answersId}`);
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error delete comment:",
+      "Error delete answer:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -107,17 +102,17 @@ export async function deleteComment(postId: string, commentId: string) {
   }
 }
 
-export async function reportComment(commentId: string, reason: string) {
+export async function reportAnswers(answersId: string, reason: string) {
   try {
     return axiosInstance.post(`/reports/`, {
-      targetId: commentId,
-      targetType: "COMMENT",
+      targetId: answersId,
+      targetType: "ANSWER",
       reason,
     });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error report comment:",
+      "Error report answer:",
       axiosError.response?.data || axiosError.message,
     );
 
@@ -125,26 +120,26 @@ export async function reportComment(commentId: string, reason: string) {
   }
 }
 
-export async function likeToComment(commentId: string) {
+export async function answerUpVote(answersId: string) {
   try {
-    return axiosInstance.post(`/comments/${commentId}/like`);
+    return axiosInstance.post(`/answers/${answersId}/vote`, { value: 1 });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error like to comment:",
+      "Error like to answer:",
       axiosError.response?.data || axiosError.message,
     );
 
     throw error;
   }
 }
-export async function unlikeToComment(commentId: string) {
+export async function answerDownVote(answersId: string) {
   try {
-    return axiosInstance.delete(`/comments/${commentId}/like`);
+    return axiosInstance.post(`/answers/${answersId}/vote`, { value: -1 });
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     console.error(
-      "Error unlike to comment:",
+      "Error unlike to answer:",
       axiosError.response?.data || axiosError.message,
     );
 

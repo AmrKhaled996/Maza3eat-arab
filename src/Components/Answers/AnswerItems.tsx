@@ -1,34 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { Comment } from "../../Types/Comment";
+import type { Answer } from "../../Types/Answer";
 import { Badge } from "../shared/Tag";
 import { FormatPublishDate } from "../../utils/DateFormater";
-import { Heart, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Heart, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 
 import ReplyItem from "./ReplyItem";
 import type { Reply as ReplyType } from "../../Types/Reply";
-import { createReplyToComment } from "../../Apis/CommentsApi/CommentReplies";
-import useGetCommentsReplies from "../../Hooks/CommentHooks/useGetCommentReplies";
+import { createReplyToAnswer } from "../../Apis/AnswersApi/AnswerReplies";
+import useGetAnswersReplies from "../../Hooks/AnswerHooks/useGetAnswersReplies";
 import {
-  deleteComment,
-  likeToComment,
-  reportComment,
-  unlikeToComment,
-} from "../../Apis/CommentsApi/Comment";
+  answerDownVote,
+  answerUpVote,
+  deleteAnswers,
+  reportAnswers,
+} from "../../Apis/AnswersApi/Answers";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import { useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
 
-export default function CommentItem({ comment }: { comment: Comment }) {
+export default function AnswerItem({ answer }: { answer: Answer }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
 
-  const [liked, setLiked] = useState(comment?.likedByMe);
-  const [likes, setLikes] = useState(comment?.likesCount);
-  const [isLiking, setIsLiking] = useState(false);
+  const [voted, setVoted] = useState(answer?.myVote);
+  const [votes, setVotes] = useState(answer?.totalVoteValue);
+  const [isVoting, setIsVoting] = useState(false);
 
   const [openMoreMenu, setOpenMoreMenu] = useState(false);
 
@@ -44,10 +44,10 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const [nextCursor, setNextCursor] = useState("");
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
-const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
-const HighlightedCommentID = searchParams.get("highlighted");
-  
+  const HighlightedAnswerID = searchParams.get("highlighted");
+
   const timeoutRef = useRef<number | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,49 +60,103 @@ const HighlightedCommentID = searchParams.get("highlighted");
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { id: postIdparam } = useParams<{ id: string }>();
+  const { id: questionIdparam } = useParams<{ id: string }>();
 
-  if (!postIdparam) return null;
+  if (!questionIdparam) return null;
 
-  const {
-    data,
-    isFetching,
-    refetch,
-  } = useGetCommentsReplies(comment?.id, nextCursor);
+  const { data, isFetching, refetch } = useGetAnswersReplies(
+    answer?.id,
+    nextCursor,
+  );
 
   const Highlight = () => {
-    console.log("url",HighlightedCommentID,"comment",comment.id)
-    if (comment?.id === HighlightedCommentID) {
-
-      return "border-blue-300 bg-sky-100"
+    console.log("url", HighlightedAnswerID, "answer", answer.id);
+    if (answer?.id === HighlightedAnswerID) {
+      return "border-blue-300 bg-sky-100";
     } else {
-  
-      return "border-[#E5E7EB] bg-[#f7f7f7]"
+      return "border-[#E5E7EB] bg-[#f7f7f7]";
     }
   };
 
-  const handleLike = async () => {
-    if (!comment?.id || isLiking) return;
+  const handleUpVote = async () => {
+    if (!answer?.id || isVoting) return;
 
-    setIsLiking(true);
+    setIsVoting(true);
 
-    const wasLiked = liked;
-    const previousLikes = likes;
+    const previousVote = voted;
+    const previousTotal = votes;
 
-    setLiked(!wasLiked);
-    setLikes(previousLikes + (wasLiked ? -1 : 1));
+    let nextVote: -1 | 0 | 1;
+    let delta = 0;
+
+    switch (previousVote) {
+      case 1:
+        nextVote = 0;
+        delta = -1;
+        break;
+
+      case 0:
+        nextVote = 1;
+        delta = 1;
+        break;
+
+      case -1:
+        nextVote = 1;
+        delta = 2;
+        break;
+    }
+
+    setVoted(nextVote);
+    setVotes(previousTotal + delta);
 
     try {
-      if (wasLiked) {
-        await unlikeToComment(comment.id);
-      } else {
-        await likeToComment(comment.id);
-      }
+      await answerUpVote(answer.id);
     } catch (error) {
-      setLiked(wasLiked);
-      setLikes(previousLikes);
+      setVoted(previousVote);
+      setVotes(previousTotal);
     } finally {
-      setIsLiking(false);
+      setIsVoting(false);
+    }
+  };
+
+  const handleDownVote = async () => {
+    if (!answer?.id || isVoting) return;
+
+    setIsVoting(true);
+
+    const previousVote = voted;
+    const previousTotal = votes;
+
+    let nextVote: -1 | 0 | 1;
+    let delta = 0;
+
+    switch (previousVote) {
+      case 1:
+        nextVote = -1;
+        delta = -2;
+        break;
+
+      case 0:
+        nextVote = -1;
+        delta = -1;
+        break;
+
+      case -1:
+        nextVote = 0;
+        delta = 1;
+        break;
+    }
+
+    setVoted(nextVote);
+    setVotes(previousTotal + delta);
+
+    try {
+      await answerDownVote(answer.id);
+    } catch (error) {
+      setVoted(previousVote);
+      setVotes(previousTotal);
+    } finally {
+      setIsVoting(false);
     }
   };
   const handleReplying = async () => {
@@ -110,38 +164,38 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
     if (!content) return;
 
-    if (!comment?.id) {
-      console.error("no valid comment id");
+    if (!answer?.id) {
+      console.error("no valid answer id");
       return;
     }
 
     if (content.length > 1000) {
-      console.error("Comment is too long");
+      console.error("Answer is too long");
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      const response = await createReplyToComment(content, comment?.id);
+      const response = await createReplyToAnswer(content, answer?.id);
 
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
     } catch (error) {
       console.error(error);
-      console.error("Failed to create comment");
+      console.error("Failed to create answer");
     } finally {
       setIsSubmitting(false);
     }
-  };      
+  };
 
   const handleDelete = async () => {
-    if (!postIdparam || !comment?.id || isDeleting) return;
+    if (!questionIdparam || !answer?.id || isDeleting) return;
 
     try {
       setIsDeleting(true);
 
-      await deleteComment(postIdparam, comment.id);
+      await deleteAnswers(questionIdparam, answer.id);
 
       setOpenDeleteDialog(false);
     } catch (err) {
@@ -154,34 +208,40 @@ const HighlightedCommentID = searchParams.get("highlighted");
   const MAX_REPORT_LENGTH = 200;
 
   const handleReport = async () => {
-    if (!comment?.id) return;
+    if (!answer?.id) return;
 
     if (isReporting) return;
 
     const reason = reportValue.trim();
 
     if (!reason) {
-      setReportingError(t("comments.errors.enterReason"));
+      setReportingError(t("answers.errors.enterReason"));
       return;
     }
 
     if (reason.length > MAX_REPORT_LENGTH) {
-      setReportingError(t("comments.errors.maxChars", { count: MAX_REPORT_LENGTH }));
+      setReportingError(
+        t("answers.errors.maxChars", { count: MAX_REPORT_LENGTH }),
+      );
       return;
     }
 
     try {
       setIsReporting(true);
 
-      await reportComment(comment.id, reason);
-      console.log("the report is reported with id:",comment.id,"reason:",reason )
+      await reportAnswers(answer.id, reason);
+      console.log(
+        "the report is reported with id:",
+        answer.id,
+        "reason:",
+        reason,
+      );
       setReportingError("");
       setOpenReportDialog(false);
     } catch (err) {
       console.error(err);
-      setReportingError(t("comments.errors.failedReport"));
-    }
-    finally {
+      setReportingError(t("answers.errors.failedReport"));
+    } finally {
       setIsReporting(false);
     }
   };
@@ -229,18 +289,19 @@ const HighlightedCommentID = searchParams.get("highlighted");
     }
   }, [data]);
   useEffect(() => {
-    if(HighlightedCommentID === comment?.id){
+    if (HighlightedAnswerID === answer?.id) {
       setIsHighligthed(true);
     }
-  },[])
+  }, []);
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={comment?.id}>
-      <div className={`relative w-9 mx-4 ${lang === "ar"?"ml-4":"mr-4"} group`}>
-      
+    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
+      <div
+        className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
+      >
         <img
-          src={comment?.author?.avatar}
+          src={answer?.author?.avatar}
           className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2"
-          style={{ outlineColor: comment?.author?.tier.badgeColor }}
+          style={{ outlineColor: answer?.author?.tier.badgeColor }}
         />
 
         <div className="w-fit ">
@@ -284,28 +345,41 @@ const HighlightedCommentID = searchParams.get("highlighted");
       </div>
 
       <div className="flex-1 relative">
-       {IsHighligthed && <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />}
+        {IsHighligthed && (
+          <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />
+        )}
         {/* bubble */}
-        <div className={cn(` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,Highlight())}>
+        <div
+          className={cn(
+            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
+            Highlight(),
+          )}
+        >
           <div className="flex gap-2 items-center">
-            <span className="font-bold">{comment?.author?.name}</span>
+            <span className="font-bold">{answer?.author?.name}</span>
             <Badge
-              tier={comment?.author?.tier.name}
-              color={comment?.author?.tier.badgeColor}
+              tier={answer?.author?.tier.name}
+              color={answer?.author?.tier.badgeColor}
             />
             <span className="mr-auto text-xs text-gray-400">
-              {FormatPublishDate(comment?.createdAt)}
+              {FormatPublishDate(answer?.createdAt)}
             </span>
+            {/* Answer Votes */}
+            <div className="flex gap-2 items-center">
+              <button onClick={() => handleUpVote()}><ArrowBigUp size={20} fill={voted === 1 ? "green" : "transparent"} color={voted ===1? "green":"gray"} className={` hover:cursor-pointer hover:opacity-85 transition-opacity duration-300`}/></button>
+                <p className={`text-lg text-gray-600 `}>{answer?.totalVoteValue}</p>
+              <button onClick={() => handleDownVote()}><ArrowBigDown size={20} fill={voted === -1 ? "red" : "transparent"} color={voted ===1? "red":"gray"} className={` hover:cursor-pointer hover:opacity-85 transition-opacity duration-300`}/></button>
+            </div>
           </div>
 
           <p className="text-sm text-gray-600 overflow-[break-word] ">
-            {comment?.content}
+            {answer?.content}
           </p>
         </div>
 
         {/* actions */}
         <div className="flex gap-4 mt-2 mx-2 mb-2 text-xs">
-          <button
+          {/* <button
             onClick={() => {
               handleLike();
             }}
@@ -313,13 +387,13 @@ const HighlightedCommentID = searchParams.get("highlighted");
           >
             <Heart
               className={`h-5 w-5 hover:cursor-pointer  hover:text-red-500 group transition-all duration-200   ${
-                liked
+                voted
                   ? "fill-red-500 text-red-500"
                   : "text-gray-600 group-hover:text-red-500 hover:cursor-pointer"
               }`}
             />{" "}
-            {likes}
-          </button>
+            {votes}
+          </button> */}
 
           <button
             onClick={() => {
@@ -327,12 +401,14 @@ const HighlightedCommentID = searchParams.get("highlighted");
             }}
             className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
           >
-            <Reply className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `} />
-            {t("comments.reply")}
+            <Reply
+              className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
+            />
+            {t("answers.reply")}
           </button>
           <div className="relative inline-block">
-            {(comment?.permissions?.canDelete ||
-              comment?.permissions?.canReport) && (
+            {(answer?.permissions?.canDelete ||
+              answer?.permissions?.canReport) && (
               <button
                 onClick={() => setOpenMoreMenu((o) => !o)}
                 onBlur={() => {
@@ -353,21 +429,21 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
             {openMoreMenu && (
               <div className="absolute right-0 bottom-full  border border-gray-200 rounded-xl mb-2 w-40 bg-white shadow-lg">
-                {comment?.permissions?.canReport && (
+                {answer?.permissions?.canReport && (
                   <button
                     onClick={() => setOpenReportDialog(true)}
                     className="block w-full px-4 py-2  hover:bg-gray-100 hover:cursor-pointer"
                   >
-                    {t("comments.report")}
+                    {t("answers.report")}
                   </button>
                 )}
 
-                {comment?.permissions?.canDelete && (
+                {answer?.permissions?.canDelete && (
                   <button
                     onClick={() => setOpenDeleteDialog(true)}
                     className="block w-full px-4 py-2 text-red-600 hover:bg-red-50 hover:cursor-pointer"
                   >
-                    {t("comments.delete")}
+                    {t("answers.delete")}
                   </button>
                 )}
               </div>
@@ -384,7 +460,7 @@ const HighlightedCommentID = searchParams.get("highlighted");
                 setreplyInputValue(e.target.value);
               }}
               onKeyDown={(e) => e.key === "Enter" && {}}
-              placeholder={t("comments.writeReplyPlaceholder")}
+              placeholder={t("answers.writeReplyPlaceholder")}
               className="flex-1 border border-slate-400 rounded-full px-3 py-2 text-sm focus:border-primary focus:outline-primary text-gray-700 placeholder-gray-400 resize-none min-h-5 h-10 scrollbar-hide line-clamp-3"
             />
             <button
@@ -396,7 +472,7 @@ const HighlightedCommentID = searchParams.get("highlighted");
                   <LoaderIcon className="animate-spin" />
                 </>
               ) : (
-                t("comments.publish")
+                t("answers.publish")
               )}
             </button>
           </div>
@@ -405,14 +481,14 @@ const HighlightedCommentID = searchParams.get("highlighted");
         {/* replies */}
         {replies && replies.length > 0 && (
           <>
-            {!showReplies && comment.repliesCount > 0 && (
+            {!showReplies && answer.repliesCount > 0 && (
               <button
                 onClick={() => {
                   setShowReplies(true);
                 }}
                 className="text-slate-600 font-semibold mt-3 mb-2"
               >
-                {t("comments.viewMoreReplies", { count: comment?.repliesCount })}
+                {t("answers.viewMoreReplies", { count: answer?.repliesCount })}
               </button>
             )}
 
@@ -430,7 +506,7 @@ const HighlightedCommentID = searchParams.get("highlighted");
                     </div>
                   );
                 })}
-                {/* {isFetchingNextPage && <SkeletonComment indent={true} />} */}
+                {/* {isFetchingNextPage && <SkeletonAnswer indent={true} />} */}
                 {/* <div ref={lastReplyRef} className="w-full h-2"></div> */}
                 {hasMoreReplies && (
                   <>
@@ -445,7 +521,7 @@ const HighlightedCommentID = searchParams.get("highlighted");
                         }}
                         className="text-slate-600 font-semibold mt-3"
                       >
-                        {t("comments.showMore")}
+                        {t("answers.showMore")}
                       </button>
                     )}
                   </>
@@ -479,5 +555,3 @@ const HighlightedCommentID = searchParams.get("highlighted");
     </div>
   );
 }
-
-

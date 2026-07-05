@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Comment as CommentType } from "../../Types/Comment";
 import CommentInput from "./CommentInput";
 import CommentItem from "./CommentItems";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import useGetCommentsByPostId from "../../Hooks/CommentHooks/useGetCommentsByPostId";
 import { useAuth } from "../../Context/Auth";
 
@@ -99,18 +99,18 @@ export default function CommentsSection() {
   const { user } = useAuth();
   const { id: postIdparam } = useParams<{ id: string }>();
   const lastCommentRef = useRef<HTMLDivElement>(null);
+  const [nextCursor, setNextCursor] = useState("");
+  const HighlightedComment = useLocation().state?.comment;
+const [searchParams] = useSearchParams();
+
+const HighlightedCommentID = searchParams.get("highlighted")||"";
+
+  
 
   if (!postIdparam) return null;
 
-  const {
-    data,
-    isLoading,
-    error,
-    isFetchingNextPage,
-    fetchNextPage,
-    isFetching,
-    refetch,
-  } = useGetCommentsByPostId(postIdparam);
+  const { data, isLoading, isFetchingNextPage, fetchNextPage, isFetching } =
+    useGetCommentsByPostId(postIdparam, nextCursor ,HighlightedCommentID );
 
   // const handleAddComment = (text: string) => {
   //   const newComment: Comment = {
@@ -156,6 +156,7 @@ export default function CommentsSection() {
     if (data) {
       const allComments = data.pages.flatMap((page: any) => page?.comments);
       setComments(allComments);
+      setNextCursor(data?.pages[data?.pages.length - 1]?.nextCursor);
       console.log("loading");
       if (isFetching) {
       }
@@ -177,17 +178,19 @@ export default function CommentsSection() {
           ))
         ) : (
           <div>
+            {HighlightedComment&&<CommentItem key={HighlightedComment?.id} comment={HighlightedComment} />}
             {comments?.map((c) => (
               <CommentItem key={c.id} comment={c} />
             ))}
           </div>
         )}
-        {isFetchingNextPage && <div className="flex flex-col gap-3 animate-pulse">
-          <SkeletonComment indent />
-          <SkeletonComment indent />
-          <SkeletonComment indent />
+        {isFetchingNextPage && (
+          <div className="flex flex-col gap-3 animate-pulse">
+            <SkeletonComment indent />
+            <SkeletonComment indent />
+            <SkeletonComment indent />
           </div>
-          }
+        )}
         <div ref={lastCommentRef} className="w-full h-3"></div>
       </div>
     </div>
