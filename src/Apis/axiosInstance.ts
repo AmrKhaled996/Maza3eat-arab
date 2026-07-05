@@ -1,13 +1,12 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { DEFAULT_LOCALE } from "../i18n/config";
 
-
 export const axiosInstance = axios.create({
-    baseURL: '/api/v1',
-    headers: {
-        "Content-Type": "application/json",
-    },
-    withCredentials: true
+  baseURL: "/api/v1",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
 });
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -25,21 +24,28 @@ axiosInstance.interceptors.response.use(
 
       // If the request opted out of auth redirect (e.g. getMe on page load),
       // or we're already on the login page, just reject without redirecting.
-      if (originalRequest._skipAuthRedirect || window.location.pathname.endsWith("/login")) {
+      if (
+        originalRequest._skipAuthRedirect ||
+        window.location.pathname.endsWith("/login")
+      ) {
         return Promise.reject(error);
       }
 
       try {
-        console.log(import.meta.env.VITE_BACKEND_URL)
-        await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/refresh-token`, {
-          withCredentials: true,
-        });
-
+        await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`,
+          {},
+          {
+            withCredentials: true,
+          },
+        );
 
         return axiosInstance(originalRequest);
       } catch (refreshTokenerror) {
-        console.error("Proccess failed, Refresh token Error", refreshTokenerror);
-
+        console.error(
+          "Proccess failed, Refresh token Error",
+          refreshTokenerror,
+        );
 
         try {
           const stored = localStorage.getItem("maza3eat-locale");
@@ -55,6 +61,5 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-

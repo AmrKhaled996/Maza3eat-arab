@@ -9,6 +9,7 @@ import { axiosInstance } from "../axiosInstance";
 export async function getGoogleAuthUrl(): Promise<string> {
   const { data } = await axiosInstance.get("/auth/google");
   console.log(data);
+
   return data.data.url;
 }
 
@@ -50,5 +51,8 @@ export async function logout(): Promise<void> {
  * Refreshes the access token using the refresh token cookie.
  */
 export async function refreshToken(): Promise<void> {
-  await axiosInstance.post("/auth/refresh-token");
+  await axiosInstance.post("/auth/refresh-token", {
+    _skipAuthRedirect: true,
+    
+  });
 }

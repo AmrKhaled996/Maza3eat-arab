@@ -249,5 +249,64 @@
     "hoursAgo": "منذ {{count}} ساعة",
     "yesterday": "أمس",
     "daysAgo": "منذ {{count}} أيام"
+  },
+  "common": {
+    "actions": {
+      "cancel": "إلغاء"
+    }
+  },
+  "confirm": {
+    "deleteEvent": {
+      "title": "حذف التعليق",
+      "message": "هل أنت متأكد أنك تريد حذف هذا التعليق؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleteButton": "حذف"
+    }
+  },
+  "report": {
+    "title": "إبلاغ",
+    "description": "لماذا تقوم بالإبلاغ عن هذا المحتوى؟",
+    "otherPlaceholder": "أخبرنا المزيد...",
+    "submit": "إرسال البلاغ",
+    "reasons": {
+      "spam": "محتوى غير مرغوب فيه",
+      "harassment": "مضايقة أو تنمر",
+      "hate": "خطاب يحض على الكراهية",
+      "misinformation": "معلومات مضللة",
+      "other": "آخر"
+    }
+  },
+  "comments": {
+    "placeholder": "اكتب تعليقاً...",
+    "writeReplyPlaceholder": "اكتب...",
+    "publish": "نشر",
+    "reply": "رد",
+    "report": "إبلاغ",
+    "delete": "حذف",
+    "viewMoreReplies": "{{count}} عرض المزيد",
+    "repliesCount": "{{count}} ردود",
+    "showMore": "عرض المزيد",
+    "errors": {
+      "enterReason": "يرجى إدخال السبب.",
+      "maxChars": "الحد الأقصى {{count}} حرفًا.",
+      "failedReport": "فشل في إرسال البلاغ."
+    },
+    "showDiscussion": "عرض المنشور كاملا"
+  },
+  "answers": {
+    "placeholder": "اكتب جوابا...",
+    "writeReplyPlaceholder": "اكتب...",
+    "publish": "نشر",
+    "reply": "رد",
+    "report": "إبلاغ",
+    "delete": "حذف",
+    "viewMoreReplies": "{{count}} عرض المزيد",
+    "repliesCount": "{{count}} ردود",
+    "showMore": "عرض المزيد",
+    "errors": {
+      "enterReason": "يرجى إدخال السبب.",
+      "maxChars": "الحد الأقصى {{count}} حرفًا.",
+      "failedReport": "فشل في إرسال البلاغ."
+    },
+    "showDiscussion": "عرض المنشور كاملا"
   }
 }

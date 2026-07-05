@@ -24,8 +24,8 @@ export default function PostAuthorCard({ post }: PostAuthorCardProps) {
       <img
         src={post.author.avatar}
         alt={post.author.name}
-        className="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow flex-shrink-0"
-        style={{ outlineColor: post.author.badgeColor, outlineWidth: 2 }}
+        className="w-12 h-12 rounded-full object-cover ring-2 ring-white outline-3 shadow flex-shrink-0"
+        style={{ outlineColor: post.author.badgeColor }}
       />
       <div className="flex-1 min-w-0">
         <p className="font-bold text-gray-900 text-sm truncate">{post.author.name}</p>

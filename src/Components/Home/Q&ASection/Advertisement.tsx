@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 function HomeQandAPostsAdvertisement() {
   const { t } = useTranslation("common");
   return (
-    <div className="rounded-2xl py-5 px-3 text-white shadow-md relative overflow-hidden bg-linear-to-br advertisement2 w-full  h-fit">
+    <div className="rounded-2xl py-5 px-3 text-white shadow-md relative overflow-hidden bg-linear-to-br advertisement2 w-100  max-w-100 h-fit">
       <span className="text-[10px] font-semibold uppercase text-white  mb-4 block ">
         {t("home.sponsored")}
       </span>
