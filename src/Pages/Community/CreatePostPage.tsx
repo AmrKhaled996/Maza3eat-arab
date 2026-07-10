@@ -14,13 +14,14 @@ import {
   FilePlus2,
   Trash2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import NavigationBar from "../../Components/shared/NavigationBar";
 import {
   POST_IMAGE_FIELD,
   createPost,
   getCreatePostErrorMessage,
 } from "../../Apis/PostsApi/createPost";
+import { createAdminPost } from "../../Apis/AdminApi";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
@@ -36,7 +37,9 @@ export default function CreatePostPage() {
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputId = useId();
+  const isAdmin = location.pathname.includes("/admin");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -144,12 +147,17 @@ export default function CreatePostPage() {
 
     setSubmitting(true);
     try {
-      const res = await createPost(formData);
-      const id = res.data?.data?.id;
-      if (id) {
-        navigate(localizedPath(lang, `post/${id}`));
+      if (isAdmin) {
+        await createAdminPost(formData);
+        navigate(localizedPath(lang, "admin/posts"));
       } else {
-        navigate(localizedPath(lang, "community"));
+        const res = await createPost(formData);
+        const id = res.data?.data?.id;
+        if (id) {
+          navigate(localizedPath(lang, `post/${id}`));
+        } else {
+          navigate(localizedPath(lang, "community"));
+        }
       }
     } catch (err) {
       setError(getCreatePostErrorMessage(err));
@@ -162,9 +170,9 @@ export default function CreatePostPage() {
 
   return (
     <div className="min-h-screen pb-16">
-      <NavigationBar page="create-post" solidNav />
+      {!isAdmin && <NavigationBar page="create-post" solidNav />}
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
+      <div className={cn("max-w-3xl mx-auto px-4 sm:px-6", isAdmin ? "pt-6" : "pt-24 md:pt-28")}>
         <button
           type="button"
           onClick={() => navigate(-1)}
