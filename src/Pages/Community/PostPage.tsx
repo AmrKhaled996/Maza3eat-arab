@@ -9,11 +9,22 @@ import Advertisement from "../../Components/shared/Advertisement";
 import { Loader, ArrowLeft, Calendar } from "lucide-react";
 import { FormatPublishDate } from "../../utils/DateFormater";
 import CommentsSection from "../../Components/Comments/MainContainer";
+import { Title } from "react-head";
+import useContentAds from "../../Hooks/AdvertisementHooks/useContentAdvertisement";
+import type { Advertisement as PostAdvertisement } from "../../Types/Advertisement";
+import { useEffect, useState } from "react";
 
 export default function PostPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: post, isLoading, isError } = usePostDetail(id || "");
+  
+  const {data:postAdvertisement} = useContentAds()  as { data?: PostAdvertisement };
+  const [adData,setAdData] = useState<PostAdvertisement>();
+  useEffect(() => {
+    console.log("postData",postAdvertisement)
+    setAdData(postAdvertisement);
+  }, [postAdvertisement]);
 
   if (isLoading) {
     return (
@@ -26,6 +37,7 @@ export default function PostPage() {
   if (isError || !post) {
     return (
       <div className="min-h-screen pb-16">
+        <Title>{post?.title}</Title>
         <NavigationBar page="post" solidNav />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
           <button
@@ -50,6 +62,7 @@ export default function PostPage() {
 
   return (
     <div className="min-h-screen pb-16">
+      <Title>{post?.title||"post"}</Title>
       <NavigationBar page="post" solidNav />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
@@ -63,7 +76,7 @@ export default function PostPage() {
         </button>
 
         {/* Three Column Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Author (col-span-2) */}
           <div className="md:col-span-2 order-2 md:order-1">
             <PostAuthorCard post={post} />
@@ -85,7 +98,7 @@ export default function PostPage() {
           </div>
 
           {/* Right Sidebar - Date (col-span-3) */}
-          <div className="md:col-span-3 order-3">
+          <div className="lg:col-span-3   order-3">
             {post.publishDate && (
               <div className="sticky top-24 bg-white rounded-xl p-6 ">
                 <div className="flex flex-row items-center gap-3">
@@ -97,7 +110,10 @@ export default function PostPage() {
               </div>
             )}
             {/* Advertisement */}
-            <Advertisement className="sticky top-40" />
+            <div>
+            <Advertisement className="sticky top-40" ad={adData} />
+            
+            </div>
           </div>
         </div>
         <CommentsSection />

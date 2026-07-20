@@ -6,8 +6,9 @@ import useHomeQuestions from "../../../Hooks/HomeHooks/useHomeQuestion";
 import QandAPopularQuestion from "../../shared/PopularQuestion";
 import HomeQandAPostsSectionMoreButton from "./MoreButton";
 import QuestionCardSkeleton from "../../Q&A/QuestionCardSkeleton";
+import type { Advertisement } from "../../../Types/Advertisement";
 
-export default function QAForum() {
+export default function QAForum({ad}:{ad?:Advertisement}) {
   const { data: questions , isLoading } = useHomeQuestions();
 
   return (
@@ -30,7 +31,7 @@ export default function QAForum() {
           <QandAPopularQuestion limit={3} />
 
           {/* Sponsored */}
-          <HomeQandAPostsAdvertisement />
+          {ad&&<HomeQandAPostsAdvertisement ad={ad} />}
         </div>
       </div>
 

@@ -6,6 +6,8 @@ import FeaturedPosts from "../../Components/Home/FeaturedPostSection/Featuerd";
 import Footer from "../../Components/shared/Footer";
 import { Title } from "react-head";
 import InfiniteSlider from "../../Components/Home/Saperators/Saperator1";
+import useHomeAds from "../../Hooks/HomeHooks/useHomeAdvertisement";
+import type { Advertisement } from "../../Types/Advertisement";
 
 
 // const posts = [
@@ -89,14 +91,23 @@ import InfiniteSlider from "../../Components/Home/Saperators/Saperator1";
 export default function HomePage() {
   const { t } = useTranslation("common");
 
+  const { data: HomeAdsData } = useHomeAds() as { data?: Advertisement[] };
+
+  const topAdvertisement = HomeAdsData?.find((i) => i.position === "top");
+  const middleAdvertisement = HomeAdsData?.find((i) => i.position === "middle");
+  const bottomAdvertisement = HomeAdsData?.find((i) => i.position === "bottom");
+  
+  
+
+
   return (
     <>
       <Title>{t("meta.homeTitle")}</Title>
       <HeroSectionLayout />
-      <FeaturedPosts  />
+      <FeaturedPosts ad={topAdvertisement} />
       <InfiniteSlider />
-      <CommunitySection  />
-      <QAForum  />
+      <CommunitySection ad={middleAdvertisement}  />
+      <QAForum ad={bottomAdvertisement} />
       <Footer  />
     </>
   );

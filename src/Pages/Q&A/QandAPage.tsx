@@ -21,12 +21,17 @@ import { useAnswers } from "../../Hooks/Q&AHooks/useAnswers";
 import { useReplies } from "../../Hooks/Q&AHooks/useReplies";
 import { useAuth } from "../../Context/Auth";
 import { FormatPublishDate } from "../../utils/DateFormater";
+import useContentAds from "../../Hooks/AdvertisementHooks/useContentAdvertisement";
+import type { Advertisement as ContentAdvertisement } from "../../Types/Advertisement";
+import AnswersSection from "../../Components/Answers/MainContainer";
+import { Title } from "react-head";
 
 export default function QandAPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const { t } = useTranslation("common");
+    const {data:contentAdvertisement} = useContentAds()  as { data?: ContentAdvertisement };
 
   const {
     data: question,
@@ -105,6 +110,7 @@ export default function QandAPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
       <NavigationBar page="q&a" solidNav />
+      <Title>{question?.title||"question"}</Title>
 
       {/* Main Page Layout */}
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 pt-28 pb-16">
@@ -226,28 +232,31 @@ export default function QandAPage() {
 
             {/* Answers List */}
             <div className="space-y-4">
-              {isAnswersLoading ? (
+              {/* {isAnswersLoading ? (
                 <div className="text-center py-8">
                   <Loader className="h-6 w-6 animate-spin mx-auto text-indigo-600" />
                 </div>
               ) : sortedAnswers.length > 0 ? (
-                sortedAnswers.map((answer) => (
-                  <AnswerCard
-                    key={answer.id}
-                    answer={answer}
-                    onVote={(val) => voteAnswer({ answerId: answer.id, value: val })}
-                  />
-                ))
+                // sortedAnswers.map((answer) => (
+                  //   <AnswerCard
+                //     key={answer.id}
+                //     answer={answer}
+                //     onVote={(val) => voteAnswer({ answerId: answer.id, value: val })}
+                //   />
+                // ))
               ) : (
                 <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 text-gray-400 flex flex-col items-center gap-2 shadow-xs">
                   <MessageSquare size={36} className="text-gray-300" />
                   <p className="text-sm font-medium">{t("QandAPage.noAnswersFallback")}</p>
                 </div>
-              )}
+              )} */}
+              <div className=" py-4 bg-white rounded-3xl border border-gray-100 -z-20">
+              <AnswersSection />
+              </div>
             </div>
 
             {/* Answer Input Box */}
-            <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-xs">
+            {/* <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-xs">
               <form onSubmit={handlePostAnswer} className="flex gap-3">
                 <img
                   src={currentUser?.avatar || "/default-avatar.png"}
@@ -271,14 +280,14 @@ export default function QandAPage() {
                   </button>
                 </div>
               </form>
-            </div>
+            </div> */}
 
           </div>
 
           {/* Sidebar Column (Right) */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-6 flex flex-row-reverse lg:flex-col no-wrab justify-center gap-6">
             {/* Sponsored Ad */}
-            <Advertisement />
+            <Advertisement ad={contentAdvertisement} />
 
             {/* Top 10 Popular Questions */}
             <PopularQuestion limit={10} />

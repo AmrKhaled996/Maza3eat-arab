@@ -1,6 +1,8 @@
 import { Heart, Share2, Bookmark } from "lucide-react";
 import { useState } from "react";
 import type { Post } from "../../../Types/Post";
+import  { likeToPost } from "../../../Apis/PostsApi/actionPost";
+import  { unlikeToPost } from "../../../Apis/PostsApi/actionPost";
 import { useTranslation } from "react-i18next";
 
 interface PostInteractionsProps {
@@ -9,17 +11,42 @@ interface PostInteractionsProps {
 
 export default function PostInteractions({ post }: PostInteractionsProps) {
   const { t } = useTranslation("common");
-  const [isLiked, setIsLiked] = useState(false);
+  const [liked, setLiked] = useState(post?.likedByMe);
+  const [likes, setLikes] = useState(post?.likesCount);
+  const [isLiking, setIsLiking] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [likeCount, setLikeCount] = useState(post?.likesCount || 0);
 
   if (!post) {
     return null;
   }
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  const handleLike = async () => {
+    // console.log("postid:",post.id,"islikeing",isLiking)
+    // if (!post?.id || isLiking) return;
+ 
+
+    setIsLiking(true);
+
+    const wasLiked = liked;
+    const previousLikes = likes;
+
+    setLiked(!wasLiked);
+    setLikes(previousLikes + (wasLiked ? -1 : 1));
+
+    try {
+      if (wasLiked) {
+        console.log("postid in here:",post.id)
+        await unlikeToPost(post.id);
+      } else {
+
+        await likeToPost(post.id);
+      }
+    } catch (error) {
+      setLiked(wasLiked);
+      setLikes(previousLikes);
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   const handleShare = async () => {
@@ -57,12 +84,12 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
       >
         <Heart
           className={`h-5 w-5 transition-colors ${
-            isLiked
+            liked
               ? "fill-red-500 text-red-500"
               : "text-gray-600 group-hover:text-red-500"
           }`}
         />
-        <span className="text-sm font-medium text-gray-700">{likeCount}</span>
+        <span className="text-sm font-medium text-gray-700">{likes}</span>
       </button>
 
       {/* Share Button */}

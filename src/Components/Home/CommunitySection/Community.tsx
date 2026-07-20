@@ -1,6 +1,7 @@
 import useHomePosts from "../../../Hooks/HomeHooks/useHomePosts";
+import type { Advertisement } from "../../../Types/Advertisement";
 import type { Post } from "../../../Types/Post";
-import HomeCommunitySectionAdd from "../../shared/Advertisement";
+import HomeCommunityPostsAdvertisement from "./Advertisement";
 import HomeCommunitySectionBigCard from "./BigCard";
 import HomeCommunitySectionBigCardSkeleton from "./BigCardSkeleton";
 import HomeCommunitySectionLayout from "./Layout";
@@ -9,7 +10,7 @@ import HomeCommunitySectionSmallCard from "./SmallCard";
 import HomeCommunitySectionSmallCardSkeleton from "./smallCardSkeleton";
 import PostTrendingTopicsSection from "./TreningTopics";
 
-function CommunitySection() {
+function CommunitySection({ ad }: { ad?: Advertisement }) {
   const { data: posts, isLoading } = useHomePosts();
 
   return (
@@ -18,7 +19,9 @@ function CommunitySection() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left — Featured + small cards */}
         <div className="md:col-span-2 flex flex-col gap-6">
-          {posts && posts.length > 0 && <HomeCommunitySectionBigCard {...posts[0]} />}
+          {posts && posts.length > 0 && (
+            <HomeCommunitySectionBigCard {...posts[0]} />
+          )}
           {isLoading && <HomeCommunitySectionBigCardSkeleton />}
         </div>
 
@@ -28,7 +31,7 @@ function CommunitySection() {
           <PostTrendingTopicsSection limit={3} />
 
           {/* Sponsored / Ad */}
-          <HomeCommunitySectionAdd />
+          {ad && <HomeCommunityPostsAdvertisement ad={ad} />}
         </div>
       </div>
       {posts && (

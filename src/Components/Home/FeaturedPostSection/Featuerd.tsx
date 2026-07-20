@@ -1,4 +1,5 @@
 import useHomeFeatured from "../../../Hooks/HomeHooks/useHomeFeatured";
+import type { Advertisement } from "../../../Types/Advertisement";
 import type { Post } from "../../../Types/Post";
 import HomeFeaturedPostsAdvertisement from "./Advertisement";
 import HomeFeatuerdPostsCard from "./Cards";
@@ -6,7 +7,7 @@ import FeaturedCardSkeleton from "./CardSkeleton";
 import HomeFeaturedPostsLayout from "./Layout";
 import HomeFeaturedPostsSectionMoreButton from "./MoreButton";
 
-function FeaturedPosts() {
+function FeaturedPosts({ad}:{ad?:Advertisement}) {
   const { data: posts, isLoading } = useHomeFeatured();
   // console.log("featuerd: ", posts);
   return (
@@ -21,7 +22,7 @@ function FeaturedPosts() {
           Array.from({ length: 5 }).map((_, index) => (
             <FeaturedCardSkeleton key={index} />
           ))}
-        <HomeFeaturedPostsAdvertisement />
+        {ad &&<HomeFeaturedPostsAdvertisement ad={ad} />}
       </div>
 
       {/* Bottom CTA */}

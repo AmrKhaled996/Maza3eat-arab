@@ -18,14 +18,14 @@ export async function createComment(content: string, postId: string) {
 export async function getCommentsByPostIdWithCursor(
   postId: string,
   cursor: string,
-  excludeCommentId?: string
+  excludeCommentId?: string,
 ) {
   try {
-    const response = await axiosInstance.get(
-      `/posts/${postId}/comments`,{
-        params: { cursor: cursor , excludeCommentId: excludeCommentId },
-      }
-    );
+    const response = await axiosInstance.get(`/posts/${postId}/comments`, {
+      params: excludeCommentId
+        ? { cursor: cursor, excludeCommentId: excludeCommentId }
+        : { cursor: cursor },
+    });
 
     return response.data.data;
   } catch (error) {
@@ -39,10 +39,13 @@ export async function getCommentsByPostIdWithCursor(
   }
 }
 
-export async function getCommentsByPostId(postId: string ,excludeCommentId?: string) {
+export async function getCommentsByPostId(
+  postId: string,
+  excludeCommentId?: string,
+) {
   try {
-    const response = await axiosInstance.get(`/posts/${postId}/comments`,{
-      params: { excludeCommentId: excludeCommentId },
+    const response = await axiosInstance.get(`/posts/${postId}/comments`, {
+      params: excludeCommentId ? { excludeCommentId: excludeCommentId } : {},
     });
 
     return response.data.data;

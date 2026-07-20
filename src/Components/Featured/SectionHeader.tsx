@@ -33,7 +33,6 @@ function SectionHeader({
             <option value={"latest"}>{t("FeaturedMainPage.latest")}</option>
           </select>
         </div>
-        <HomeCommunitySectionCreateButton />
       </div>
     </div>
   );

@@ -211,7 +211,7 @@ export default function ReplyItem({
     const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
-      return reply.offsetTop - parentRect;
+      return reply.offsetTop;
     });
 
     setreplyHeights(tops);
@@ -268,7 +268,7 @@ export default function ReplyItem({
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
         <img
           src={reply?.author?.avatar}
-          className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 ${lang === "ar" ? "ml-4" : "mr-4"}`}
+          className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 relative z-30 ${lang === "ar" ? "ml-4" : "mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />
 
@@ -277,7 +277,7 @@ export default function ReplyItem({
             <>
               {" "}
               <div
-                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] z-10"
                 style={{
                   top: "36px",
                   height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
@@ -292,7 +292,7 @@ export default function ReplyItem({
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : "-right-1/2 -translate-x-[0.75px] "} text-[#B4B8C0] group-hover:text-blue-400   w-full absolute  -z-10`}
+                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : "-right-1/2 -translate-x-[0.75px] "} text-[#B4B8C0] group-hover:text-blue-400   w-full absolute  z-10`}
                     style={{
                       top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
@@ -302,7 +302,7 @@ export default function ReplyItem({
                       stroke="currentColor"
                       strokeWidth={1.5}
                       vectorEffect="non-scaling-stroke"
-                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] z-10"
                     />
                   </svg>
                 );

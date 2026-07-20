@@ -14,9 +14,10 @@
 
 import type { Image } from "./Image";
 
-        export interface Ad {
+        export interface Advertisement {
             id: string;
-            position: string;
+            position?: string;
+            weight?:number
             title: string;
             text: string;
             link: string;

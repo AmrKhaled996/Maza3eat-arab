@@ -21,10 +21,12 @@ import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import { useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
+import { useAuth } from "../../Context/Auth";
 
 export default function AnswerItem({ answer }: { answer: Answer }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
+  const {user}= useAuth()
 
   const [voted, setVoted] = useState(answer?.myVote);
   const [votes, setVotes] = useState(answer?.totalVoteValue);
@@ -159,6 +161,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
       setIsVoting(false);
     }
   };
+
   const handleReplying = async () => {
     const content = replyInputValue.trim();
 
@@ -251,7 +254,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
     const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
-      return reply.offsetTop - parentRect;
+      return reply.offsetTop;
     });
 
     setreplyHeights(tops);
@@ -297,10 +300,10 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
-      >
+      > 
         <img
           src={answer?.author?.avatar}
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2"
+          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
           style={{ outlineColor: answer?.author?.tier.badgeColor }}
         />
 
@@ -309,7 +312,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
             <>
               {" "}
               <div
-                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 transition-colors duration-300 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 transition-colors duration-300 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] z-10"
                 style={{
                   top: "36px",
                   height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
@@ -324,7 +327,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : " -right-1/2 -translate-x-[0.75px]"} text-[#B4B8C0] group-hover:text-blue-400 w-full absolute  transition-colors duration-300 -z-10`}
+                    className={` ${lang == "ar" ? "-scale-x-100 -left-1/2 translate-x-[0.75px]" : " -right-1/2 -translate-x-[0.75px]"} text-[#B4B8C0] group-hover:text-blue-400 w-full absolute  transition-colors duration-300 z-10`}
                     style={{
                       top: `${replyHeights[index] - 100}px`,
                     }} //36 is the height of the bubble of the image
@@ -334,7 +337,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
                       stroke="currentColor"
                       strokeWidth={1.5}
                       vectorEffect="non-scaling-stroke"
-                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] -z-10"
+                      className="absolute w-[1.5px] max-w-[1.5px] min-w-[1.5px] z-10"
                     />
                   </svg>
                 );
@@ -367,8 +370,8 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
             {/* Answer Votes */}
             <div className="flex gap-2 items-center">
               <button onClick={() => handleUpVote()}><ArrowBigUp size={20} fill={voted === 1 ? "green" : "transparent"} color={voted ===1? "green":"gray"} className={` hover:cursor-pointer hover:opacity-85 transition-opacity duration-300`}/></button>
-                <p className={`text-lg text-gray-600 `}>{answer?.totalVoteValue}</p>
-              <button onClick={() => handleDownVote()}><ArrowBigDown size={20} fill={voted === -1 ? "red" : "transparent"} color={voted ===1? "red":"gray"} className={` hover:cursor-pointer hover:opacity-85 transition-opacity duration-300`}/></button>
+                <p className={`text-lg text-gray-600 `}>{votes}</p>
+              <button onClick={() => handleDownVote()}><ArrowBigDown size={20} fill={voted === -1 ? "red" : "transparent"} color={voted ===-1? "red":"gray"} className={` hover:cursor-pointer hover:opacity-85 transition-opacity duration-300`}/></button>
             </div>
           </div>
 

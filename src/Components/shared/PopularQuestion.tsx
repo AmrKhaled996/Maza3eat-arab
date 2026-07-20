@@ -1,8 +1,13 @@
 import useHomePopularQuestions from "../../Hooks/HomeHooks/useHomePopular";
 import type { Question } from "../../Types/Question";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useLocale } from "../../i18n/useLocale";
+import { localizedPath } from "../../i18n/paths";
 function QandAPopularQuestion({ limit }: { limit: number }) {
+  const navigate = useNavigate(); 
   const { t } = useTranslation("common");
+  const {lang} =useLocale(); 
   const {
     data: popularQuestions,
     isLoading: popularQuestionsLoading,
@@ -17,7 +22,8 @@ function QandAPopularQuestion({ limit }: { limit: number }) {
       {popularQuestions && (
         <div className="flex flex-col gap-4">
           {popularQuestions.map((popularQuestion: Question ,index:number) => (
-            <div key={popularQuestion?.id} className="cursor-pointer group">
+            <div key={popularQuestion?.id}
+            onClick={() => {navigate(localizedPath(lang, "q&a/" +popularQuestion?.id ))}} className="cursor-pointer group">
               <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors leading-snug">
                 {popularQuestion?.title}
               </p>

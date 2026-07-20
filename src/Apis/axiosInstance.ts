@@ -14,6 +14,8 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _skipAuthRedirect?: boolean;
 }
 
+let refreshPromise: Promise<void> | null = null;
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -32,14 +34,20 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`,
-          {},
-          {
-            withCredentials: true,
-          },
-        );
+        if (!refreshPromise) {
+          refreshPromise = axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`,
+              {},
+              {
+                withCredentials: true,
+              }
+            )
+            .then(() => {})
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
 
+        await refreshPromise;
         return axiosInstance(originalRequest);
       } catch (refreshTokenerror) {
         console.error(
@@ -47,14 +55,14 @@ axiosInstance.interceptors.response.use(
           refreshTokenerror,
         );
 
-        try {
-          const stored = localStorage.getItem("maza3eat-locale");
-          const lang =
-            stored === "ar" || stored === "en" ? stored : DEFAULT_LOCALE;
-          window.location.href = `/${lang}/login`;
-        } catch {
-          window.location.href = `/${DEFAULT_LOCALE}/login`;
-        }
+        // try {
+        //   const stored = localStorage.getItem("maza3eat-locale");
+        //   const lang =
+        //     stored === "ar" || stored === "en" ? stored : DEFAULT_LOCALE;
+        //   window.location.href = `/${lang}/login`;
+        // } catch {
+        //   window.location.href = `/${DEFAULT_LOCALE}/login`;
+        // }
 
         return Promise.reject(refreshTokenerror);
       }
