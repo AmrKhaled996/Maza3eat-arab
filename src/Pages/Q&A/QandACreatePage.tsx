@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import NavigationBar from "../../Components/shared/NavigationBar";
 import RichTextEditor from "../../Components/shared/RichTextEditor";
 import { createQuestion } from "../../Apis/Qus&AnsApi/QandAApis";
+import { createAdminQuestion } from "../../Apis/AdminApi";
+import cn from "../../utils/Cn";
 
 export default function QndACreatePage() {
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdmin = location.pathname.includes("/admin");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -53,11 +57,16 @@ export default function QndACreatePage() {
 
     setSubmitting(true);
     try {
-      const res = await createQuestion(title.trim(), content.trim(), tags);
-      if (res.data?.id) {
-        navigate(localizedPath(lang, `q&a/${res.data.id}`));
+      if (isAdmin) {
+        await createAdminQuestion({ title: title.trim(), content: content.trim(), tags });
+        navigate(localizedPath(lang, "admin/questions"));
       } else {
-        navigate(localizedPath(lang, "q&a"));
+        const res = await createQuestion(title.trim(), content.trim(), tags);
+        if (res.data?.id) {
+          navigate(localizedPath(lang, `q&a/${res.data.id}`));
+        } else {
+          navigate(localizedPath(lang, "q&a"));
+        }
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || "Request failed");
@@ -68,10 +77,10 @@ export default function QndACreatePage() {
 
   return (
     <div className="min-h-screen pb-16">
-      <NavigationBar page="q&a" solidNav />
+      {!isAdmin && <NavigationBar page="q&a" solidNav />}
 
       {/* Main Container */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
+      <div className={cn("max-w-3xl mx-auto px-4 sm:px-6", isAdmin ? "pt-6" : "pt-24 md:pt-28")}>
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}

@@ -22,6 +22,22 @@ import { SUPPORTED_LOCALES } from "../i18n/config";
 import { localizedPath } from "../i18n/paths";
 import RepliesThreadPage from "../Pages/Comments/RepliesThreadPage";
 
+import AdminProtectedRoute from "./AdminProtectedRoute";
+import AdminLayout from "../Pages/Admin/AdminLayout";
+import AdminHomePage from "../Pages/Admin/AdminHomePage";
+import AdminUsersPage from "../Pages/Admin/AdminUsersPage";
+import AdminUserDetails from "../Pages/Admin/Details/AdminUserDetails";
+import AdminPostsPage from "../Pages/Admin/AdminPostsPage";
+import AdminPostDetails from "../Pages/Admin/Details/AdminPostDetails";
+import AdminQuestionsPage from "../Pages/Admin/AdminQuestionsPage";
+import AdminQuestionDetails from "../Pages/Admin/Details/AdminQuestionDetails";
+import AdminTagsPage from "../Pages/Admin/AdminTagsPage";
+import AdminReportsPage from "../Pages/Admin/AdminReportsPage";
+import AdminReportDetails from "../Pages/Admin/Details/AdminReportDetails";
+import AdminTiersPage from "../Pages/Admin/AdminTiersPage";
+import AdminAdsPage from "../Pages/Admin/AdminAdsPage";
+import AdminAnnouncementsPage from "../Pages/Admin/AdminAnnouncementsPage";
+
 export default function MainRouter(): React.ReactElement {
   return (
     <BrowserRouter>
@@ -50,6 +66,26 @@ export default function MainRouter(): React.ReactElement {
             <Route path="featured" element={<FeaturedMainPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="replies/:id" element={<RepliesThreadPage />} />
+
+            <Route path="admin" element={<AdminProtectedRoute />}>
+              <Route element={<AdminLayout />}>
+                <Route index element={<AdminHomePage />} />
+                <Route path="users" element={<AdminUsersPage />} />
+                <Route path="users/:id" element={<AdminUserDetails />} />
+                <Route path="posts" element={<AdminPostsPage />} />
+                <Route path="posts/create" element={<CreatePostPage />} />
+                <Route path="posts/:id" element={<AdminPostDetails />} />
+                <Route path="questions" element={<AdminQuestionsPage />} />
+                <Route path="questions/create" element={<QndACreatePage />} />
+                <Route path="questions/:id" element={<AdminQuestionDetails />} />
+                <Route path="tags" element={<AdminTagsPage />} />
+                <Route path="reports" element={<AdminReportsPage />} />
+                <Route path="reports/:id" element={<AdminReportDetails />} />
+                <Route path="tiers" element={<AdminTiersPage />} />
+                <Route path="ads" element={<AdminAdsPage />} />
+                <Route path="announcements" element={<AdminAnnouncementsPage />} />
+              </Route>
+            </Route>
             <Route
               path="*"
               element={<NotFoundPage />}
