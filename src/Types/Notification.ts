@@ -10,7 +10,9 @@ export type NotificationType =
   | "POST_APPROVAL"
   | "QUESTION_APPROVAL"
   | "POST_REJECTION"
-  | "QUESTION_REJECTION";
+  | "QUESTION_REJECTION"
+  | "TIER_UPGRADE"
+  | "ADMIN_ANNOUNCEMENT";
 
 export interface NotificationSender {
   id: string;

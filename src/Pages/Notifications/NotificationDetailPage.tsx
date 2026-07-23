@@ -4,7 +4,7 @@ import { useNotifications } from "../../Hooks/useNotifications";
 import { fetchNotificationById } from "../../Apis/NotificationApi";
 import { useTranslation } from "react-i18next";
 import NavigationBar from "../../Components/shared/NavigationBar";
-import { ArrowLeft, ArrowRight, Calendar, Shield, CheckCircle2, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Shield, CheckCircle2, ExternalLink, Award, Megaphone } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import type { Notification } from "../../Types/Notification";
@@ -211,6 +211,22 @@ export default function NotificationDetailPage() {
           textColor: "text-green-700",
           badgeKey: "notifications.official",
         };
+      case "TIER_UPGRADE":
+        return {
+          icon: <Award className="h-6 w-6 text-white" />,
+          bgColor: "bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 animate-pulse",
+          lightBg: "bg-gradient-to-r from-amber-50 via-pink-50 to-indigo-50",
+          textColor: "text-purple-700 font-bold",
+          badgeKey: "notifications.tierUpgrade",
+        };
+      case "ADMIN_ANNOUNCEMENT":
+        return {
+          icon: <Megaphone className="h-6 w-6 text-white" />,
+          bgColor: "bg-blue-600",
+          lightBg: "bg-blue-50",
+          textColor: "text-blue-700",
+          badgeKey: "notifications.official",
+        };
       default:
         return {
           icon: <Shield className="h-6 w-6 text-white" />,
@@ -322,6 +338,10 @@ export default function NotificationDetailPage() {
                       ? "تم رفض منشورك من قبل فريق الإدارة."
                       : notification.type === "QUESTION_REJECTION"
                       ? "تم رفض سؤالك من قبل فريق الإدارة."
+                      : notification.type === "TIER_UPGRADE"
+                      ? "تهانينا! لقد تم ترقية مستوى حسابك بنجاح للاستمتاع بالمزيد من المميزات والصلاحيات."
+                      : notification.type === "ADMIN_ANNOUNCEMENT"
+                      ? "إعلان هام من إدارة المنصة."
                       : "لديك إشعار جديد."
                     : notification.type === "POST_APPROVAL"
                     ? "Your post has been successfully approved by the administration team. You can view it now and interact with other members."
@@ -331,6 +351,10 @@ export default function NotificationDetailPage() {
                     ? "Your post was rejected by the administration team."
                     : notification.type === "QUESTION_REJECTION"
                     ? "Your question was rejected by the administration team."
+                    : notification.type === "TIER_UPGRADE"
+                    ? "Congratulations! Your tier has been upgraded successfully to unlock more privileges and features."
+                    : notification.type === "ADMIN_ANNOUNCEMENT"
+                    ? "Important announcement from platform administration."
                     : "You have a new notification."
                   }
                 </p>

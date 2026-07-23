@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminTiers, updateTier } from "../../Apis/AdminApi";
 import { Edit2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminTiersPage() {
   const { t } = useTranslation();
@@ -71,7 +72,7 @@ export default function AdminTiersPage() {
                 <p className="text-gray-600 text-sm mt-2">{tier.description}</p>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <span className="text-xs text-gray-400">{t("admin.created")} {new Date(tier.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-gray-400">{t("admin.created")} {safeFormatDate(tier.createdAt)}</span>
                 {tier.isSystem && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{t("admin.systemTier")}</span>}
               </div>
             </div>

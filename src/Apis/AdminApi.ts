@@ -22,9 +22,9 @@ export const updateUserTier = async (userId: string, tierId: number) => {
   return data.data;
 };
 
-export const getAdminPosts = async (status: "PENDING" | "APPROVED", cursor?: string | null) => {
+export const getAdminPosts = async (status: "PENDING" | "APPROVED", cursor?: string | null, search?: string) => {
   const { data } = await axiosInstance.get(`/admin/posts`, {
-    params: { status: status.toLowerCase(), cursor },
+    params: { status: status.toLowerCase(), cursor, search: search || undefined },
   });
   return data.data;
 };
@@ -101,6 +101,21 @@ export const deleteHomeAd = async (homeAdId: string) => {
   return data.data;
 };
 
+export const getModerators = async (cursor?: string | null) => {
+  const { data } = await axiosInstance.get(`/admin/moderators`, { params: { cursor } });
+  return data.data;
+};
+
+export const promoteToModerator = async (userId: string) => {
+  const { data } = await axiosInstance.put(`/admin/moderators/${userId}`);
+  return data.data;
+};
+
+export const demoteModerator = async (userId: string) => {
+  const { data } = await axiosInstance.delete(`/admin/moderators/${userId}`);
+  return data.data;
+};
+
 // === NEW MISSING APIs ===
 
 export const getAdminUserById = async (userId: string) => {
@@ -136,33 +151,13 @@ export const getAdminReportById = async (reportId: string) => {
 };
 
 export const getAdminAnnouncements = async (cursor?: string | null) => {
-  // Backend endpoint is returning 500 due to unmigrated Prisma enum.
-  // Mocking the response on the frontend so the page can load.
-  // const { data } = await axiosInstance.get(`/admin/announcements`, { params: { cursor } });
-  // return data.data;
-  return {
-    announcements: [
-      {
-        id: "mock-1",
-        title: "Welcome to Maza3eat Admin",
-        content: "This is a mocked announcement since the backend is currently returning a 500 error due to Prisma schema mismatch.",
-        type: "INFO",
-        createdAt: new Date().toISOString(),
-      }
-    ],
-    nextCursor: null,
-    hasMore: false
-  };
+  const { data } = await axiosInstance.get(`/admin/announcements`, { params: { cursor } });
+  return data.data;
 };
 
 export const createAdminAnnouncement = async (payload: { title: string; content: string; type: "OFFICIAL" | "URGENT" | "INFO" }) => {
-  // Backend endpoint is returning 500 due to unmigrated Prisma enum.
-  // Mocking the response on the frontend.
-  // const { data } = await axiosInstance.post(`/admin/announcements`, payload);
-  // return data.data;
-  return {
-    id: "mock-" + Date.now(),
-    ...payload,
-    createdAt: new Date().toISOString()
-  };
+  // Backend expects 'message' string (combining title & content if desired, or content)
+  const message = payload.title ? `${payload.title}\n\n${payload.content}` : payload.content;
+  const { data } = await axiosInstance.post(`/admin/announcements`, { message });
+  return data.data;
 };

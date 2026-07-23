@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminReportById, updateReportStatus } from "../../../Apis/AdminApi";
 import { ArrowLeft, CheckCircle, XCircle, AlertTriangle, FileText, Link as LinkIcon, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import ConfirmModal from "../../../Components/shared/ConfirmModal";
+import { safeFormatDate } from "../../../utils/DateFormater";
 
 export default function AdminReportDetails() {
   const { id } = useParams();
@@ -73,7 +73,7 @@ export default function AdminReportDetails() {
                 </div>
                 <div>
                    <h3 className="text-lg font-bold text-red-900">{report.reason}</h3>
-                   <p className="text-sm text-red-700">{new Date(report.createdAt).toLocaleString()}</p>
+                   <p className="text-sm text-red-700">{safeFormatDate(report.createdAt, true)}</p>
                 </div>
              </div>
 
@@ -159,7 +159,7 @@ export default function AdminReportDetails() {
         isOpen={resolveModal}
         title={t("admin.resolveReportTitle", "Resolve Report")}
         message={t("admin.resolveReportMsg", "Are you sure you want to resolve this report? It will be removed from the pending list.")}
-        theme="danger"
+        type="danger"
         onConfirm={() => actionMutation.mutate("RESOLVED")}
         onCancel={() => setResolveModal(false)}
       />
@@ -168,7 +168,7 @@ export default function AdminReportDetails() {
         isOpen={rejectModal}
         title={t("admin.rejectReportTitle", "Reject Report")}
         message={t("admin.rejectReportMsg", "Are you sure you want to dismiss this report? It will be removed from the pending list.")}
-        theme="info"
+        type="info"
         onConfirm={() => actionMutation.mutate("REJECTED")}
         onCancel={() => setRejectModal(false)}
       />

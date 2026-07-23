@@ -13,6 +13,7 @@ import {
   LogOut,
   ArrowLeft,
   Image,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../../Context/Auth";
 import { localizedPath } from "../../i18n/paths";
@@ -25,21 +26,22 @@ export default function AdminLayout() {
   const { pathname, search, hash } = useLocation();
   const navigate = useNavigate();
 
-  const goLocale = (next: string) => {
+  const goLocale = (next: "ar" | "en") => {
     const nextPath = pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${next}`);
     navigate(`${nextPath}${search}${hash}`, { flushSync: true });
   };
 
   const menuItems = [
-    { to: localizedPath(lang, "admin"), icon: LayoutDashboard, label: t("admin.dashboard"), end: true },
-    { to: localizedPath(lang, "admin/users"), icon: Users, label: t("admin.users") },
-    { to: localizedPath(lang, "admin/posts"), icon: FileText, label: t("admin.posts") },
-    { to: localizedPath(lang, "admin/questions"), icon: HelpCircle, label: t("admin.questions") },
-    { to: localizedPath(lang, "admin/tags"), icon: Tags, label: t("admin.tags") },
-    { to: localizedPath(lang, "admin/reports"), icon: AlertTriangle, label: t("admin.reports") },
-    { to: localizedPath(lang, "admin/tiers"), icon: Award, label: t("admin.tiers") },
-    { to: localizedPath(lang, "admin/ads"), icon: Image, label: t("admin.ads") },
-    { to: localizedPath(lang, "admin/announcements"), icon: Megaphone, label: t("admin.announcements", "Announcements") },
+    { to: localizedPath(lang as "ar" | "en", "admin"), icon: LayoutDashboard, label: t("admin.dashboard"), end: true },
+    { to: localizedPath(lang as "ar" | "en", "admin/users"), icon: Users, label: t("admin.users") },
+    ...(user?.role === "ADMIN" ? [{ to: localizedPath(lang as "ar" | "en", "admin/moderators"), icon: ShieldCheck, label: t("admin.moderators") }] : []),
+    { to: localizedPath(lang as "ar" | "en", "admin/posts"), icon: FileText, label: t("admin.posts") },
+    { to: localizedPath(lang as "ar" | "en", "admin/questions"), icon: HelpCircle, label: t("admin.questions") },
+    { to: localizedPath(lang as "ar" | "en", "admin/tags"), icon: Tags, label: t("admin.tags") },
+    { to: localizedPath(lang as "ar" | "en", "admin/reports"), icon: AlertTriangle, label: t("admin.reports") },
+    { to: localizedPath(lang as "ar" | "en", "admin/tiers"), icon: Award, label: t("admin.tiers") },
+    ...(user?.role === "ADMIN" ? [{ to: localizedPath(lang as "ar" | "en", "admin/ads"), icon: Image, label: t("admin.ads") }] : []),
+    { to: localizedPath(lang as "ar" | "en", "admin/announcements"), icon: Megaphone, label: t("admin.announcements") },
   ];
 
   return (
@@ -53,46 +55,46 @@ export default function AdminLayout() {
           <span className="font-bold text-xl text-primary tracking-wide">Maza3eat Admin</span>
         </div>
         
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-0.5">
           {menuItems.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               end={link.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium text-sm ${
+                `flex items-center gap-3 px-3 py-2 rounded-xl transition-colors font-medium text-sm ${
                   isActive
                     ? "bg-primary text-white shadow-md shadow-primary/20"
                     : "text-gray-600 hover:bg-gray-100 hover:text-primary"
                 }`
               }
             >
-              <link.icon className="w-5 h-5" />
+              <link.icon className="w-4 h-4" />
               <span>{link.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-200 space-y-4">
+        <div className="p-3 border-t border-gray-200 space-y-2">
           <div className="flex items-center gap-3 px-2">
             {user?.avatar ? (
-              <img src={user.avatar} alt="admin" className="w-9 h-9 rounded-full object-cover shadow-sm border border-gray-100" />
+              <img src={user.avatar} alt="admin" className="w-8 h-8 rounded-full object-cover shadow-sm border border-gray-100" />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-gray-200" />
+              <div className="w-8 h-8 rounded-full bg-gray-200" />
             )}
             <div className="flex flex-col">
-              <span className="text-sm font-semibold truncate w-32">{user?.name}</span>
-              <span className="text-xs text-gray-500 uppercase">{user?.role}</span>
+              <span className="text-xs font-semibold truncate w-32">{user?.name}</span>
+              <span className="text-[10px] text-gray-500 uppercase">{user?.role}</span>
             </div>
           </div>
-          <Link to={localizedPath(lang, "")} className="flex items-center gap-2 text-primary hover:bg-blue-50 px-4 py-2 rounded-xl transition-colors font-medium text-sm">
-            <ArrowLeft className="w-5 h-5" /> {t("admin.backToSite", "Back to Site")}
+          <Link to={localizedPath(lang as "ar" | "en", "")} className="flex items-center gap-2 text-primary hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors font-medium text-xs">
+            <ArrowLeft className="w-4 h-4" /> {t("admin.backToSite", "Back to Site")}
           </Link>
           <button
             onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-colors font-medium text-sm"
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors font-medium text-xs"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             <span>{t("login.logout")}</span>
           </button>
         </div>

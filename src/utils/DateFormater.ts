@@ -139,3 +139,10 @@ export const FormatPublishDate = (dateInput: Date): string => {
     return `${day} ${month} ${year}`; // 1 Jan 2022
   }
 };
+
+export const safeFormatDate = (dateInput: any, includeTime: boolean = false): string => {
+  if (!dateInput) return "N/A";
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return "N/A";
+  return includeTime ? d.toLocaleString() : d.toLocaleDateString();
+};

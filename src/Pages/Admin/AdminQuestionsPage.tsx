@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminQuestions, updateQuestionStatus, deleteQuestion } from "../../Apis/AdminApi";
-import { CheckCircle, XCircle, Trash2, Eye } from "lucide-react";
+import { CheckCircle, Trash2, Eye } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
-import PromptModal from "../../Components/shared/PromptModal";
+import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminQuestionsPage() {
   const { t } = useTranslation();
@@ -17,7 +17,6 @@ export default function AdminQuestionsPage() {
   const queryClient = useQueryClient();
 
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; type: "approve" | "delete"; questionId: string | null }>({ isOpen: false, type: "approve", questionId: null });
-  const [promptModal, setPromptModal] = useState<{ isOpen: boolean; questionId: string | null }>({ isOpen: false, questionId: null });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["adminQuestions", statusTab],
@@ -39,10 +38,6 @@ export default function AdminQuestionsPage() {
 
   const handleApprove = (questionId: string) => {
     setConfirmModal({ isOpen: true, type: "approve", questionId });
-  };
-
-  const handleReject = (questionId: string) => {
-    setPromptModal({ isOpen: true, questionId });
   };
 
   const handleDelete = (questionId: string) => {
@@ -110,7 +105,7 @@ export default function AdminQuestionsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(question.createdAt).toLocaleDateString()}
+                        {safeFormatDate(question.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
@@ -123,13 +118,6 @@ export default function AdminQuestionsPage() {
                               <CheckCircle className="w-5 h-5" />
                             </button>
                           )}
-                          <button
-                            onClick={() => handleReject(question.id)}
-                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                            title="Reject"
-                          >
-                            <XCircle className="w-5 h-5" />
-                          </button>
                           <button
                             onClick={() => handleDelete(question.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -179,19 +167,6 @@ export default function AdminQuestionsPage() {
             } else {
               deleteMutation.mutate(confirmModal.questionId);
             }
-          }
-        }}
-      />
-
-      <PromptModal
-        isOpen={promptModal.isOpen}
-        title={t("admin.reject")}
-        message={t("admin.rejectReason")}
-        type="warning"
-        onCancel={() => setPromptModal({ isOpen: false, questionId: null })}
-        onConfirm={(reason) => {
-          if (promptModal.questionId) {
-            updateStatusMutation.mutate({ questionId: promptModal.questionId, status: "REJECTED", reason });
           }
         }}
       />

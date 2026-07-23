@@ -13,6 +13,7 @@ import { useAuth } from "./Auth";
 export const SOCKET_EVENTS = {
   NOTIFICATION_COUNT: "notification:count",
   FORCE_LOGOUT: "auth:force-logout",
+  ANNOUNCEMENT_NOTIFICATION: "notification:announcement",
 } as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -103,6 +104,22 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       }
     );
 
+    // ── Listen for announcement notification socket ──────────────────────────
+    socket.on(SOCKET_EVENTS.ANNOUNCEMENT_NOTIFICATION, () => {
+      console.log("[Socket] notification:announcement received");
+      setLiveCount((prev) => {
+        const currentNotifCount = prev?.notifications?.count ?? 0;
+        const currentContactCount = prev?.contactRequests?.count ?? 0;
+        const newNotifCount = currentNotifCount + 1;
+        const newTotal = newNotifCount + currentContactCount;
+        return {
+          total: { count: newTotal, isCapped: false },
+          notifications: { count: newNotifCount, isCapped: false },
+          contactRequests: prev?.contactRequests ?? { count: currentContactCount, isCapped: false },
+        };
+      });
+    });
+
     // ── Listen for force logout ──────────────────────────────────────────────
     socket.on(SOCKET_EVENTS.FORCE_LOGOUT, () => {
       console.warn("[Socket] Received auth:force-logout. Redirecting to banned page.");
@@ -113,6 +130,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     // Cleanup on unmount or when auth changes
     return () => {
       socket.off(SOCKET_EVENTS.NOTIFICATION_COUNT);
+      socket.off(SOCKET_EVENTS.ANNOUNCEMENT_NOTIFICATION);
       socket.off(SOCKET_EVENTS.FORCE_LOGOUT);
       socket.disconnect();
       socketRef.current = null;

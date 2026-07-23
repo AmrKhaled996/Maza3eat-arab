@@ -25,6 +25,8 @@ import {
   Info,
   MoreHorizontal,
   Flag,
+  Megaphone,
+  Award,
 } from "lucide-react";
 
 export default function NotificationsPage() {
@@ -119,6 +121,20 @@ export default function NotificationsPage() {
           icon: <ShieldAlert className="h-3 w-3 text-red-600" />,
           bgColor: "bg-red-50 ring-4 ring-white",
         };
+      case "TIER_UPGRADE":
+        return {
+          icon: (
+            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 via-purple-500 to-indigo-500 flex items-center justify-center animate-pulse">
+              <Award className="h-2.5 w-2.5 text-white" />
+            </div>
+          ),
+          bgColor: "bg-gradient-to-r from-amber-100 via-pink-100 to-indigo-100 ring-4 ring-white shadow-md",
+        };
+      case "ADMIN_ANNOUNCEMENT":
+        return {
+          icon: <Megaphone className="h-3 w-3 text-blue-600 fill-blue-600" />,
+          bgColor: "bg-blue-100 ring-4 ring-white border border-blue-300",
+        };
       default:
         return {
           icon: <Info className="h-3 w-3 text-gray-500" />,
@@ -195,6 +211,14 @@ export default function NotificationsPage() {
           return <span>تم رفض منشورك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
         case "QUESTION_REJECTION":
           return <span>تم رفض سؤالك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "TIER_UPGRADE":
+          return (
+            <span className="flex items-center gap-1.5 font-bold bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 bg-clip-text text-transparent">
+              مبروك! تم ترقية المستوى الخاص بك 🎉
+            </span>
+          );
+        case "ADMIN_ANNOUNCEMENT":
+          return <span>إعلان جديد من الإدارة — <span className="text-blue-600 font-semibold">{t("notifications.seeItNow")}</span></span>;
         default:
           return <span>إشعار جديد</span>;
       }
@@ -260,6 +284,14 @@ export default function NotificationsPage() {
           return <span>Your post was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
         case "QUESTION_REJECTION":
           return <span>Your question was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+        case "TIER_UPGRADE":
+          return (
+            <span className="flex items-center gap-1.5 font-bold bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 bg-clip-text text-transparent">
+              Congratulations! Your tier has been upgraded 🎉
+            </span>
+          );
+        case "ADMIN_ANNOUNCEMENT":
+          return <span>New Admin Announcement — <span className="text-blue-600 font-semibold">{t("notifications.seeItNow")}</span></span>;
         default:
           return <span>New notification</span>;
       }
@@ -359,8 +391,12 @@ export default function NotificationsPage() {
                     <div
                       key={n.id}
                       onClick={() => handleNotificationClick(n)}
-                      className={`p-5 flex gap-4 transition-all hover:bg-gray-50/50 hover:cursor-pointer items-start relative ${
-                        !n.isRead ? "bg-blue-50/50" : ""
+                      className={`p-5 flex gap-4 transition-all hover:bg-blue-100/50 hover:cursor-pointer items-start relative ${
+                        n.type === "ADMIN_ANNOUNCEMENT"
+                          ? "bg-blue-50 border-s-4 border-s-blue-600"
+                          : !n.isRead
+                          ? "bg-blue-50/50"
+                          : ""
                       }`}
                     >
                       {/* Left side: Avatar + type badge */}

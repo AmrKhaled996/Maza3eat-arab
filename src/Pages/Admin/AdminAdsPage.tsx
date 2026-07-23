@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminAds, deleteAdminAd, getHomeAds, deleteHomeAd } from "../../Apis/AdminApi";
 import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { safeFormatDate } from "../../utils/DateFormater";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 
 export default function AdminAdsPage() {
@@ -86,7 +87,7 @@ export default function AdminAdsPage() {
                     </button>
                     <div className="p-4">
                       <p className="text-xs text-gray-500">{t("admin.addedBy")}: {ad.addedBy?.name}</p>
-                      <p className="text-xs text-gray-500 mt-1">{t("admin.date")}: {new Date(ad.createdAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-gray-500 mt-1">{t("admin.date")}: {safeFormatDate(ad.createdAt)}</p>
                     </div>
                   </div>
                 ))

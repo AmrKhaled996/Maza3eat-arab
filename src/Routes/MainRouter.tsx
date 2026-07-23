@@ -23,6 +23,7 @@ import { localizedPath } from "../i18n/paths";
 import RepliesThreadPage from "../Pages/Comments/RepliesThreadPage";
 
 import AdminProtectedRoute from "./AdminProtectedRoute";
+import AdminModeratorsPage from "../Pages/Admin/AdminModeratorsPage";
 import AdminLayout from "../Pages/Admin/AdminLayout";
 import AdminHomePage from "../Pages/Admin/AdminHomePage";
 import AdminUsersPage from "../Pages/Admin/AdminUsersPage";
@@ -72,6 +73,7 @@ export default function MainRouter(): React.ReactElement {
                 <Route index element={<AdminHomePage />} />
                 <Route path="users" element={<AdminUsersPage />} />
                 <Route path="users/:id" element={<AdminUserDetails />} />
+                <Route path="moderators" element={<AdminModeratorsPage />} />
                 <Route path="posts" element={<AdminPostsPage />} />
                 <Route path="posts/create" element={<CreatePostPage />} />
                 <Route path="posts/:id" element={<AdminPostDetails />} />

@@ -1,27 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAdminPosts, updatePostStatus, deletePost, createAdminPost } from "../../Apis/AdminApi";
-import { CheckCircle, XCircle, Trash2, Eye } from "lucide-react";
+import { getAdminPosts, updatePostStatus, deletePost } from "../../Apis/AdminApi";
+import { CheckCircle, Trash2, Eye, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
-import PromptModal from "../../Components/shared/PromptModal";
+import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminPostsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { lang } = useLocale();
   const [statusTab, setStatusTab] = useState<"PENDING" | "APPROVED">("PENDING");
+  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; type: "approve" | "delete"; postId: string | null }>({ isOpen: false, type: "approve", postId: null });
-  const [promptModal, setPromptModal] = useState<{ isOpen: boolean; postId: string | null }>({ isOpen: false, postId: null });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
-    queryKey: ["adminPosts", statusTab],
-    queryFn: ({ pageParam }) => getAdminPosts(statusTab, pageParam as string | null),
+    queryKey: ["adminPosts", statusTab, searchQuery],
+    queryFn: ({ pageParam }) => getAdminPosts(statusTab, pageParam as string | null, searchQuery),
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextCursor : undefined,
   });
@@ -41,24 +41,32 @@ export default function AdminPostsPage() {
     setConfirmModal({ isOpen: true, type: "approve", postId });
   };
 
-  const handleReject = (postId: string) => {
-    setPromptModal({ isOpen: true, postId });
-  };
-
   const handleDelete = (postId: string) => {
     setConfirmModal({ isOpen: true, type: "delete", postId });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-gray-800">{t("admin.postsManagement")}</h2>
-        <button
-          onClick={() => navigate(localizedPath(lang, "admin/posts/create"))}
-          className="px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors"
-        >
-          + {t("admin.createPost", "Create Post")}
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder={t("admin.searchPosts", "Search posts...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm w-full sm:w-64"
+            />
+          </div>
+          <button
+            onClick={() => navigate(localizedPath(lang, "admin/posts/create"))}
+            className="px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors text-sm whitespace-nowrap"
+          >
+            + {t("admin.createPost", "Create Post")}
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-4 border-b border-gray-200">
@@ -110,7 +118,7 @@ export default function AdminPostsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(post.createdAt).toLocaleDateString()}
+                        {safeFormatDate(post.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
@@ -123,13 +131,6 @@ export default function AdminPostsPage() {
                               <CheckCircle className="w-5 h-5" />
                             </button>
                           )}
-                          <button
-                            onClick={() => handleReject(post.id)}
-                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                            title="Reject"
-                          >
-                            <XCircle className="w-5 h-5" />
-                          </button>
                           <button
                             onClick={() => handleDelete(post.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -181,21 +182,6 @@ export default function AdminPostsPage() {
             }
           }
         }}
-      />
-
-      <PromptModal
-        isOpen={promptModal.isOpen}
-        title={t("admin.rejectReasonTitle", "Reject Post")}
-        message={t("admin.rejectReasonMsg", "Please provide a reason for rejecting this post.")}
-        placeholder={t("admin.enterReason", "Enter reason...")}
-        confirmText={t("admin.reject", "Reject")}
-        onConfirm={(reason) => {
-          if (promptModal.postId) {
-            updateStatusMutation.mutate({ postId: promptModal.postId, status: "REJECTED", reason });
-          }
-          setPromptModal({ isOpen: false, postId: null });
-        }}
-        onCancel={() => setPromptModal({ isOpen: false, postId: null })}
       />
     </div>
   );

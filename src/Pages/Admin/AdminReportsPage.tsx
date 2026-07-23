@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminReports, updateReportStatus } from "../../Apis/AdminApi";
-import { CheckCircle, XCircle, Eye } from "lucide-react";
+import { Trash2, Eye, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
+import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminReportsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const queryClient = useQueryClient();
 
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; type: "resolve" | "reject"; reportId: string | null }>({ isOpen: false, type: "resolve", reportId: null });
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; reportId: string | null }>({ isOpen: false, reportId: null });
+  const [detailModal, setDetailModal] = useState<{ isOpen: boolean; report: any | null }>({ isOpen: false, report: null });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["adminReports"],
@@ -19,27 +22,51 @@ export default function AdminReportsPage() {
     getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextCursor : undefined,
   });
 
-  const updateStatusMutation = useMutation({
-    mutationFn: ({ reportId, status }: { reportId: string; status: "RESOLVED" | "REJECTED" }) => 
-      updateReportStatus(reportId, status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["adminReports"] }),
+  const deleteMutation = useMutation({
+    mutationFn: (reportId: string) => updateReportStatus(reportId, "REJECTED"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminReports"] });
+      setDeleteModal({ isOpen: false, reportId: null });
+    },
   });
 
-  const handleResolve = (reportId: string) => {
-    setConfirmModal({ isOpen: true, type: "resolve", reportId });
+  const handleDelete = (reportId: string) => {
+    setDeleteModal({ isOpen: true, reportId });
   };
 
-  const handleReject = (reportId: string) => {
-    setConfirmModal({ isOpen: true, type: "reject", reportId });
+  const formatTargetType = (type: string) => {
+    if (lang === "ar") {
+      switch (type) {
+        case "POST": return "منشور";
+        case "QUESTION": return "سؤال";
+        case "COMMENT": return "تعليق";
+        case "ANSWER": return "إجابة";
+        case "COMMENT_REPLY": return "رد على تعليق";
+        case "ANSWER_REPLY": return "رد على إجابة";
+        case "COMMENT_REPLY_REPLY": return "رد فرعي";
+        case "CONTACT_REQUEST": return "طلب تواصل";
+        default: return type;
+      }
+    } else {
+      switch (type) {
+        case "POST": return "Post";
+        case "QUESTION": return "Question";
+        case "COMMENT": return "Comment";
+        case "ANSWER": return "Answer";
+        case "COMMENT_REPLY": return "Comment Reply";
+        case "ANSWER_REPLY": return "Answer Reply";
+        case "COMMENT_REPLY_REPLY": return "Nested Reply";
+        case "CONTACT_REQUEST": return "Contact Request";
+        default: return type;
+      }
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">{t("admin.reportsManagement")}</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{t("admin.reportsManagement", "Reports Management")}</h2>
       </div>
-
-
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {isLoading ? (
@@ -49,11 +76,11 @@ export default function AdminReportsPage() {
             <table className="w-full text-start">
               <thead className="bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-500 uppercase tracking-wider">
                 <tr>
-                  <th className="px-6 py-4 text-start">{t("admin.reporter")}</th>
-                  <th className="px-6 py-4 text-start">{t("admin.targetType")}</th>
-                  <th className="px-6 py-4 text-start">{t("admin.reason")}</th>
-                  <th className="px-6 py-4 text-start">{t("admin.date")}</th>
-                  <th className="px-6 py-4 text-end">{t("admin.actions")}</th>
+                  <th className="px-6 py-4 text-start">{t("admin.reporter", "Reporter")}</th>
+                  <th className="px-6 py-4 text-start">{t("admin.targetType", "Target Type")}</th>
+                  <th className="px-6 py-4 text-start">{t("admin.reason", "Reason")}</th>
+                  <th className="px-6 py-4 text-start">{t("admin.date", "Date")}</th>
+                  <th className="px-6 py-4 text-end">{t("admin.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -62,42 +89,41 @@ export default function AdminReportsPage() {
                     <tr key={`${i}-${report.id}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <img src={report.reporter.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                          <img src={report.reporter.avatar} alt="" className="w-8 h-8 rounded-full object-cover bg-gray-100" />
                           <span className="text-sm font-medium text-gray-700">{report.reporter.name}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {report.targetType}
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                          {formatTargetType(report.targetType)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 max-w-sm truncate">
-                        {report.reason}
+                      <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                        <button
+                          onClick={() => setDetailModal({ isOpen: true, report })}
+                          className="text-start truncate hover:text-primary hover:underline block w-full"
+                          title={t("admin.clickToViewReason", "Click to view full reason")}
+                        >
+                          {report.reason}
+                        </button>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(report.createdAt).toLocaleDateString()}
+                        {safeFormatDate(report.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
-                          <Link
-                            to={`/admin/reports/${report.id}`}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
-                          >
-                            <Eye className="w-4 h-4" /> {t("admin.view")}
-                          </Link>
                           <button
-                            onClick={() => handleResolve(report.id)}
-                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                            title="Resolve"
+                            onClick={() => setDetailModal({ isOpen: true, report })}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
                           >
-                            <CheckCircle className="w-5 h-5" />
+                            <Eye className="w-4 h-4" /> {t("admin.view", "View Details")}
                           </button>
                           <button
-                            onClick={() => handleReject(report.id)}
-                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                            title="Reject"
+                            onClick={() => handleDelete(report.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title={t("admin.deleteReport", "Delete Report")}
                           >
-                            <XCircle className="w-5 h-5" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       </td>
@@ -107,7 +133,7 @@ export default function AdminReportsPage() {
                 {data?.pages[0]?.reports.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                      {t("admin.noReports")}
+                      {t("admin.noReports", "No pending reports")}
                     </td>
                   </tr>
                 )}
@@ -128,18 +154,65 @@ export default function AdminReportsPage() {
         )}
       </div>
 
+      {/* Reason Detail Popup Modal */}
+      {detailModal.isOpen && detailModal.report && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl text-start space-y-4">
+            <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+              <div className="p-2 bg-red-50 text-red-600 rounded-xl">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{t("admin.reportReasonDetails", "Report Reason Details")}</h3>
+                <span className="text-xs text-gray-400">{formatTargetType(detailModal.report.targetType)} • {safeFormatDate(detailModal.report.createdAt, true)}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">{t("admin.reporter", "Reporter")}</label>
+                <div className="flex items-center gap-2">
+                  <img src={detailModal.report.reporter.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                  <span className="text-sm font-medium text-gray-800">{detailModal.report.reporter.name} ({detailModal.report.reporter.email})</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">{t("admin.reason", "Report Reason")}</label>
+                <div className="bg-red-50/50 border border-red-100 p-4 rounded-xl text-red-900 text-sm font-medium leading-relaxed">
+                  {detailModal.report.reason}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <Link
+                to={`/admin/reports/${detailModal.report.id}`}
+                className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+              >
+                <Eye className="w-4 h-4" /> {t("admin.goToFullReport", "Go to Full Report Page")}
+              </Link>
+              
+              <button
+                onClick={() => setDetailModal({ isOpen: false, report: null })}
+                className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl text-sm transition-colors"
+              >
+                {t("admin.close", "Close")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmModal
-        isOpen={confirmModal.isOpen}
-        title={confirmModal.type === "resolve" ? t("admin.resolve") : t("admin.reject")}
-        message={confirmModal.type === "resolve" ? t("admin.resolveConfirm") : t("admin.rejectConfirm")}
-        type={confirmModal.type === "resolve" ? "info" : "danger"}
-        onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false, reportId: null })}
+        isOpen={deleteModal.isOpen}
+        title={t("admin.deleteReportTitle", "Delete Report")}
+        message={t("admin.deleteReportConfirm", "Are you sure you want to delete this report?")}
+        type="danger"
+        onCancel={() => setDeleteModal({ isOpen: false, reportId: null })}
         onConfirm={() => {
-          if (confirmModal.reportId) {
-            updateStatusMutation.mutate({ 
-              reportId: confirmModal.reportId, 
-              status: confirmModal.type === "resolve" ? "RESOLVED" : "REJECTED" 
-            });
+          if (deleteModal.reportId) {
+            deleteMutation.mutate(deleteModal.reportId);
           }
         }}
       />

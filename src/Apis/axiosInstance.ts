@@ -21,6 +21,13 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
+    if (error.response?.status === 403 && !window.location.pathname.endsWith("/banned")) {
+      const stored = localStorage.getItem("maza3eat-locale");
+      const lang = stored === "ar" || stored === "en" ? stored : DEFAULT_LOCALE;
+      window.location.href = `/${lang}/banned`;
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

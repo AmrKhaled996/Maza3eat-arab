@@ -16,9 +16,9 @@ export default function AdminProtectedRoute() {
     );
   }
 
-  // Redirect if not authenticated or not admin
-  if (!user || user.role !== "ADMIN") {
-    return <Navigate to={localizedPath(i18n.language, "")} replace />;
+  // Redirect if not authenticated or not admin/moderator
+  if (!user || (user.role !== "ADMIN" && user.role !== "MODERATOR")) {
+    return <Navigate to={localizedPath(i18n.language as "ar" | "en", "")} replace />;
   }
 
   return <Outlet />;

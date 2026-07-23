@@ -2,6 +2,7 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminUserById } from "../../../Apis/AdminApi";
+import { safeFormatDate } from "../../../utils/DateFormater";
 import { ArrowLeft, User, Mail, Calendar, Shield, Award, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -57,7 +58,7 @@ export default function AdminUserDetails() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-500 text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> {t("admin.joined", "Joined")}</span>
-                <span className="text-sm font-medium text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</span>
+                <span className="text-sm font-medium text-gray-900">{safeFormatDate(user.createdAt)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-500 text-sm flex items-center gap-2"><Activity className="w-4 h-4" /> {t("admin.reputation", "Reputation")}</span>
@@ -100,7 +101,7 @@ export default function AdminUserDetails() {
                   <span className="font-semibold">{t("admin.reason", "Reason")}:</span> {user.ban.reason}
                 </div>
                 <div className="text-xs text-red-500 mt-1">
-                  <span className="font-semibold">{t("admin.bannedAt", "Banned at")}:</span> {new Date(user.ban.createdAt).toLocaleString()}
+                  <span className="font-semibold">{t("admin.bannedAt", "Banned at")}:</span> {safeFormatDate(user.ban.createdAt, true)}
                 </div>
              </div>
            )}

@@ -3,6 +3,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { getAdminAnnouncements, createAdminAnnouncement } from "../../Apis/AdminApi";
 import { Megaphone, Plus, Calendar, Type } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminAnnouncementsPage() {
   const { t } = useTranslation();
@@ -116,33 +117,27 @@ export default function AdminAnnouncementsPage() {
                     <tr key={`${i}-${item.id}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${
-                            item.type === 'URGENT' ? 'bg-red-50 text-red-600' :
-                            item.type === 'OFFICIAL' ? 'bg-blue-50 text-blue-600' :
-                            'bg-gray-50 text-gray-600'
-                          }`}>
+                          <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
                             <Megaphone className="w-5 h-5" />
                           </div>
                           <div>
-                            <div className="font-semibold text-gray-900">{item.title}</div>
-                            <div className="text-sm text-gray-500 line-clamp-1 max-w-md">{item.content}</div>
+                            <div className="font-semibold text-gray-900 line-clamp-1 max-w-md">{item.title || item.message}</div>
+                            {item.title && item.content && (
+                              <div className="text-sm text-gray-500 line-clamp-1 max-w-md">{item.content}</div>
+                            )}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          item.type === 'URGENT' ? 'bg-red-50 text-red-700 border border-red-200' :
-                          item.type === 'OFFICIAL' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                          'bg-gray-100 text-gray-700 border border-gray-200'
-                        }`}>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                           <Type className="w-3 h-3" />
-                          {item.type}
+                          {t("admin.typeOfficial", "Official")}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
-                          {new Date(item.createdAt).toLocaleDateString()}
+                          {safeFormatDate(item.createdAt)}
                         </div>
                       </td>
                     </tr>
