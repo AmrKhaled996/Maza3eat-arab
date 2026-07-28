@@ -2,13 +2,13 @@ import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 import type {
   UserPostsResponse,
-  userProfileData,
+  UserProfileData,
   UserQuestionsResponse,
 } from "../../Types/Profile/profile-types";
 
-export async function getUserProfile(): Promise<userProfileData> {
+export async function getUserProfile({userId}: {userId: string}): Promise<UserProfileData> {
   try {
-    const response = await axiosInstance.get("/users/me");
+    const response = await axiosInstance.get(`/users/${userId}`);
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;

@@ -1,19 +1,33 @@
+import type { Image } from "../Image";
 import type { Tag } from "../Tag";
 
-export interface userProfileData {
+export interface UserProfileData {
   id: string;
   name: string;
-  email: string;
   avatar: string;
+  tier: UserTier;
+  counts: UserCounts;
+  permissions: UserPermissions;
 }
-export interface Tags {
+
+export interface UserTier {
+  id: number;
   name: string;
+  badgeColor: string;
+  description: string;
 }
-export interface image {
-  url: string;
-  name: string;
-  remainingImages: number;
+
+export interface UserCounts {
+  posts: number;
+  questions: number;
 }
+
+export interface UserPermissions {
+  canEditProfile: boolean;
+}
+
+
+
 export interface UserPost {
   id: string;
   title: string;
@@ -21,8 +35,8 @@ export interface UserPost {
   likesCount: number;
   commentsCount: number;
   publishDate: string;
-  tags: Tags[];
-  image: image;
+  tags: Tag[];
+  image: Image;
   author:string,
 }
 export interface UserPostsResponse {
