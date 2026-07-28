@@ -9,7 +9,6 @@ import { axiosInstance } from "../axiosInstance";
 export async function getGoogleAuthUrl(): Promise<string> {
   const { data } = await axiosInstance.get("/auth/google");
   console.log(data);
-
   return data.data.url;
 }
 

@@ -321,3 +321,17 @@ html[dir="rtl"] .ql-editor ol {
 .ql-snow .ql-align .ql-picker-item[data-value="justify"]::before {
     content: "Justify";
 }
+::-webkit-scrollbar  {
+  width: 6px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #2563eb;
+  transition: all 0.3s ease-in-out;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2057cc;
+}
