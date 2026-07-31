@@ -6,7 +6,7 @@ import { getAnswersByQuestionId, getAnswersByQuestionIdWithCursor } from "../../
 
 function useGetAnswersByQuestionId( questionId: string ,cursor:string ="") {
     return  useInfiniteQuery({
-        queryKey: ["get-question-answer"],
+        queryKey: ["get-question-answer", questionId],
         queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){
@@ -15,6 +15,7 @@ function useGetAnswersByQuestionId( questionId: string ,cursor:string ="") {
       return  getAnswersByQuestionId(questionId)},
     initialPageParam: cursor,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
+    enabled: !!questionId,
   });
 
 }

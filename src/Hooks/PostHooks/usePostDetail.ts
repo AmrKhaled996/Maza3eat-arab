@@ -7,8 +7,10 @@ function usePostDetail(postId: string) {
         queryKey: ["post", postId],
         queryFn: async () => {
             const res = await getPostById(postId);
-            const data = res.data.data;
-            
+            // Backend returns images as [{ imageUrl, originalName }], which is
+            // wider than the declared Post type — read it untyped.
+            const data = res.data.data as any;
+
             // Transform backend response to match Post type
             return {
                 id: postId,
@@ -22,8 +24,12 @@ function usePostDetail(postId: string) {
                     name: data.images?.[0]?.originalName || "",
                     remainingImages: Math.max((data.images?.length || 1) - 1, 0),
                 },
+                images: (data.images ?? []).map(
+                    (img: { imageUrl: string }) => img.imageUrl,
+                ),
                 author: data.author,
                 publishDate: data.publishDate,
+                likedByMe: data.likedByMe,
             } as Post;
         },
         enabled: !!postId,

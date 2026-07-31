@@ -5,7 +5,7 @@ import { getReplyReplies, getReplyRepliesWithCursor } from "../../Apis/AnswersAp
 
 function useGetReplysReplys(replyId: string, cursor: string = "") {
   return useQuery({
-    queryKey: ["get-answer-reply-replies", replyId],
+    queryKey: ["get-answer-reply-replies", replyId, cursor],
     queryFn: () => {
       if (cursor) {
         return getReplyRepliesWithCursor(replyId, cursor);
