@@ -1,14 +1,16 @@
-import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminUserById } from "../../../Apis/AdminApi";
 import { safeFormatDate } from "../../../utils/DateFormater";
-import { ArrowLeft, User, Mail, Calendar, Shield, Award, Activity } from "lucide-react";
+import { ArrowLeft, User, Calendar, Shield, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { localizedPath } from "../../../i18n/paths";
+import { useLocale } from "../../../i18n/useLocale";
 
 export default function AdminUserDetails() {
   const { id } = useParams();
   const { t } = useTranslation();
+  const { lang } = useLocale();
 
   const { data: user, isLoading, isError } = useQuery({
     queryKey: ["adminUser", id],
@@ -22,7 +24,7 @@ export default function AdminUserDetails() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link to="/admin/users" className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
+        <Link to={localizedPath(lang, "admin/users")} className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <h2 className="text-2xl font-bold text-gray-800">{t("admin.userDetails", "User Details")}</h2>
@@ -60,10 +62,6 @@ export default function AdminUserDetails() {
                 <span className="text-gray-500 text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> {t("admin.joined", "Joined")}</span>
                 <span className="text-sm font-medium text-gray-900">{safeFormatDate(user.createdAt)}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500 text-sm flex items-center gap-2"><Activity className="w-4 h-4" /> {t("admin.reputation", "Reputation")}</span>
-                <span className="text-sm font-bold text-gray-900">{user.reputationScore}</span>
-              </div>
             </div>
           </div>
         </div>
@@ -73,19 +71,19 @@ export default function AdminUserDetails() {
               <h4 className="font-semibold text-gray-900 mb-4">{t("admin.userStats", "User Statistics")}</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <div className="text-2xl font-bold text-blue-700">{user._count?.posts || 0}</div>
+                    <div className="text-2xl font-bold text-blue-700">{user.counts?.posts || 0}</div>
                     <div className="text-xs text-blue-600 font-medium uppercase mt-1">{t("admin.posts", "Posts")}</div>
                  </div>
                  <div className="p-4 bg-green-50 rounded-xl border border-green-100">
-                    <div className="text-2xl font-bold text-green-700">{user._count?.questions || 0}</div>
+                    <div className="text-2xl font-bold text-green-700">{user.counts?.questions || 0}</div>
                     <div className="text-xs text-green-600 font-medium uppercase mt-1">{t("admin.questions", "Questions")}</div>
                  </div>
                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                    <div className="text-2xl font-bold text-purple-700">{user._count?.comments || 0}</div>
+                    <div className="text-2xl font-bold text-purple-700">{user.counts?.comments || 0}</div>
                     <div className="text-xs text-purple-600 font-medium uppercase mt-1">{t("admin.comments", "Comments")}</div>
                  </div>
                  <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                    <div className="text-2xl font-bold text-orange-700">{user._count?.answers || 0}</div>
+                    <div className="text-2xl font-bold text-orange-700">{user.counts?.answers || 0}</div>
                     <div className="text-xs text-orange-600 font-medium uppercase mt-1">{t("admin.answers", "Answers")}</div>
                  </div>
               </div>

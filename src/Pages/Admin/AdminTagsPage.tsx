@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../Apis/axiosInstance";
 import { Tags as TagsIcon, FileText, HelpCircle, Search, TrendingUp } from "lucide-react";
