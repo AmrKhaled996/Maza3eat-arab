@@ -98,6 +98,38 @@ function parseInlineMarkdown(text: string) {
   return parts.length > 0 ? parts : text;
 }
 
+function extractBodyFromRaw(raw: any): string | undefined {
+  if (!raw) return undefined;
+  if (typeof raw === "string" && raw.trim()) return raw;
+  if (typeof raw.body === "string" && raw.body.trim()) return raw.body;
+  if (typeof raw.message === "string" && raw.message.trim()) return raw.message;
+  if (typeof raw.content === "string" && raw.content.trim()) return raw.content;
+  if (typeof raw.text === "string" && raw.text.trim()) return raw.text;
+
+  // Nested announcement object
+  if (raw.announcement) {
+    if (typeof raw.announcement === "string" && raw.announcement.trim()) return raw.announcement;
+    if (typeof raw.announcement.message === "string" && raw.announcement.message.trim()) return raw.announcement.message;
+    if (typeof raw.announcement.content === "string" && raw.announcement.content.trim()) return raw.announcement.content;
+    if (typeof raw.announcement.text === "string" && raw.announcement.text.trim()) return raw.announcement.text;
+  }
+
+  // Nested data or notification object
+  if (raw.data) {
+    if (typeof raw.data === "string" && raw.data.trim()) return raw.data;
+    if (typeof raw.data.message === "string" && raw.data.message.trim()) return raw.data.message;
+    if (typeof raw.data.content === "string" && raw.data.content.trim()) return raw.data.content;
+    if (typeof raw.data.text === "string" && raw.data.text.trim()) return raw.data.text;
+  }
+
+  if (raw.notification) {
+    if (typeof raw.notification.message === "string" && raw.notification.message.trim()) return raw.notification.message;
+    if (typeof raw.notification.content === "string" && raw.notification.content.trim()) return raw.notification.content;
+  }
+
+  return undefined;
+}
+
 export default function NotificationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -105,42 +137,62 @@ export default function NotificationDetailPage() {
   const { t } = useTranslation("common");
   const { notifications, markAsRead } = useNotifications();
 
-  // First try the cached list, then fall back to a direct API call
+  // First try the cached list, then fetch full detail from API
   const cachedNotification = notifications.find((n) => n.id === id);
   const [notification, setNotification] = useState<Notification | null>(
     cachedNotification ?? null
   );
   const [isLoadingDetail, setIsLoadingDetail] = useState(!cachedNotification);
 
-  // If not in cache, fetch from API
+  // Always fetch detail endpoint to get complete raw body/message text
   useEffect(() => {
+    if (!id) return;
+
     if (cachedNotification) {
       setNotification(cachedNotification);
       setIsLoadingDetail(false);
-      return;
+    } else {
+      setIsLoadingDetail(true);
     }
-    if (!id) return;
 
-    setIsLoadingDetail(true);
     fetchNotificationById(id).then((raw) => {
       if (!raw) {
         setIsLoadingDetail(false);
         return;
       }
-      // The detail endpoint returns rich data; build a minimal Notification
-      // from the common fields that are always present.
+
+      const bodyText = extractBodyFromRaw(raw) || cachedNotification?.body;
+      const titleText =
+        (raw.title as string) ||
+        (raw.announcement as any)?.title ||
+        (raw.data as any)?.title ||
+        cachedNotification?.title;
+
+      // The backend wraps the payload as { notification: { …, postId | questionId } }
+      const nested = raw.notification as Record<string, unknown> | undefined;
+
       const mapped: Notification = {
         id: id,
-        type: (raw.type as Notification["type"]) ?? "ANSWER_REPLY",
-        isRead: true, // server marks it read on fetch
+        type: ((raw.type || cachedNotification?.type) as Notification["type"]) ?? "ADMIN_ANNOUNCEMENT",
+        isRead: true,
         createdAt:
           (raw.createdAt as string) ??
           (raw.lastActivityAt as string) ??
+          cachedNotification?.createdAt ??
           new Date().toISOString(),
-        title: (raw.title as string) ?? undefined,
-        body: (raw.body as string) ?? undefined,
-        resourceId: (raw.resourceId as string) ?? undefined,
+        title: titleText,
+        body: bodyText,
+        // The backend never emits `resourceId` — it sends postId / questionId
+        resourceId:
+          ((raw.resourceId ??
+            nested?.postId ??
+            nested?.questionId ??
+            raw.postId ??
+            raw.questionId) as string | undefined) ??
+          cachedNotification?.resourceId,
+        sender: (raw.sender as any) ?? cachedNotification?.sender,
       };
+
       setNotification(mapped);
       setIsLoadingDetail(false);
     });

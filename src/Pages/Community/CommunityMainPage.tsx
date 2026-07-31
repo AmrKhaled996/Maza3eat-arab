@@ -9,6 +9,7 @@ import BounceLoading from "../../Components/shared/BounceLoading";
 import MainPageLayout from "../../Components/Community/MainPageLayout";
 import { useSearchParams } from "react-router-dom";
 import SectionHeader from "../../Components/Community/SectionHeader";
+import TrendingTags from "../../Components/shared/TrendingTags";
 
 export default function CommunityMainPage() {
   const [sortBy, setSortBy] = useState("latest");
@@ -27,7 +28,7 @@ export default function CommunityMainPage() {
     isFetching,
     refetch,
   } = useCommuintySearch(searchParam, sortBy);
-  // Infinite scrolling with Intersection Observer
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
@@ -42,29 +43,23 @@ export default function CommunityMainPage() {
     };
   }, [fetchNextPage]);
 
-  // Update postsData when new data is fetched
   useEffect(() => {
     if (data) {
       const allPosts = data.pages.flatMap((page: any) => page.posts);
       setPostsData(allPosts);
-      console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
 
-  // Refetch when sortBy, searchValue, or search changes
   const search = useSearchParams()[0].get("search") || "";
   useEffect(() => {
     refetch();
   }, [sortBy, searchValue, search]);
 
-  // Update searchLoading state based on isFetching
   useEffect(() => {
-    console.log("fetching");
-    if (isFetchingNextPage||isLoading) return;
+    if (isFetchingNextPage || isLoading) return;
     setSearchLoading(isFetching);
   }, [isFetching]);
+
   return (
     <MainPageLayout>
       <SearchHeroSection
@@ -77,21 +72,29 @@ export default function CommunityMainPage() {
       {/* Section header */}
       <SectionHeader sortBy={sortBy} setSortBy={setSortBy} />
 
-      {/* Posts */}
-      <div className="flex flex-col gap-5">
-        {postsData.map((p: Post) => (
-          <PostCard key={p.id} post={p} />
-        ))}
-        {(isLoading || isFetchingNextPage) && (
-          <div className="flex flex-col gap-5">
-            <PostSkeleton />
-            <PostSkeleton />
-            <PostSkeleton />
-            {/* ping loading */}
-            <BounceLoading />
-          </div>
-        )}
-        <div ref={lastPost} />
+      {/* Main Grid Layout */}
+      {/* Sidebar column must stretch to the row height so its sticky child can travel */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Posts List Column */}
+        <div className="lg:col-span-8 space-y-5">
+          {postsData.map((p: Post) => (
+            <PostCard key={p.id} post={p} />
+          ))}
+          {(isLoading || isFetchingNextPage) && (
+            <div className="flex flex-col gap-5">
+              <PostSkeleton />
+              <PostSkeleton />
+              <PostSkeleton />
+              <BounceLoading />
+            </div>
+          )}
+          <div ref={lastPost} />
+        </div>
+
+        {/* Sidebar Column */}
+        <div className="lg:col-span-4 hidden lg:block">
+          <TrendingTags limit={10} />
+        </div>
       </div>
     </MainPageLayout>
   );

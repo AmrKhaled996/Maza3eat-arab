@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import NavigationBar from "../../Components/shared/NavigationBar";
 import {
   POST_IMAGE_FIELD,
@@ -26,6 +27,8 @@ import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
 import RichTextEditor from "../../Components/shared/RichTextEditor";
+import { getSuggestedTags, type TagItem } from "../../Apis/TagsApi";
+import SubmissionConfirmModal from "../../Components/shared/SubmissionConfirmModal";
 
 const MAX_IMAGES = 6;
 
@@ -40,6 +43,7 @@ export default function CreatePostPage() {
   const location = useLocation();
   const fileInputId = useId();
   const isAdmin = location.pathname.includes("/admin");
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -49,6 +53,8 @@ export default function CreatePostPage() {
   const [mainIndex, setMainIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tagSuggestions, setTagSuggestions] = useState<TagItem[]>([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const previewsRef = useRef<PreviewItem[]>([]);
   previewsRef.current = previews;
@@ -90,8 +96,24 @@ export default function CreatePostPage() {
     });
   };
 
-  const addTag = () => {
-    const raw = tagInput.trim().replace(/^#+/, "");
+  useEffect(() => {
+    if (!tagInput.trim()) {
+      setTagSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const results = await getSuggestedTags(tagInput);
+        setTagSuggestions(results);
+      } catch {
+        setTagSuggestions([]);
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [tagInput]);
+
+  const addTag = (tagName?: string) => {
+    const raw = (tagName || tagInput).trim().replace(/^#+/, "");
     if (!raw) return;
     if (raw.length < 3 || raw.length > 30) {
       setError(t("createPost.errorTagLength"));
@@ -99,6 +121,7 @@ export default function CreatePostPage() {
     }
     if (tags.includes(raw)) {
       setTagInput("");
+      setTagSuggestions([]);
       return;
     }
     if (tags.length >= 10) {
@@ -107,10 +130,11 @@ export default function CreatePostPage() {
     }
     setTags((t) => [...t, raw]);
     setTagInput("");
+    setTagSuggestions([]);
     setError(null);
   };
 
-  const onSubmit = async (e: FormEvent) => {
+  const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     if (previews.length < 1) {
@@ -130,13 +154,19 @@ export default function CreatePostPage() {
       setError(t("createPost.errorMaxTags"));
       return;
     }
+    if (isAdmin) {
+      executeSubmit();
+    } else {
+      setShowConfirmModal(true);
+    }
+  };
 
+  const executeSubmit = async () => {
+    setShowConfirmModal(false);
+    const cleanContent = content.trim();
     const formData = new FormData();
     formData.append("title", title.trim());
     formData.append("content", cleanContent);
-    // Send tags individually so multer parses them as an array.
-    // If there is only 1 tag, duplicate it to force multer to parse it as an array.
-    // The backend service will naturally deduplicate it.
     if (tags.length === 1) {
       formData.append("tags", tags[0]);
       formData.append("tags", tags[0]);
@@ -149,9 +179,12 @@ export default function CreatePostPage() {
     try {
       if (isAdmin) {
         await createAdminPost(formData);
+        queryClient.invalidateQueries({ queryKey: ["adminPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
         navigate(localizedPath(lang, "admin/posts"));
       } else {
         const res = await createPost(formData);
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
         const id = res.data?.data?.id;
         if (id) {
           navigate(localizedPath(lang, `post/${id}`));
@@ -182,7 +215,7 @@ export default function CreatePostPage() {
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        <form onSubmit={onSubmit} className="space-y-8">
+        <form onSubmit={handleFormSubmit} className="space-y-8">
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             {main ? (
               <div className="relative aspect-[16/10] bg-gray-100">
@@ -328,26 +361,44 @@ export default function CreatePostPage() {
                 </span>
               ))}
             </div>
-            <div className="mt-2 flex gap-2">
-              <input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addTag();
-                  }
-                }}
-                placeholder={t("createPost.tagPlaceholder")}
-                className="min-w-0 flex-1 rounded-xl border border-gray-200/90 bg-white/90 px-4 py-2.5 text-sm outline-none ring-1 ring-transparent transition focus:border-primary/40 focus:ring-primary/15"
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="shrink-0 rounded-xl border border-dashed border-primary/35 bg-transparent px-4 py-2.5 text-sm font-semibold transition hover:border-primary/50"
-              >
-                <span className="gradient-text">{t("createPost.addTag")}</span>
-              </button>
+            <div className="mt-2 relative">
+              <div className="flex gap-2">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  placeholder={t("createPost.tagPlaceholder")}
+                  className="min-w-0 flex-1 rounded-xl border border-gray-200/90 bg-white/90 px-4 py-2.5 text-sm outline-none ring-1 ring-transparent transition focus:border-primary/40 focus:ring-primary/15"
+                />
+                <button
+                  type="button"
+                  onClick={() => addTag()}
+                  className="shrink-0 rounded-xl border border-dashed border-primary/35 bg-transparent px-4 py-2.5 text-sm font-semibold transition hover:border-primary/50"
+                >
+                  <span className="gradient-text">{t("createPost.addTag")}</span>
+                </button>
+              </div>
+
+              {/* Tag Autocomplete Suggestions */}
+              {tagSuggestions.length > 0 && (
+                <div className="absolute top-full inset-x-0 mt-1.5 z-20 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 max-h-48 overflow-y-auto">
+                  {tagSuggestions.map((item) => (
+                    <button
+                      key={item.name}
+                      type="button"
+                      onClick={() => addTag(item.name)}
+                      className="w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between cursor-pointer font-medium"
+                    >
+                      <span>#{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -367,6 +418,13 @@ export default function CreatePostPage() {
           </button>
         </form>
       </div>
+
+      <SubmissionConfirmModal
+        isOpen={showConfirmModal}
+        isSubmitting={submitting}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={executeSubmit}
+      />
     </div>
   );
 }

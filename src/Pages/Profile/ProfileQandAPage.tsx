@@ -1,5 +1,3 @@
-function ProfileQandAPage() {
-    return ( <></> );
-}
+import ProfilePostPage from "./ProfilePostPage";
 
-export default ProfileQandAPage;
+export default ProfilePostPage;

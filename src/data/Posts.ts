@@ -15,6 +15,7 @@ export const posts: Post[] = [
       name: "luxor_trip.jpg",
     },
     author: {
+      id: "mock-author",
       name: "أحمد محمود",
       avatar: "https://i.pravatar.cc/40?img=7",
       tierName: "Gold",
@@ -34,6 +35,7 @@ export const posts: Post[] = [
       name: "sharm_trip.jpg",
     },
     author: {
+      id: "mock-author",
       name: "سارة علي",
       avatar: "https://i.pravatar.cc/40?img=3",
       tierName: "Silver",
@@ -53,6 +55,7 @@ export const posts: Post[] = [
       name: "cairo_trip.jpg",
     },
     author: {
+      id: "mock-author",
       name: "محمد حسن",
       avatar: "https://i.pravatar.cc/40?img=4",
       tierName: "Bronze",
@@ -72,6 +75,7 @@ export const posts: Post[] = [
       name: "aswan_trip.jpg",
     },
     author: {
+      id: "mock-author",
       name: "نور خالد",
       avatar: "https://i.pravatar.cc/40?img=5",
       tierName: "Silver",
