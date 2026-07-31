@@ -62,8 +62,6 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
   const { id: postIdparam } = useParams<{ id: string }>();
 
-  if (!postIdparam) return null;
-
   const {
     data,
     isFetching,
@@ -188,7 +186,6 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
-    const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
       // return reply.offsetTop - parentRect;
@@ -224,7 +221,7 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
   useEffect(() => {
     if (data) {
-      setReplies((prev) => [...prev, ...data?.replies]);
+      setReplies((prev) => [...prev, ...(data?.replies ?? [])]);
       setNextCursor(data?.nextCursor);
       setHasMoreReplies(data?.hasMore);
     }
@@ -234,6 +231,9 @@ const HighlightedCommentID = searchParams.get("highlighted");
       setIsHighligthed(true);
     }
   },[])
+
+  if (!postIdparam) return null;
+
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={comment?.id}>
       <div className={`relative w-9 mx-4 ${lang === "ar"?"ml-4":"mr-4"} group`}>

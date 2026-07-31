@@ -13,10 +13,8 @@ export default function AnswersSection() {
   const { id: questionIdparam } = useParams<{ id: string }>();
   const lastAnswerRef = useRef<HTMLDivElement>(null);
 
-  if (!questionIdparam) return null;
-
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, isFetching } =
-    useGetAnswersByPostId(questionIdparam);
+  const { data, isLoading, isFetchingNextPage, fetchNextPage } =
+    useGetAnswersByPostId(questionIdparam ?? "");
 
 
 
@@ -42,11 +40,10 @@ export default function AnswersSection() {
     if (data) {
       const allAnswers = data.pages.flatMap((page: any) => page?.answers);
       setAnswers(allAnswers);
-      console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
+
+  if (!questionIdparam) return null;
 
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">
@@ -63,8 +60,8 @@ export default function AnswersSection() {
           ))
         ) : (
           <div>
-            {answers?.map((c) => (
-              <AnswerItem key={c.id} answer={c} />
+            {answers?.map((c, idx) => (
+              <AnswerItem key={c.id} answer={c} isFirst={idx === 0} />
             ))}
           </div>
         )}
