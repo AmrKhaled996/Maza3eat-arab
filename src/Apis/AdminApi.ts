@@ -22,15 +22,15 @@ export const updateUserTier = async (userId: string, tierId: number) => {
   return data.data;
 };
 
-export const getAdminPosts = async (status: "PENDING" | "APPROVED", cursor?: string | null, search?: string) => {
+export const getAdminPosts = async (statusTab?: "PENDING" | "APPROVED", cursor?: string | null, searchQuery?: string) => {
   const { data } = await axiosInstance.get(`/admin/posts`, {
-    params: { status: status.toLowerCase(), cursor, search: search || undefined },
+    params: { status: statusTab?.toLowerCase(), cursor, search: searchQuery || undefined },
   });
   return data.data;
 };
 
-export const updatePostStatus = async (postId: string, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
-  const action = status === "APPROVED" ? "approve" : "reject";
+export const updatePostStatus = async (postId: string, _status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
+  const action = _status === "APPROVED" ? "approve" : "reject";
   const { data } = await axiosInstance.patch(`/admin/posts/${postId}`, { action, reason: rejectionReason });
   return data.data;
 };
@@ -65,7 +65,7 @@ export const getAdminReports = async (status: "PENDING" | "RESOLVED" | "REJECTED
   return data.data;
 };
 
-export const updateReportStatus = async (reportId: string, status: "RESOLVED" | "REJECTED") => {
+export const updateReportStatus = async (reportId: string, _status: "RESOLVED" | "REJECTED") => {
   // Backend handles both resolve and reject by deleting the report
   const { data } = await axiosInstance.delete(`/admin/reports/${reportId}`);
   return data?.data;
@@ -81,8 +81,24 @@ export const updateTier = async (tierId: number, payload: { name: string; descri
   return data.data;
 };
 
-export const getAdminAds = async () => {
-  const { data } = await axiosInstance.get(`/admin/ads`);
+export const getAdminAds = async (cursor?: string | null) => {
+  const { data } = await axiosInstance.get(`/admin/ads`, {
+    params: cursor ? { cursor } : undefined,
+  });
+  return data.data;
+};
+
+export const createAdminAd = async (formData: FormData) => {
+  const { data } = await axiosInstance.post(`/admin/ads`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.data;
+};
+
+export const updateAdminAd = async (adId: string, formData: FormData) => {
+  const { data } = await axiosInstance.put(`/admin/ads/${adId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return data.data;
 };
 
@@ -93,6 +109,16 @@ export const deleteAdminAd = async (adId: string) => {
 
 export const getHomeAds = async () => {
   const { data } = await axiosInstance.get(`/admin/ads/home`);
+  return data.data;
+};
+
+export const createHomeAd = async (adId: string, adPosition: "top" | "middle" | "bottom") => {
+  const { data } = await axiosInstance.post(`/admin/ads/home`, { adId, adPosition });
+  return data.data;
+};
+
+export const updateHomeAd = async (homeAdId: string, adId: string) => {
+  const { data } = await axiosInstance.patch(`/admin/ads/home/${homeAdId}`, { adId });
   return data.data;
 };
 
@@ -155,9 +181,7 @@ export const getAdminAnnouncements = async (cursor?: string | null) => {
   return data.data;
 };
 
-export const createAdminAnnouncement = async (payload: { title: string; content: string; type: "OFFICIAL" | "URGENT" | "INFO" }) => {
-  // Backend expects 'message' string (combining title & content if desired, or content)
-  const message = payload.title ? `${payload.title}\n\n${payload.content}` : payload.content;
+export const createAdminAnnouncement = async (message: string) => {
   const { data } = await axiosInstance.post(`/admin/announcements`, { message });
   return data.data;
 };
