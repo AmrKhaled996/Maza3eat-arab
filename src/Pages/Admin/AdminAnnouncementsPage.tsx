@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminAnnouncements, createAdminAnnouncement } from "../../Apis/AdminApi";
-import { Megaphone, Plus, Calendar, Type } from "lucide-react";
+import { Megaphone, Plus, Calendar, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { safeFormatDate } from "../../utils/DateFormater";
 
@@ -9,11 +9,8 @@ export default function AdminAnnouncementsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState<{ title: string; content: string; type: "OFFICIAL" | "URGENT" | "INFO" }>({
-    title: "",
-    content: "",
-    type: "INFO",
-  });
+  const [message, setMessage] = useState("");
+  const [detailAnnouncement, setDetailAnnouncement] = useState<any>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["adminAnnouncements"],
@@ -23,18 +20,18 @@ export default function AdminAnnouncementsPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: () => createAdminAnnouncement(formData),
+    mutationFn: () => createAdminAnnouncement(message.trim()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminAnnouncements"] });
       setShowForm(false);
-      setFormData({ title: "", content: "", type: "INFO" });
+      setMessage("");
     },
     onError: (err: any) => alert(err?.response?.data?.message || "Failed to create announcement"),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) return;
+    if (!message.trim()) return;
     createMutation.mutate();
   };
 
@@ -54,34 +51,13 @@ export default function AdminAnnouncementsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-in fade-in slide-in-from-top-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.title", "Title")}</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.type", "Type")}</label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-              >
-                <option value="INFO">{t("admin.typeInfo", "Information")}</option>
-                <option value="OFFICIAL">{t("admin.typeOfficial", "Official")}</option>
-                <option value="URGENT">{t("admin.typeUrgent", "Urgent")}</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.content", "Content")}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.content", "Message")}</label>
               <textarea
                 required
                 rows={4}
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={t("admin.announcementPlaceholder", "Write your announcement message...")}
                 className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
               />
             </div>
@@ -106,33 +82,27 @@ export default function AdminAnnouncementsPage() {
             <table className="w-full text-start">
               <thead className="bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-500 uppercase tracking-wider">
                 <tr>
-                  <th className="px-6 py-4 text-start">{t("admin.title")}</th>
-                  <th className="px-6 py-4 text-start">{t("admin.type")}</th>
+                  <th className="px-6 py-4 text-start">{t("admin.content", "Message")}</th>
                   <th className="px-6 py-4 text-start">{t("admin.date")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {data?.pages.map((page, i) =>
                   page.announcements?.map((item: any) => (
-                    <tr key={`${i}-${item.id}`} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={`${i}-${item.id}`}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => setDetailAnnouncement(item)}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
                             <Megaphone className="w-5 h-5" />
                           </div>
-                          <div>
-                            <div className="font-semibold text-gray-900 line-clamp-1 max-w-md">{item.title || item.message}</div>
-                            {item.title && item.content && (
-                              <div className="text-sm text-gray-500 line-clamp-1 max-w-md">{item.content}</div>
-                            )}
+                          <div className="font-semibold text-gray-900 line-clamp-1 max-w-md">
+                            {item.message || item.title || item.content}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                          <Type className="w-3 h-3" />
-                          {t("admin.typeOfficial", "Official")}
-                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -145,7 +115,7 @@ export default function AdminAnnouncementsPage() {
                 )}
                 {(!data?.pages[0]?.announcements || data.pages[0].announcements.length === 0) && (
                   <tr>
-                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={2} className="px-6 py-8 text-center text-gray-500">
                       {t("admin.noAnnouncements", "No announcements found.")}
                     </td>
                   </tr>
@@ -166,6 +136,47 @@ export default function AdminAnnouncementsPage() {
           </div>
         )}
       </div>
+
+      {/* Announcement Detail Modal */}
+      {detailAnnouncement && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+                  <Megaphone className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {t("admin.announcementDetail", "Announcement")}
+                </h3>
+              </div>
+              <button
+                onClick={() => setDetailAnnouncement(null)}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                  {detailAnnouncement.message || detailAnnouncement.content || detailAnnouncement.title}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Calendar className="w-3.5 h-3.5" />
+                {safeFormatDate(detailAnnouncement.createdAt)}
+              </div>
+              <button
+                onClick={() => setDetailAnnouncement(null)}
+                className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors"
+              >
+                {t("admin.close", "Close")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

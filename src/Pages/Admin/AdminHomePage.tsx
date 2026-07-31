@@ -1,4 +1,3 @@
-import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminPosts, getAdminQuestions, getAdminReports } from "../../Apis/AdminApi";
 import { FileText, HelpCircle, AlertTriangle } from "lucide-react";

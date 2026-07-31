@@ -6,8 +6,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { io, type Socket } from "socket.io-client";
 import { useAuth } from "./Auth";
+import { playNotificationSound } from "../utils/sounds";
 
 // ─── Socket event constants (mirroring backend SOCKET_EVENTS) ─────────────────
 export const SOCKET_EVENTS = {
@@ -43,8 +45,10 @@ const SocketContext = createContext<SocketContextType>({
  * Emits `notification:count` events that update `liveCount`.
  */
 export function SocketProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
+  const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
+  const liveCountRef = useRef<NotificationCountPayload | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [liveCount, setLiveCount] = useState<NotificationCountPayload | null>(null);
 
@@ -57,7 +61,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         socketRef.current = null;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsConnected(false);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        liveCountRef.current = null;
         setLiveCount(null);
       }
       return;
@@ -100,6 +104,17 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       SOCKET_EVENTS.NOTIFICATION_COUNT,
       (payload: NotificationCountPayload) => {
         console.log("[Socket] notification:count →", payload);
+        // On the first push of a session there is no previous socket value yet,
+        // so fall back to the REST-cached count as the baseline.
+        const prevCount =
+          liveCountRef.current?.total.count ??
+          queryClient.getQueryData<NotificationCountPayload>(["unreadCount"])?.total
+            .count ??
+          0;
+        if (payload.total.count > prevCount) {
+          playNotificationSound();
+        }
+        liveCountRef.current = payload;
         setLiveCount(payload);
       }
     );
@@ -107,23 +122,39 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     // ── Listen for announcement notification socket ──────────────────────────
     socket.on(SOCKET_EVENTS.ANNOUNCEMENT_NOTIFICATION, () => {
       console.log("[Socket] notification:announcement received");
+      playNotificationSound();
       setLiveCount((prev) => {
-        const currentNotifCount = prev?.notifications?.count ?? 0;
-        const currentContactCount = prev?.contactRequests?.count ?? 0;
+        const cached = queryClient.getQueryData<NotificationCountPayload>(["unreadCount"]);
+        const base = prev || cached || {
+          total: { count: 0, isCapped: false },
+          notifications: { count: 0, isCapped: false },
+          contactRequests: { count: 0, isCapped: false },
+        };
+
+        const currentNotifCount = base.notifications?.count ?? 0;
+        const currentContactCount = base.contactRequests?.count ?? 0;
         const newNotifCount = currentNotifCount + 1;
         const newTotal = newNotifCount + currentContactCount;
-        return {
-          total: { count: newTotal, isCapped: false },
-          notifications: { count: newNotifCount, isCapped: false },
-          contactRequests: prev?.contactRequests ?? { count: currentContactCount, isCapped: false },
+
+        const updated: NotificationCountPayload = {
+          total: { count: newTotal, isCapped: base.total?.isCapped || false },
+          notifications: { count: newNotifCount, isCapped: base.notifications?.isCapped || false },
+          contactRequests: base.contactRequests || { count: currentContactCount, isCapped: false },
         };
+
+        queryClient.setQueryData(["unreadCount"], updated);
+        liveCountRef.current = updated;
+        return updated;
       });
+
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["unreadCount"] });
     });
 
     // ── Listen for force logout ──────────────────────────────────────────────
-    socket.on(SOCKET_EVENTS.FORCE_LOGOUT, () => {
-      console.warn("[Socket] Received auth:force-logout. Redirecting to banned page.");
-      // We can trigger a full redirect to handle clearing session
+    socket.on(SOCKET_EVENTS.FORCE_LOGOUT, async () => {
+      console.warn("[Socket] Received auth:force-logout. Logging out and redirecting to banned page.");
+      try { await logout(); } catch { /* ignore */ }
       window.location.href = `/${localStorage.getItem("maza3eat-locale") || "en"}/banned`;
     });
 

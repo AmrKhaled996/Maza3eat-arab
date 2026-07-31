@@ -1,4 +1,4 @@
-import { ArrowRight, CircleQuestionMarkIcon } from "lucide-react";
+import { CircleQuestionMarkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";

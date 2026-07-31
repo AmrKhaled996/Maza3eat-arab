@@ -17,8 +17,9 @@ interface DateTimeResult {
  * console.log(result.time); // "12:30"
  */
 export const extractDateTime = (dateinput: string): DateTimeResult => {
-  // Remove the 'Z' at the end of the input string to avoid timezone issues
-  const realDate: string = dateinput.replace("Z", "") as string;
+  // Keep the input as-is: stripping the trailing 'Z' would re-read a UTC instant
+  // as a local one, which shifts the calendar date by the viewer's offset.
+  const realDate: string = dateinput;
 
   const date: Date = new Date(realDate);
 
@@ -96,7 +97,10 @@ export const extractDateParts = (dateInput: string): object => {
 export const FormatPublishDate = (dateInput: Date): string => {
   const lang = getLocale();
   const formatedDate = extractDateTime(dateInput.toString()).date as string; // "2022-01-01"
-  const dateObj: Date = new Date(formatedDate);
+  // Build the Date from the local calendar parts: parsing "YYYY-MM-DD" directly
+  // would be read as UTC midnight while every getter below is a local one.
+  const [fy, fm, fd] = formatedDate.split("-").map(Number);
+  const dateObj: Date = new Date(fy, fm - 1, fd);
 
   const day: number = dateObj.getDate(); // Day number
   if (lang == "en") {

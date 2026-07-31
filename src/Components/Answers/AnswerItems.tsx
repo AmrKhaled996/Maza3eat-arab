@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Answer } from "../../Types/Answer";
 import { Badge } from "../shared/Tag";
 import { FormatPublishDate } from "../../utils/DateFormater";
-import { ArrowBigDown, ArrowBigUp, Heart, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, LoaderIcon, MoreHorizontal, Reply } from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 
@@ -19,14 +19,14 @@ import {
 } from "../../Apis/AnswersApi/Answers";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
-import { useAuth } from "../../Context/Auth";
+import { CheckCircle2 } from "lucide-react";
+import { localizedPath } from "../../i18n/paths";
 
-export default function AnswerItem({ answer }: { answer: Answer }) {
+export default function AnswerItem({ answer, isFirst = false }: { answer: Answer; isFirst?: boolean }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
-  const {user}= useAuth()
 
   const [voted, setVoted] = useState(answer?.myVote);
   const [votes, setVotes] = useState(answer?.totalVoteValue);
@@ -64,17 +64,16 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
 
   const { id: questionIdparam } = useParams<{ id: string }>();
 
-  if (!questionIdparam) return null;
-
   const { data, isFetching, refetch } = useGetAnswersReplies(
     answer?.id,
     nextCursor,
   );
 
   const Highlight = () => {
-    console.log("url", HighlightedAnswerID, "answer", answer.id);
     if (answer?.id === HighlightedAnswerID) {
       return "border-blue-300 bg-sky-100";
+    } else if (isFirst) {
+      return "border-emerald-300 bg-emerald-50/70 shadow-sm";
     } else {
       return "border-[#E5E7EB] bg-[#f7f7f7]";
     }
@@ -251,7 +250,6 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
-    const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
       return reply.offsetTop;
@@ -286,7 +284,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
 
   useEffect(() => {
     if (data) {
-      setReplies((prev) => [...prev, ...data?.replies]);
+      setReplies((prev) => [...prev, ...(data?.replies ?? [])]);
       setNextCursor(data?.nextCursor);
       setHasMoreReplies(data?.hasMore);
     }
@@ -296,16 +294,21 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
       setIsHighligthed(true);
     }
   }, []);
+
+  if (!questionIdparam) return null;
+
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       > 
-        <img
-          src={answer?.author?.avatar}
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
-          style={{ outlineColor: answer?.author?.tier.badgeColor }}
-        />
+        <Link to={localizedPath(lang, `profile/${answer?.author?.id}`)}>
+          <img
+            src={answer?.author?.avatar}
+            className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30 cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ outlineColor: answer?.author?.tier.badgeColor }}
+          />
+        </Link>
 
         <div className="w-fit ">
           {showReplies && (
@@ -358,12 +361,20 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
             Highlight(),
           )}
         >
-          <div className="flex gap-2 items-center">
-            <span className="font-bold">{answer?.author?.name}</span>
+          <div className="flex gap-2 items-center flex-wrap">
+            <Link to={localizedPath(lang, `profile/${answer?.author?.id}`)} className="font-bold text-gray-900 hover:text-primary transition-colors">
+              {answer?.author?.name}
+            </Link>
             <Badge
               tier={answer?.author?.tier.name}
               color={answer?.author?.tier.badgeColor}
             />
+            {isFirst && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
+                <CheckCircle2 className="w-3 h-3" />
+                {lang === "ar" ? "أفضل إجابة" : "Best Answer"}
+              </span>
+            )}
             <span className="mr-auto text-xs text-gray-400">
               {FormatPublishDate(answer?.createdAt)}
             </span>

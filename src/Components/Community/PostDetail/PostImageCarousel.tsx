@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Post } from "../../../Types/Post";
 import cn from "../../../utils/Cn";
 
@@ -7,20 +8,26 @@ interface PostImageCarouselProps {
   post: Post | undefined;
 }
 
+/** Minimum horizontal travel (px) before a touch counts as a swipe. */
+const SWIPE_THRESHOLD = 50;
+
 export default function PostImageCarousel({ post }: PostImageCarouselProps) {
+  const { t } = useTranslation("common");
   const [mainIndex, setMainIndex] = useState(0);
-  
+  const touchStartX = useRef<number | null>(null);
+
   if (!post?.image?.url) {
     return (
-      <div className="rounded-2xl overflow-hidden bg-gray-100 aspect-[16/10] flex items-center justify-center">
-        <p className="text-gray-400">No image available</p>
+      <div className="rounded-3xl overflow-hidden bg-gray-100/80 aspect-[16/10] flex items-center justify-center border border-gray-100">
+        <p className="text-gray-400 text-sm font-medium">{t("post.noImage")}</p>
       </div>
     );
   }
 
-  // For now, we only have one image in the Post type, but structure allows for expansion
-  const images = [post.image];
-  const mainImage = images[mainIndex];
+  // Handle single or multiple images if post has an array
+  const images = Array.isArray((post as any).images) && (post as any).images.length > 0
+    ? (post as any).images.map((url: string, i: number) => ({ url, name: `image-${i}` }))
+    : [post.image];
 
   const handlePrev = () => {
     setMainIndex((i) => (i === 0 ? images.length - 1 : i - 1));
@@ -30,54 +37,100 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
     setMainIndex((i) => (i === images.length - 1 ? 0 : i + 1));
   };
 
-  return (
-    <div className="rounded-2xl overflow-hidden bg-gray-100">
-      {/* Main Image */}
-      <div className="relative aspect-[16/10] bg-gray-100 flex items-center justify-center">
-        <img
-          src={mainImage.url}
-          alt={mainImage.name}
-          className="w-full h-full object-cover"
-        />
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
 
-        {/* Navigation Buttons */}
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || images.length < 2) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) >= SWIPE_THRESHOLD) {
+      if (delta < 0) handleNext();
+      else handlePrev();
+    }
+    touchStartX.current = null;
+  };
+
+  return (
+    <div className="rounded-3xl overflow-hidden bg-gray-900 shadow-md relative group">
+      {/* Main Image View */}
+      <div
+        className="relative aspect-[16/10] sm:aspect-[16/9] bg-black/90 flex items-center justify-center overflow-hidden touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Sliding track — one full-width slide per image */}
+        <div
+          dir="ltr"
+          className="flex h-full w-full transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${mainIndex * 100}%)` }}
+        >
+          {images.map((img: any, i: number) => (
+            <img
+              key={i}
+              src={img.url}
+              alt={img.name || "Post image"}
+              className="h-full w-full shrink-0 object-cover"
+              draggable={false}
+            />
+          ))}
+        </div>
+
+        {/* Floating Glassmorphic Controls */}
         {images.length > 1 && (
           <>
             <button
               onClick={handlePrev}
-              className="absolute start-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+              className="absolute start-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 backdrop-blur-md p-2.5 text-white hover:bg-white/40 transition-all duration-300 shadow-lg cursor-pointer hover:scale-110 active:scale-95"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute end-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition-colors"
+              className="absolute end-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 backdrop-blur-md p-2.5 text-white hover:bg-white/40 transition-all duration-300 shadow-lg cursor-pointer hover:scale-110 active:scale-95"
               aria-label="Next image"
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-5 w-5" />
             </button>
+
+            {/* Dots Indicator */}
+            <div className="absolute bottom-4 inset-x-0 flex justify-center gap-1.5 z-10">
+              {images.map((_: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setMainIndex(idx)}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300 cursor-pointer",
+                    idx === mainIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
+                  )}
+                />
+              ))}
+            </div>
           </>
         )}
 
-        {/* Image Count Badge */}
-        {mainImage.remainingImages !== undefined && mainImage.remainingImages > 1 && (
-          <span className="absolute top-3 end-3 bg-black/50 text-white text-xs font-bold px-2 py-1 rounded-full backdrop-blur-sm">
-            {mainIndex + 1} / {images.length}
-          </span>
+        {/* Image Counter Badge */}
+        {images.length > 1 && (
+          <div className="absolute top-4 end-4 bg-black/60 backdrop-blur-md text-white text-xs font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10 shadow-md">
+            <Layers className="w-3.5 h-3.5" />
+            <span>
+              {mainIndex + 1} / {images.length}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Thumbnails */}
+      {/* Thumbnails strip if multiple */}
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto p-3 bg-white">
-          {images.map((img, i) => (
+        <div className="flex gap-2 overflow-x-auto p-3 bg-white border-t border-gray-100">
+          {images.map((img: any, i: number) => (
             <button
               key={i}
               onClick={() => setMainIndex(i)}
               className={cn(
-                "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
-                i === mainIndex ? "border-primary" : "border-transparent"
+                "relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 transition-all cursor-pointer",
+                i === mainIndex ? "border-primary ring-2 ring-primary/20 scale-105" : "border-transparent opacity-70 hover:opacity-100"
               )}
             >
               <img

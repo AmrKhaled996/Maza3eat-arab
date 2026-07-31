@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Mail, Check, Loader2 } from "lucide-react";
 import { createContactRequest } from "../../Apis/ContactRequestApi";
 import { useAuth } from "../../Hooks/Auth";
+import ContactGuidelinesModal from "./ContactGuidelinesModal";
 
 interface Props {
   /** The ID of the user to send the contact request to */
@@ -14,8 +16,10 @@ type Status = "idle" | "loading" | "sent" | "error";
 
 export function ContactButton({ receiverId, defaultReason = "" }: Props) {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation("common");
   const [status, setStatus] = useState<Status>("idle");
   const [showModal, setShowModal] = useState(false);
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const [reason, setReason] = useState(defaultReason);
 
   const handleOpen = () => {
@@ -48,7 +52,7 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
         className="flex items-center gap-1 text-[11px] font-semibold bg-purple-200 text-purple-600 border border-purple-200 px-2.5 py-0.5 rounded-full hover:bg-purple-100 transition-colors hover:cursor-pointer"
       >
         <Mail size={12} className="text-secondary" />
-        تواصل
+        {t("contactRequest.button")}
       </button>
 
       {showModal && (
@@ -75,15 +79,15 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
 
             <div className="p-6 pt-8">
               <h3 className="text-lg font-extrabold text-gray-900 mb-1 text-center">
-                طلب تواصل
+                {t("contactRequest.modalTitle")}
               </h3>
               <p className="text-sm text-gray-400 text-center mb-5">
-                اكتب سبب رغبتك في التواصل
+                {t("contactRequest.modalSubtitle")}
               </p>
 
               <textarea
                 rows={4}
-                placeholder="مرحباً! أود التواصل معك بخصوص..."
+                placeholder={t("contactRequest.reasonPlaceholder")}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 maxLength={500}
@@ -96,13 +100,13 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
 
               {status === "error" && (
                 <p className="text-xs text-red-500 mb-3 text-center">
-                  حدث خطأ. حاول مرة أخرى.
+                  {t("contactRequest.sendError")}
                 </p>
               )}
 
               <button
                 disabled={!reason.trim() || status === "loading" || status === "sent"}
-                onClick={handleSend}
+                onClick={() => setShowGuidelines(true)}
                 className="w-full py-3.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold rounded-2xl transition-all hover:-translate-y-0.5 hover:cursor-pointer flex items-center justify-center gap-2"
               >
                 {status === "loading" ? (
@@ -110,12 +114,12 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
                 ) : status === "sent" ? (
                   <>
                     <Check size={16} />
-                    <span>تم الإرسال!</span>
+                    <span>{t("contactRequest.sentSuccess")}</span>
                   </>
                 ) : (
                   <>
                     <Mail size={14} />
-                    <span>إرسال طلب التواصل</span>
+                    <span>{t("contactRequest.sendButton")}</span>
                   </>
                 )}
               </button>
@@ -123,6 +127,15 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
           </div>
         </div>
       )}
+
+      <ContactGuidelinesModal
+        isOpen={showGuidelines}
+        onCancel={() => setShowGuidelines(false)}
+        onConfirm={() => {
+          setShowGuidelines(false);
+          handleSend();
+        }}
+      />
     </>
   );
 }

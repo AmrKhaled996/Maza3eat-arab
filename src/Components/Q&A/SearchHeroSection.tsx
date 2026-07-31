@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 
 function SearchHeroSection({
-  searchValue,
   setSearchValue,
   searchLoading,
   setSearchLoading,

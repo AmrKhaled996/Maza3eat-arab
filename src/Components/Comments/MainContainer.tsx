@@ -107,10 +107,8 @@ const HighlightedCommentID = searchParams.get("highlighted")||"";
 
   
 
-  if (!postIdparam) return null;
-
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, isFetching } =
-    useGetCommentsByPostId(postIdparam, nextCursor ,HighlightedCommentID );
+  const { data, isLoading, isFetchingNextPage, fetchNextPage } =
+    useGetCommentsByPostId(postIdparam ?? "", nextCursor ,HighlightedCommentID );
 
   // const handleAddComment = (text: string) => {
   //   const newComment: Comment = {
@@ -157,11 +155,10 @@ const HighlightedCommentID = searchParams.get("highlighted")||"";
       const allComments = data.pages.flatMap((page: any) => page?.comments);
       setComments(allComments);
       setNextCursor(data?.pages[data?.pages.length - 1]?.nextCursor);
-      console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
+
+  if (!postIdparam) return null;
 
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">

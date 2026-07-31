@@ -10,12 +10,10 @@ function QandAPopularQuestion({ limit }: { limit: number }) {
   const {lang} =useLocale(); 
   const {
     data: popularQuestions,
-    isLoading: popularQuestionsLoading,
-    error: popularQuestionsError,
   } = useHomePopularQuestions(limit);
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm w-100">
+    <div className="bg-white rounded-3xl p-5 shadow-xs border border-gray-100 sticky top-28">
       <h3 className="font-bold text-gray-900 mb-4 text-base">
         {t("home.qnaPopularTitle")}
       </h3>
@@ -23,7 +21,7 @@ function QandAPopularQuestion({ limit }: { limit: number }) {
         <div className="flex flex-col gap-4">
           {popularQuestions.map((popularQuestion: Question ,index:number) => (
             <div key={popularQuestion?.id}
-            onClick={() => {navigate(localizedPath(lang, "q&a/" +popularQuestion?.id ))}} className="cursor-pointer group">
+            onClick={() => {navigate(localizedPath(lang, `q&a?search=${encodeURIComponent(popularQuestion?.title || "")}` ))}} className="cursor-pointer group">
               <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors leading-snug">
                 {popularQuestion?.title}
               </p>
@@ -32,7 +30,7 @@ function QandAPopularQuestion({ limit }: { limit: number }) {
                   count: popularQuestion?.answersCount ?? 0,
                 })}
               </p>
-              {index < popularQuestions.length - 1 && <hr className="border-t border-gray-200 mt-4" />}
+              {index < popularQuestions.length - 1 && <hr className="border-t border-gray-100 mt-4" />}
             </div>
           ))}
         </div>

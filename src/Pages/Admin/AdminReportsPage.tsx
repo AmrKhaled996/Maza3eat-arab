@@ -6,10 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import { safeFormatDate } from "../../utils/DateFormater";
+import { localizedPath } from "../../i18n/paths";
+import { useLocale } from "../../i18n/useLocale";
 
 export default function AdminReportsPage() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language;
+  const { t } = useTranslation();
+  const { lang } = useLocale();
   const queryClient = useQueryClient();
 
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; reportId: string | null }>({ isOpen: false, reportId: null });
@@ -88,10 +90,13 @@ export default function AdminReportsPage() {
                   page.reports.map((report: any) => (
                     <tr key={`${i}-${report.id}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                        <Link
+                          to={localizedPath(lang, `profile/${report.reporter.id || report.reporterId}`)}
+                          className="flex items-center gap-2 group hover:text-primary"
+                        >
                           <img src={report.reporter.avatar} alt="" className="w-8 h-8 rounded-full object-cover bg-gray-100" />
-                          <span className="text-sm font-medium text-gray-700">{report.reporter.name}</span>
-                        </div>
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-primary group-hover:underline">{report.reporter.name}</span>
+                        </Link>
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
@@ -171,10 +176,13 @@ export default function AdminReportsPage() {
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">{t("admin.reporter", "Reporter")}</label>
-                <div className="flex items-center gap-2">
+                <Link
+                  to={localizedPath(lang, `profile/${detailModal.report.reporter.id || detailModal.report.reporterId}`)}
+                  className="flex items-center gap-2 group"
+                >
                   <img src={detailModal.report.reporter.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
-                  <span className="text-sm font-medium text-gray-800">{detailModal.report.reporter.name} ({detailModal.report.reporter.email})</span>
-                </div>
+                  <span className="text-sm font-medium text-gray-800 group-hover:text-primary group-hover:underline">{detailModal.report.reporter.name} ({detailModal.report.reporter.email})</span>
+                </Link>
               </div>
 
               <div>
@@ -187,7 +195,7 @@ export default function AdminReportsPage() {
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
               <Link
-                to={`/admin/reports/${detailModal.report.id}`}
+                to={localizedPath(lang, `admin/reports/${detailModal.report.id}`)}
                 className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
               >
                 <Eye className="w-4 h-4" /> {t("admin.goToFullReport", "Go to Full Report Page")}

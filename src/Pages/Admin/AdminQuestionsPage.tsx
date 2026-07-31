@@ -91,7 +91,7 @@ export default function AdminQuestionsPage() {
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-900 max-w-md truncate">{question.title}</div>
                         <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                          <Link to={`/admin/questions/${question.id}`} className="text-primary hover:underline inline-flex items-center gap-1">
+                          <Link to={localizedPath(lang, `admin/questions/${question.id}`)} className="text-primary hover:underline inline-flex items-center gap-1">
                             <Eye className="w-3 h-3" /> {t("admin.view")}
                           </Link>
                           <span>•</span>
@@ -99,10 +99,10 @@ export default function AdminQuestionsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <img src={question.author.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
-                          <span className="text-sm font-medium text-gray-700">{question.author.name}</span>
-                        </div>
+                        <Link to={localizedPath(lang, `profile/${question.author.id}`)} className="flex items-center gap-2 group hover:text-primary">
+                          <img src={question.author.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-gray-100" />
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{question.author.name}</span>
+                        </Link>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {safeFormatDate(question.createdAt)}

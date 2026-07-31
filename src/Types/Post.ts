@@ -10,6 +10,8 @@ export interface Post {
   commentsCount: number;
   tags: Tag[];
   image: Image;
+  images?: string[];
+  likedByMe?: boolean;
   author: Author;
   publishDate?: Date; 
 }

@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import ReplyItem from "../../Components/Comments/ReplyItem";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { Reply } from "../../Types/Reply";
 import HomeQandAPostsAdvertisement from "../../Components/Home/Q&ASection/Advertisement";
 import QandAPopularQuestion from "../../Components/shared/PopularQuestion";
@@ -14,17 +15,18 @@ function RepliesThreadPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams<{ id: string }>();
 
   const state = location.state as { reply: Reply; postId: string } | undefined;
 
-  if (!state) {
-    navigate(-1);
-    return null;
-  }
+  const reply = state?.reply;
+  const postId = state?.postId;
 
-  const { reply, postId } = state;
-
-  if (!state.reply) navigate(-1);
+  useEffect(() => {
+    if (!reply && !id) {
+      navigate(localizedPath(lang, ""), { replace: true });
+    }
+  }, [reply, id, lang, navigate]);
 
   return (
     <div className="min-h-screen  max-w-7xl mx-auto">
@@ -46,20 +48,30 @@ function RepliesThreadPage() {
                 <ArrowLeft className="h-5 w-5" />
               </button>
               {/* Show Discussion */}
-              <button
-                onClick={() => {
-                  navigate(localizedPath(lang, `post/${postId}`));
-                }}
-                className="rounded-full bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer  px-4 py-1 text-sm font-medium \ m-auto flex gap-2"
-              >
-                {t("comments.showDiscussion")}{" "}
-                <ArrowUpRight className="ml-2 h-4 w-4" />
-              </button>
+              {postId && (
+                <button
+                  onClick={() => {
+                    navigate(localizedPath(lang, `post/${postId}`));
+                  }}
+                  className="rounded-full bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer  px-4 py-1 text-sm font-medium \ m-auto flex gap-2"
+                >
+                  {t("comments.showDiscussion")}{" "}
+                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                </button>
+              )}
             </div>
 
             {/* Thread */}
             <div className="rounded-2xl">
-              <ReplyItem reply={reply} showRepliesFlag={true} />
+              {reply ? (
+                <ReplyItem reply={reply} showRepliesFlag={true} />
+              ) : (
+                <div className="rounded-2xl border border-[#E5E7EB] bg-[#f7f7f7] px-6 py-10 text-center text-sm text-gray-600">
+                  {lang === "ar"
+                    ? "هذه المحادثة غير متاحة. ارجع إلى المنشور لعرض الردود."
+                    : "This thread is unavailable. Go back to the post to view its replies."}
+                </div>
+              )}
             </div>
           </section>
 

@@ -22,7 +22,6 @@ export default function FeaturedMainPage() {
   const {
     data,
     isLoading,
-    error,
     isFetchingNextPage,
     fetchNextPage,
     isFetching,

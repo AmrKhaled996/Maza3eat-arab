@@ -5,15 +5,16 @@ import { getCommentsByPostId, getCommentsByPostIdWithCursor } from "../../Apis/C
 
 function useGetCommentsByPostId( postId: string ,cursor:string ="" , excludeCommentId?: string) {
     return  useInfiniteQuery({
-        queryKey: ["get-post-comment"],
+        queryKey: ["get-post-comment", postId, excludeCommentId ?? null],
         queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){
         return getCommentsByPostIdWithCursor(postId, pageParam ,excludeCommentId);
       }
       return  getCommentsByPostId(postId ,excludeCommentId)} ,
-    initialPageParam: cursor,
+    initialPageParam: "",
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
+    enabled: !!postId,
   });
 
 }

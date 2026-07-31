@@ -13,6 +13,7 @@ import { Title } from "react-head";
 import useContentAds from "../../Hooks/AdvertisementHooks/useContentAdvertisement";
 import type { Advertisement as PostAdvertisement } from "../../Types/Advertisement";
 import { useEffect, useState } from "react";
+import TrendingTags from "../../Components/shared/TrendingTags";
 
 export default function PostPage() {
   const { id } = useParams<{ id: string }>();
@@ -98,9 +99,9 @@ export default function PostPage() {
           </div>
 
           {/* Right Sidebar - Date (col-span-3) */}
-          <div className="lg:col-span-3   order-3">
+          <div className="lg:col-span-3 order-3 space-y-6">
             {post.publishDate && (
-              <div className="sticky top-24 bg-white rounded-xl p-6 ">
+              <div className="bg-white rounded-xl p-6 ">
                 <div className="flex flex-row items-center gap-3">
                   <Calendar className="h-6 w-6 text-gray-600" />
                   <p className="text-sm font-medium text-gray-500">
@@ -109,11 +110,10 @@ export default function PostPage() {
                 </div>
               </div>
             )}
-            {/* Advertisement */}
-            <div>
-            <Advertisement className="sticky top-40" ad={adData} />
-            
-            </div>
+            {/* Advertisement & Trending Tags — direct children of the stretched
+                grid column so TrendingTags' own `sticky` has room to travel */}
+            <Advertisement ad={adData} />
+            <TrendingTags limit={10} />
           </div>
         </div>
         <CommentsSection />

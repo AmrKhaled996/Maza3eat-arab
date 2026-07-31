@@ -3,14 +3,9 @@ import type { Question } from "../../Types/Question";
 import { ContactButton } from "../shared/ContactButton";
 import type { Tag as TagType } from "../../Types/Tag";
 import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
-  Check,
   Heart,
-  Reply,
   MessageCircle,
-  MoreHorizontal,
+  ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
@@ -41,142 +36,88 @@ export function QuestionCard({ question }: { question: Question }) {
   return (
     <div
       onClick={() => navigate(localizedPath(lang, `q&a/${question.id}`))}
-      className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 overflow-hidden pb-2 hover:cursor-pointer"
+      className="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md hover:border-gray-200 transition-all duration-300 overflow-hidden hover:cursor-pointer p-6 space-y-4"
     >
-      <div className="p-5">
-        {/* Author row */}
+      {/* Author Header */}
+      <div className="flex items-center justify-between">
         <div
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             navigate(localizedPath(lang, `profile/${question.author.id}`));
           }}
-          className="flex flex-wrap items-center gap-2 mb-3"
+          className="flex items-center gap-3 group"
         >
           <img
-            src={question?.author?.avatar}
+            src={question?.author?.avatar || "/default-avatar.png"}
             alt={question?.author?.name}
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow outline-2"
-            style={{ outlineColor: question?.author?.badgeColor }}
+            className="w-10 h-10 rounded-full object-cover border border-gray-100 ring-2 ring-gray-50 group-hover:scale-105 transition-transform"
           />
-          <span className="text-sm font-bold text-gray-800">
-            {question?.author?.name}
-          </span>
-          <Badge
-            color={question?.author?.badgeColor}
-            tier={question?.author?.tierName}
-          />
-          <span onClick={(e) => e.stopPropagation()}>
-            <ContactButton receiverId={question.author.id} />
-          </span>
-          <span
-            className={cn(
-              ` text-xs text-gray-400`,
-              lang === "ar" ? "mr-auto ml-2" : "ml-auto mr-2",
-            )}
-          >
-            {question?.publishDate
-              ? FormatPublishDate(question.publishDate)
-              : ""}
-          </span>
-        </div>
-
-        {/* Question */}
-        <h3 className="text-base font-extrabold text-gray-900 mb-2 leading-snug">
-          {question?.title}
-        </h3>
-        <p className="text-sm text-gray-500 leading-relaxed mb-3 line-clamp-3">
-          {stripHtml(question?.content || "")}
-        </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-3 mb-3">
-          {question?.tags.map((t: TagType) => (
-            <Tag key={t.name} label={t.name} />
-          ))}
-        </div>
-
-        {/* Likes / answers */}
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <button className={`flex items-center gap-1.5 transition-colors `}>
-            <Heart size={16} fill="red" color="red" />
-            <span className="font-medium">{question?.likesCount}</span>
-          </button>
-          <span className="flex items-center gap-1.5">
-            <MessageCircle size={16} color="#4B5563" />
-            <span className="font-medium">
-              {t("home.answerCount", { count: answerCount })}
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-gray-900 group-hover:text-primary transition-colors text-sm">
+                {question?.author?.name}
+              </span>
+              {question?.author?.tierName && (
+                <Badge
+                  color={question?.author?.badgeColor}
+                  tier={question?.author?.tierName}
+                />
+              )}
+              <span onClick={(e) => e.stopPropagation()}>
+                <ContactButton receiverId={question.author.id} />
+              </span>
+            </div>
+            <span className="text-xs text-gray-400">
+              {question?.publishDate ? FormatPublishDate(question.publishDate) : ""}
             </span>
-          </span>
+          </div>
+        </div>
+
+        {/* Answer count pill badge */}
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-xs font-extrabold shadow-2xs">
+          <MessageCircle className="w-3.5 h-3.5" />
+          <span>{answerCount} {lang === "ar" ? "إجابة" : "Answers"}</span>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-gray-100 mx-5" />
-
-      {/* Answers section */}
-      <div className="px-5 py-3">
-        <p className="text-xs font-bold text-gray-700 mb-3">
-          {question?.answersCount} اجابة
+      {/* Question Title & Content */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-bold text-gray-950 leading-snug group-hover:text-primary transition-colors">
+          {question?.title}
+        </h3>
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+          {stripHtml(question?.content || "")}
         </p>
+      </div>
 
-        {/* <div
-          key={question?.topAnswer?.id}
-          className="rounded-l-xl p-3 mb-2 bg-[#effff4] relative before:content-[''] before:block before:absolute  before:top-0 before:right-0 before:w-0.75 before:rounded-r-xl before:h-full before:bg-[#22C55E] "
-         >
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <img
-              src={question?.topAnswer?.author?.avatar}
-              alt={question?.topAnswer?.author?.name}
-              className="w-7 h-7 rounded-full object-cover ring-1 ring-white outline-2"
-              style={{
-                outlineColor: question.topAnswer?.author?.tier?.badgeColor,
-              }}
-            />
-            <span className="text-xs font-bold text-gray-800">
-              {question?.topAnswer?.author?.name}
-            </span>
+      {/* Tags */}
+      {question?.tags && question.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {question.tags.map((t: TagType) => (
+            <Tag key={t.name} label={t.name} />
+          ))}
+        </div>
+      )}
 
-            <Badge
-              color={question?.topAnswer?.author?.tier?.badgeColor as string}
-              tier={question?.topAnswer?.author?.tier?.name as string}
-            />
-            <span onClick={(e) => e.stopPropagation()}>
-              <ContactButton receiverId={question.topAnswer?.author ? question.author.id : question.author.id} />
-            </span>
+      {/* Footer Interactions */}
+      <div className="flex items-center justify-between pt-3 border-t border-gray-100/80 text-xs text-gray-500">
+        <div className="flex items-center gap-4">
+          <button className="flex items-center gap-1.5 font-semibold text-gray-600 hover:text-red-500 transition-colors">
+            <Heart size={16} className="text-red-500 fill-red-500" />
+            <span>{question?.likesCount || 0}</span>
+          </button>
 
-            <span className="text-[11px] font-bold bg-[#22C55E] text-white px-2.5 py-0.5 rounded-full flex items-center gap-1">
-              <Check className="w-4 h-4" /> افضل اجابة
-            </span>
-
-            <div className="ml-auto flex items-center gap-1.5 text-xs font-bold">
-              <button className="flex gap-1 text-[#22C55E]">
-                <ArrowUp className="h-4 w-4 text-gray-400" />
-                {question?.topAnswer?.totalVoteValue}
-              </button>
-              <button className="text-gray-400">
-                <ArrowDown className="h-4 w-4" />
-              </button>
-            </div>
+          <div className="flex items-center gap-1.5 font-semibold text-gray-500">
+            <MessageCircle size={16} />
+            <span>{t("home.answerCount", { count: answerCount })}</span>
           </div>
-          <p className="text-xs text-gray-600 leading-relaxed mb-2">
-            {question?.topAnswer?.content}
-          </p>
-          <div className="flex items-center gap-3 text-[11px] text-gray-400">
-            <button className="font-semibold text-primary mr-2 underline transition-colors flex gap-1">
-              رد
-              <Reply className="h-4 w-4" />
-            </button>
-            <button className="hover:text-gray-600 transition-colors flex text-primary hover:cursor-pointer hover:opacity-80">
-              <MoreHorizontal size={16} />
-            </button>
-          </div>
-        </div> */}
+        </div>
 
-        <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" />
-          {t("home.viewAnswers", { count: answerCount })}
-        </button>
+        <span className="font-bold text-primary hover:underline flex items-center gap-1">
+          <span>{lang === "ar" ? "عرض التفاصيل والإجابات" : "View Answers"}</span>
+          <ArrowRight className={cn("w-4 h-4", lang === "ar" && "rotate-180")} />
+        </span>
       </div>
     </div>
   );

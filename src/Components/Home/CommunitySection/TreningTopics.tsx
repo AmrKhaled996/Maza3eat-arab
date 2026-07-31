@@ -1,20 +1,17 @@
 import { useTranslation } from "react-i18next";
 import useHomeTrendingPosts from "../../../Hooks/HomeHooks/useHomeTrending";
 import type { Tag } from "../../../Types/Tag";
-import { t } from "i18next";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
 
-function PostTrendingTopicsSection({ limit }: { limit?: number }) {
+function PostTrendingTopicsSection({ limit = 3 }: { limit?: number }) {
   const navigate = useNavigate(); 
   const { t } = useTranslation();
   const {lang} =useLocale(); 
   const {
     data: trendingTopics,
-    isLoading: trendingTopicsLoading,
-    error: trendingTopicsError,
-  } = useHomeTrendingPosts(3);
+  } = useHomeTrendingPosts(limit);
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md">

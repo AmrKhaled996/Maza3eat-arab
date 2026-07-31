@@ -190,7 +190,7 @@ function NavigationBar({
           <div
             className={`flex rounded-full border px-1 py-0.5 text-xs font-bold ${effectiveScrolled ? "border-gray-200 bg-white" : "border-gray-200 bg-white/10"}`}
             role="group"
-            aria-label={lang === "ar" ? "Language" : "اللغة"}
+            aria-label={lang === "ar" ? "اللغة" : "Language"}
           >
             <button
               type="button"
@@ -253,7 +253,7 @@ function NavigationBar({
                   if (e.key === "Enter") handleSearch();
                 }}
                 onChange={(e) => setsearchval(e.target.value)}
-                placeholder="ماذا تريد أن ترى؟"
+                placeholder={t("nav.searchPlaceholder")}
                 className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
               />
             </div>
@@ -274,14 +274,19 @@ function NavigationBar({
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               {unreadCount.total.count > 0 && (
-                <span className="absolute -top-1 -inset-e-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {unreadCount.total.count}
+                <span className="absolute -top-1 -end-1 bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                  {unreadCount.total.isCapped || unreadCount.total.count > 99 ? "99+" : unreadCount.total.count}
                 </span>
               )}
             </Link>
           )}
 
-          <div className="relative" ref={profileWrapRef}>
+          <div
+            className="relative"
+            ref={profileWrapRef}
+            onMouseEnter={() => isAuthenticated && setProfileOpen(true)}
+            onMouseLeave={() => setProfileOpen(false)}
+          >
             {isAuthenticated && user ? (
               <>
                 <button
@@ -299,10 +304,20 @@ function NavigationBar({
                   />
                 </button>
                 {profileOpen && (
+                  /* pt-2 (not mt-2) keeps the hover bridge between avatar and menu */
+                  <div className="absolute end-0 top-full z-50 pt-2 min-w-50">
                   <div
-                    className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                    className="rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
                     role="menu"
                   >
+                    <Link
+                      to={localizedPath(lang, `profile/${user.id}`)}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {lang === "ar" ? "ملفي الشخصي" : "My Profile"}
+                    </Link>
                     <Link
                       to={localizedPath(lang, "create-post")}
                       role="menuitem"
@@ -311,6 +326,7 @@ function NavigationBar({
                     >
                       {t("createPost.menuCreatePost")}
                     </Link>
+                    <div className="border-t border-gray-100 my-1" />
                     <button
                       type="button"
                       role="menuitem"
@@ -323,6 +339,7 @@ function NavigationBar({
                     >
                       {t("login.logout")}
                     </button>
+                  </div>
                   </div>
                 )}
               </>
@@ -343,7 +360,15 @@ function NavigationBar({
           </div>
 
           {isAuthenticated && user && user.tier && (
-            <Badge tier={user.tier.name} color={user.tier.badgeColor} />
+            <div className="relative group">
+              <Badge tier={user.tier.name} color={user.tier.badgeColor} />
+              {user.tier.description && (
+                <div className="absolute top-full mt-2 end-0 z-50 w-56 bg-gray-900 text-white text-xs rounded-xl px-4 py-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                  <p className="leading-relaxed">{user.tier.description}</p>
+                  <div className="absolute -top-1 end-4 w-2 h-2 bg-gray-900 rotate-45" />
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -462,7 +487,7 @@ function NavigationBar({
               </span>
               {unreadCount.total.count > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {unreadCount.total.count}
+                  {unreadCount.total.isCapped || unreadCount.total.count > 99 ? "99+" : unreadCount.total.count}
                 </span>
               )}
             </Link>
@@ -477,7 +502,7 @@ function NavigationBar({
                     if (e.key === "Enter") handleSearch();
                   }}
                   onChange={(e) => setsearchval(e.target.value)}
-                  placeholder="ماذا تريد أن ترى؟"
+                  placeholder={t("nav.searchPlaceholder")}
                   className="w-full  bg-white rounded-full ring-1 ring-primary px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
                 />
               </div>
@@ -506,23 +531,33 @@ function NavigationBar({
               </button>
               {profileOpen && (
                 <div
-                  className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                  className="absolute end-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
                   role="menu"
                 >
+                  <Link
+                    to={localizedPath(lang, `profile/${user.id}`)}
+                    role="menuitem"
+                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
+                  >
+                    {lang === "ar" ? "ملفي الشخصي" : "My Profile"}
+                  </Link>
                   <Link
                     to={localizedPath(lang, "create-post")}
                     role="menuitem"
                     className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                    onClick={() => setProfileOpen(false)}
+                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
                   >
                     {t("createPost.menuCreatePost")}
                   </Link>
+                  <div className="border-t border-gray-100 my-1" />
                   <button
                     type="button"
                     role="menuitem"
                     className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50"
                     onClick={async () => {
                       setProfileOpen(false);
+                      setMenuOpen(false);
                       await logout();
                       navigate(localizedPath(lang, "login"));
                     }}

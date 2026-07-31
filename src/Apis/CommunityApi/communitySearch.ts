@@ -1,10 +1,21 @@
 import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 
+/**
+ * Builds the `&search=` query fragment.
+ * A leading "#" (tag pills link with `?search=#tagName`) is stripped — the backend
+ * matches tags by their bare normalized name — and the value is encoded so "#",
+ * spaces and Arabic text survive the URL instead of being cut off as a fragment.
+ */
+function searchParam(searchTerm: string) {
+  const clean = (searchTerm || "").trim().replace(/^#+/, "");
+  return clean ? `&search=${encodeURIComponent(clean)}` : "";
+}
+
 export async function getCommunityPostsBySearch(searchTerm: string ,sortBy: string ) {
   try {
 
-    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}`);
+    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchParam(searchTerm)}`);
 
     return response.data.data;
   } catch (error) {
@@ -23,7 +34,7 @@ export async function getCommunityPostsBySearchWithCursor(searchTerm: string ,so
 
   try {
 
-    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchTerm&&`&search=${searchTerm}`}&cursor=${cursor}`);
+    const response = await axiosInstance.get(`/posts?scope=community&sort=${sortBy}${searchParam(searchTerm)}&cursor=${cursor}`);
 
     return response.data.data;
   } catch (error) {
