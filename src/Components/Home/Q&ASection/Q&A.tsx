@@ -24,14 +24,16 @@ export default function QAForum({ad}:{ad?:Advertisement}) {
            
         </div>
 
-        {/* Sidebar */}
-        <div className="flex flex-col gap-5">
-          {/* Popular Questions */}
+        {/* Sidebar — popular questions and the ad stick together as one block */}
+        <div className="flex flex-col">
+          <div className="sticky top-28 flex flex-col gap-5">
+            {/* Popular Questions */}
 
-          <QandAPopularQuestion limit={3} />
+            <QandAPopularQuestion limit={3} />
 
-          {/* Sponsored */}
-          {ad&&<HomeQandAPostsAdvertisement ad={ad} />}
+            {/* Sponsored */}
+            {ad&&<HomeQandAPostsAdvertisement ad={ad} />}
+          </div>
         </div>
       </div>
 

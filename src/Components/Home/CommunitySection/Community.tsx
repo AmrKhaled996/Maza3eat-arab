@@ -25,13 +25,15 @@ function CommunitySection({ ad }: { ad?: Advertisement }) {
           {isLoading && <HomeCommunitySectionBigCardSkeleton />}
         </div>
 
-        {/* Right sidebar */}
-        <div className="flex flex-col gap-5">
-          {/* Trending Topics */}
-          <PostTrendingTopicsSection limit={3} />
+        {/* Right sidebar — trending topics and the ad stick together as one block */}
+        <div className="flex flex-col">
+          <div className="sticky top-28 flex flex-col gap-5">
+            {/* Trending Topics */}
+            <PostTrendingTopicsSection limit={3} />
 
-          {/* Sponsored / Ad */}
-          {ad && <HomeCommunityPostsAdvertisement ad={ad} />}
+            {/* Sponsored / Ad */}
+            {ad && <HomeCommunityPostsAdvertisement ad={ad} />}
+          </div>
         </div>
       </div>
       {posts && (
