@@ -4,7 +4,6 @@ import { useSearchParams } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 
 function SearchHeroSection({
-  searchValue,
   setSearchValue,
   searchLoading,
   setSearchLoading,
@@ -61,7 +60,7 @@ function SearchHeroSection({
           }}
           onChange={(e) => setsearchval(e.target.value)}
           placeholder={t("CommunityMainPage.searchPlaceholder")}
-          className="w-full bg-white rounded-full ring-1 ring-primary px-5 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pr-12"
+          className="w-full bg-white rounded-full ring-1 ring-primary px-5 py-3.5 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 pe-12"
         />
         <button
           onClick={() => handleSearch()}

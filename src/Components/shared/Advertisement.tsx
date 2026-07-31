@@ -16,15 +16,16 @@ function HomeCommunitySectionAdd({ className ,ad }: { className?: string ,ad?:Ad
         alt={ad?.image?.name||"Sponsored"}
         className="max-w-full w-full h-fit sm:h-40 object-cover aspect-video"
       />
-      <h4 className="font-bold text-lg leading-tight my-2 climp-line-2">
+      <h4 className="font-bold text-lg leading-tight my-2 line-clamp-2">
         {ad?.title||t("home.adTravelGear")}
       </h4>
-      <p className="text-sm opacity-80 mb-4 climp-line-4">
+      <p className="text-sm opacity-80 mb-4 line-clamp-4">
         {ad?.text||t("home.adTravelGearDesc")}
       </p>
-      <button 
-      onClick={()=>{window.open(`${ad?.link}`, `_blank`)}}
-      className="w-full bg-white text-sm font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 hover:cursor-pointer transition-opacity">
+      <button
+      disabled={!ad?.link}
+      onClick={()=>{ if (ad?.link) window.open(ad.link, "_blank", "noopener,noreferrer"); }}
+      className="w-full bg-white text-sm font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 hover:cursor-pointer transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
         <span className="bg-white secondary-gradient bg-clip-text text-transparent flex items-center gap-2 ">
           <ArrowUpRight size={16} className=" text-accent" /> {ad?.buttonText||t("home.adCta")}
         </span>

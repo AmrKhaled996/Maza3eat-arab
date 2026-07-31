@@ -4,7 +4,6 @@ import { useSearchParams } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 
 function SearchHeroSection({
-  searchValue,
   setSearchValue,
   searchLoading,
   setSearchLoading,

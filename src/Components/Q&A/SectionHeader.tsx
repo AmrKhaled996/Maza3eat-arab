@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import HomeCommunitySectionCreateButton from "../shared/CreateQuestionButton";
-import { useLocale } from "../../i18n/useLocale";
 
 function SectionHeader({
   sortBy,
@@ -10,7 +9,6 @@ function SectionHeader({
   setSortBy: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const { t } = useTranslation("common");
-  const { lang } = useLocale();
   return (
     <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5">
       <div>
