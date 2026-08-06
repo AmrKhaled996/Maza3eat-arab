@@ -4,13 +4,16 @@ import { getAdminTiers, updateTier } from "../../Apis/AdminApi";
 import { Edit2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { safeFormatDate } from "../../utils/DateFormater";
+import { useLocale } from "../../i18n/useLocale";
 
 export default function AdminTiersPage() {
   const { t } = useTranslation();
+  const { lang } = useLocale();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTier, setEditingTier] = useState<any>(null);
-  
+  const [error, setError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -27,18 +30,25 @@ export default function AdminTiersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminTiers"] });
       closeModal();
-    }
+    },
+    onError: (err: any) =>
+      setError(
+        err?.response?.data?.message ||
+          (lang === "ar" ? "تعذر حفظ الفئة. حاول مرة أخرى." : "Failed to save tier. Please try again.")
+      ),
   });
 
   const openModal = (tier: any) => {
     setEditingTier(tier);
     setFormData({ name: tier.name, description: tier.description, badgeColor: tier.badgeColor });
+    setError(null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingTier(null);
+    setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -84,12 +94,16 @@ export default function AdminTiersPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 text-start">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
             <h3 className="text-xl font-bold mb-4">{t("admin.editTier")}</h3>
+            {error && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm">{error}</div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.name")}</label>
                 <input
                   type="text"
                   required
+                  maxLength={50}
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
@@ -99,6 +113,7 @@ export default function AdminTiersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.description")}</label>
                 <textarea
                   required
+                  maxLength={500}
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none h-24"

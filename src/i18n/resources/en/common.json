@@ -6,7 +6,8 @@
     "featured": "Featured",
     "community": "Community",
     "qna": "Q&A",
-    "about": "About"
+    "about": "About",
+    "searchPlaceholder": "What do you want to see?"
   },
   "lang": {
     "shortAr": "ع",
@@ -35,14 +36,34 @@
     "qnaJoin": "Join the discussion",
     "qnaPopularTitle": "Popular questions",
     "answerCount": "{{count}} answers",
+    "answerCount_zero": "No answers",
+    "answerCount_one": "{{count}} answer",
+    "answerCount_two": "{{count}} answers",
+    "answerCount_few": "{{count}} answers",
+    "answerCount_many": "{{count}} answers",
+    "answerCount_other": "{{count}} answers",
     "answersHeading": "{{count}} answers",
+    "answersHeading_zero": "No answers",
+    "answersHeading_one": "{{count}} answer",
+    "answersHeading_two": "{{count}} answers",
+    "answersHeading_few": "{{count}} answers",
+    "answersHeading_many": "{{count}} answers",
+    "answersHeading_other": "{{count}} answers",
     "bestAnswer": "Best answer",
     "reply": "Reply",
     "viewAnswers": "View {{count}} answers",
+    "viewAnswers_zero": "View answers",
+    "viewAnswers_one": "View {{count}} answer",
+    "viewAnswers_two": "View {{count}} answers",
+    "viewAnswers_few": "View {{count}} answers",
+    "viewAnswers_many": "View {{count}} answers",
+    "viewAnswers_other": "View {{count}} answers",
     "sponsored": "Sponsored",
     "adTravelGear": "Travel gear",
-    "adTravelGearDesc": "Backpacks and premium accessories—up to 60% off!",
-    "adCta": "See deals"
+    "adTravelGearDesc": "Everything you need for your next trip, in one place.",
+    "adCta": "See deals",
+    "galleryTitle": "Discover the Moments",
+    "gallerySubtitle": "Explore our gallery for stunning travel photos and the best vibes"
   },
   "createPost": {
     "back": "Back",
@@ -157,10 +178,10 @@
     "latest": "Latest",
     "searchPlaceholder": "Search for experiences...",
     "morePost": "Read full post"
-
   },
   "login": {
     "meta": "Sign In - Maza3eat Arab",
+    "signInSignUp": "Sign in / Sign up",
     "welcome": "Welcome",
     "googleSignIn": "sign in / sign up",
     "imageAlt": "Traveler on mountain top",
@@ -170,7 +191,7 @@
   "FeaturedMainPage": {
     "meta": "Featured Posts - Maza3eat Arab",
     "title": "Featured Posts",
-    "subtitle": "Hand-picked content from our editorial team",
+    "subtitle": "Discover hand-picked adventures \n to feed your passion for travel",
     "featuredTitle": "Featured Posts",
     "featuredSubtitle": "Content curated by our editorial team",
     "sortBy": "Sort by",
@@ -196,7 +217,11 @@
   },
   "QandAPage": {
     "answersHeading": "{{count}} Answers",
+    "answersHeading_zero": "No Answers",
     "answersHeading_one": "1 Answer",
+    "answersHeading_two": "{{count}} Answers",
+    "answersHeading_few": "{{count}} Answers",
+    "answersHeading_many": "{{count}} Answers",
     "answersHeading_other": "{{count}} Answers",
     "sortBy": "Sort by",
     "mostLiked": "Most Liked",
@@ -205,7 +230,22 @@
     "writeAnswerPlaceholder": "Write an answer...",
     "postAnswerButton": "Post",
     "postingAnswerButton": "Posting...",
-    "noAnswersFallback": "Be the first to answer this question!"
+    "noAnswersFallback": "Be the first to answer this question!",
+    "share": "Share",
+    "answersLabel": "{{count}} Answers",
+    "answersLabel_zero": "No answers",
+    "answersLabel_one": "{{count}} Answer",
+    "answersLabel_two": "{{count}} Answers",
+    "answersLabel_few": "{{count}} Answers",
+    "answersLabel_many": "{{count}} Answers",
+    "answersLabel_other": "{{count}} Answers",
+    "likesLabel": "{{count}} Likes",
+    "likesLabel_zero": "No likes",
+    "likesLabel_one": "{{count}} Like",
+    "likesLabel_two": "{{count}} Likes",
+    "likesLabel_few": "{{count}} Likes",
+    "likesLabel_many": "{{count}} Likes",
+    "likesLabel_other": "{{count}} Likes"
   },
   "notifications": {
     "title": "Notifications & Contact Requests",
@@ -230,6 +270,7 @@
     "announcement": "Announcement",
     "official": "OFFICIAL",
     "urgent": "URGENT",
+    "tierUpgrade": "TIER UPGRADE",
     "seeItNow": "See it now",
     "backToNotifications": "Back to notifications",
     "likedYourQuestion": "liked your question",
@@ -253,7 +294,12 @@
   "common": {
     "actions": {
       "cancel": "Cancel"
-    }
+    },
+    "cancel": "Cancel",
+    "goBack": "Go Back",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "publishing": "Publishing..."
   },
   "confirm": {
     "deleteEvent": {
@@ -291,9 +337,6 @@
       "failedReport": "Failed to submit report."
     },
     "showDiscussion": "Show Full Discussion"
-
-    
-
   },
   "answers": {
     "placeholder": "Write an answer...",
@@ -311,9 +354,6 @@
       "failedReport": "Failed to submit report."
     },
     "showDiscussion": "Show Full Discussion"
-
-    
-
   },
   "profile": {
     "menuProfile": "Profile",
@@ -406,6 +446,11 @@
     "cancel": "Cancel",
     "saveTier": "Save Tier",
     "saving": "Saving...",
+    "publish": "Publish",
+    "content": "Message",
+    "announcementPlaceholder": "Write your announcement message...",
+    "announcementDetail": "Announcement",
+    "noAnnouncements": "No announcements found.",
     "adsManagement": "Ads Management",
     "standardAds": "Standard Ads",
     "homeAds": "Home Ads",
@@ -416,6 +461,12 @@
     "deleteHomeAdConfirm": "Delete this Home Ad?",
     "noAds": "No ads found.",
     "noHomeAds": "No home ads found.",
+    "selectAd": "Select Ad",
+    "assign": "Assign",
+    "update": "Update",
+    "positionTop": "Top",
+    "positionMiddle": "Middle",
+    "positionBottom": "Bottom",
     "trendingTags": "Trending Tags",
     "tagsDesc": "Tags are created organically by users when making posts or questions.",
     "uses": "uses",
@@ -434,6 +485,22 @@
     "banUser": "Ban User",
     "enterReason": "Enter Reason:",
     "announcements": "Announcements",
+    "createAnnouncement": "Create Announcement",
+    "createAnnouncementTitle": "Create System Announcement",
+    "createPost": "Create Post",
+    "createPostTitle": "Create Official Post",
+    "createQuestion": "Create Question",
+    "createQuestionTitle": "Create Official Question",
+    "postTitle": "Post Title",
+    "postContent": "Content",
+    "title": "Title",
+    "type": "Type",
+    "typeInfo": "Info",
+    "typeOfficial": "Official",
+    "typeUrgent": "Urgent",
+    "creating": "Creating...",
+    "create": "Create",
+    "noAnnouncementsMsg": "No announcements have been created yet.",
     "moderators": "Moderators",
     "moderatorsManagement": "Moderators Management",
     "moderatorsDesc": "Promote users to moderators or demote existing moderators.",
@@ -474,6 +541,82 @@
     "promoteSuccess": "User promoted to moderator successfully!",
     "promoteFailed": "Failed to promote user.",
     "demoteSuccess": "Moderator demoted successfully!",
-    "demoteFailed": "Failed to demote moderator."
+    "demoteFailed": "Failed to demote moderator.",
+    "accountInfo": "Account Information",
+    "approveConfirmMsg": "Are you sure you want to approve this post? It will become visible to all users.",
+    "approveConfirmTitle": "Approve Post",
+    "assignToHome": "Assign to Home",
+    "banDetails": "Ban Details",
+    "bannedAt": "Banned at",
+    "clickToViewReason": "Click to view full reason",
+    "createAd": "Create Ad",
+    "deleteReport": "Delete Report",
+    "deleteReportConfirm": "Are you sure you want to delete this report?",
+    "deleteReportTitle": "Delete Report",
+    "editAd": "Edit Ad",
+    "goToFullReport": "Go to Full Report Page",
+    "id": "ID",
+    "metadata": "Metadata",
+    "noDescription": "No additional description provided.",
+    "postNotFound": "Post not found",
+    "questionNotFound": "Question not found",
+    "rejectReasonMsg": "Please provide a reason for rejecting this post.",
+    "rejectReasonTitle": "Reject Post",
+    "rejectReportMsg": "Are you sure you want to dismiss this report? It will be removed from the pending list.",
+    "rejectReportTitle": "Reject Report",
+    "rejectionReason": "Rejection Reason",
+    "reportDescription": "Description provided by reporter:",
+    "reportDetails": "Report Details",
+    "reportNotFound": "Report not found",
+    "reportReasonDetails": "Report Reason Details",
+    "reportedContent": "Reported Content",
+    "reporterInfo": "Reporter",
+    "resolveReportMsg": "Are you sure you want to resolve this report? It will be removed from the pending list.",
+    "resolveReportTitle": "Resolve Report",
+    "search": "Search",
+    "searchPosts": "Search posts...",
+    "searchTags": "Search tags...",
+    "searching": "Searching...",
+    "totalUses": "Total Uses",
+    "unknown": "N/A",
+    "updatedAt": "Updated",
+    "userDetails": "User Details",
+    "userStats": "User Statistics",
+    "viewFullPost": "View full post",
+    "viewFullQuestion": "View full question",
+    "viewReporterProfile": "View Reporter Profile",
+    "viewUserProfile": "View user profile"
+  },
+  "submissionModal": {
+    "title": "Review Process Notice",
+    "message": "Your post will be reviewed by our team before publishing to ensure it meets our community guidelines. You will be notified once it is approved.",
+    "confirm": "Confirm & Send"
+  },
+  "profile": {
+    "userNotFound": "User Not Found",
+    "postsTab": "Posts",
+    "questionsTab": "Questions",
+    "noPosts": "No posts yet.",
+    "noQuestions": "No questions yet.",
+    "joined": "Joined {{date}}"
+  },
+  "community": {
+    "trendingTags": "Trending Tags",
+    "noTags": "No trending tags yet."
+  },
+  "post": {
+    "featuredBadge": "Featured",
+    "share": "Share",
+    "save": "Save",
+    "noImage": "No image available"
+  },
+  "contactRequest": {
+    "button": "Contact",
+    "modalTitle": "Contact Request",
+    "modalSubtitle": "Write why you'd like to get in touch",
+    "reasonPlaceholder": "Hi! I'd like to reach out about...",
+    "sendError": "Something went wrong. Please try again.",
+    "sentSuccess": "Sent!",
+    "sendButton": "Send contact request"
   }
 }

@@ -7,7 +7,7 @@ export const questions: Question[] = [
     content: "انا عايز اروح الغردقة و كنت عايز اعرف رأيكم فيها",
     likesCount: 0,
     answersCount: 0,
-    publishDate: "2026-03-22T19:52:21.867Z",
+    publishDate: new Date("2026-03-22T19:52:21.867Z"),
     tags: [
       {
         name: "مصر",
@@ -17,6 +17,7 @@ export const questions: Question[] = [
       },
     ],
     author: {
+      id: "mock-author",
       name: "علي مجدي",
       avatar:
         "https://lh3.googleusercontent.com/a/ACg8ocJ8lO4FuIth060aQBQnjAaFIOjsO4El77jPV0C5ufophaOaVA=s96-c",
@@ -44,7 +45,7 @@ export const questions: Question[] = [
     content: "انا عايز اروح الغردقة و كنت عايز اعرف رأيكم فيها",
     likesCount: 0,
     answersCount: 0,
-    publishDate: "2026-03-22T19:52:21.867Z",
+    publishDate: new Date("2026-03-22T19:52:21.867Z"),
     tags: [
       {
         name: "مصر",
@@ -54,6 +55,7 @@ export const questions: Question[] = [
       },
     ],
     author: {
+      id: "mock-author",
       name: "علي مجدي",
       avatar:
         "https://lh3.googleusercontent.com/a/ACg8ocIae5etiTmWvSfoWULlWBVEj5b8vKs2PsUs4bID0axMZkIsNBE=s96-c",

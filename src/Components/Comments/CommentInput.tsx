@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createComment } from "../../Apis/CommentsApi/Comment";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../Context/Auth";
 import { LoaderIcon } from "lucide-react";
 import type { Comment } from "../../Types/Comment";
@@ -15,6 +15,8 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
  
 
   const handleComment = async () => {
+    if (isSubmitting) return;
+
     const content = commentValue.trim();
 
     if (!content) return;
@@ -63,6 +65,7 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
       />
       <button
         onClick={() => handleComment()}
+        disabled={isSubmitting}
         className={`text-white text-sm font-bold px-5 py-2 rounded-full shrink-0 hover:opacity-90 transition-opacity shadow hover:cursor-pointer ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
         style={{ background: "linear-gradient(135deg, #2563eb, #9333ea)" }}
       >

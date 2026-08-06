@@ -54,6 +54,8 @@ export default function AnswersSection() {
     }
   }, [data]);
 
+  if (!questionIdparam) return null;
+
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">
       {user && (
@@ -70,8 +72,8 @@ export default function AnswersSection() {
         ) : (
           <div>
             {HighlightedAnswer && <AnswerItem key={HighlightedAnswer?.id} answer={HighlightedAnswer} />}
-            {answers?.map((c) => (
-              <AnswerItem key={c.id} answer={c} />
+            {answers?.map((c, idx) => (
+              <AnswerItem key={c.id} answer={c} isFirst={idx === 0} />
             ))}
           </div>
         )}

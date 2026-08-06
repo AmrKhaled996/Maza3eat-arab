@@ -34,7 +34,7 @@ export default function ReplyItem({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(Boolean(reply?.likedByMe));
   const [likes, setLikes] = useState(reply?.likesCount);
   const [isLiking, setIsLiking] = useState(false);
 
@@ -51,6 +51,8 @@ export default function ReplyItem({
 
   const [hasMoreReplies, setHasMoreReplies] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
+  // cursor actually sent to the server; only advances on an explicit "show more"
+  const [pageCursor, setPageCursor] = useState("");
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
   const [searchParams] = useSearchParams();
@@ -70,7 +72,7 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching } = useGetReplyReplies(reply?.id, nextCursor);
+  const { data, isFetching } = useGetReplyReplies(reply?.id, pageCursor);
 
   const Highlight = () => {
     if (reply?.id === HighlightedCommentID) {
@@ -107,6 +109,8 @@ export default function ReplyItem({
     }
   };
   const handleReplying = async () => {
+    if (isSubmitting) return;
+
     const content = replyInputValue.trim();
 
     if (!content) return;
@@ -202,7 +206,6 @@ export default function ReplyItem({
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
-    const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
       // return reply.offsetTop - parentRect;
@@ -239,9 +242,11 @@ export default function ReplyItem({
 
   useEffect(() => {
     if (data) {
-      setReplies(data?.replies);
-      setNextCursor(data?.nextCursor);
-      setHasMoreReplies(data?.hasMore);
+      setReplies((prev) =>
+        pageCursor ? [...prev, ...(data?.replies ?? [])] : (data?.replies ?? []),
+      );
+      setNextCursor(data?.nextCursor ?? "");
+      setHasMoreReplies(!!data?.hasMore);
     }
   }, [data]);
 
@@ -414,6 +419,7 @@ export default function ReplyItem({
             />
             <button
               onClick={() => handleReplying()}
+              disabled={isSubmitting}
               className="px-4 py-1 text-white font-semibold main-gradient rounded-full"
             >
               {isSubmitting ? (
@@ -459,7 +465,7 @@ export default function ReplyItem({
                 )}
                 {hasMoreReplies && (
                   <button
-                    onClick={() => handleShowReplies()}
+                    onClick={() => nextCursor && setPageCursor(nextCursor)}
                     className="text-slate-600 font-semibold mt-3  mb-3"
                   >
                     {t("comments.showMore")}

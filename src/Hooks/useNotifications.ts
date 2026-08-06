@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   Notification,
   ContactRequest,
@@ -17,37 +17,36 @@ import {
 import { useSocket } from "../Context/SocketContext";
 import { useAuth } from "../Hooks/Auth";
 
-// ─── Query keys ────────────────────────────────────────────────────────────────
 const NOTIFICATIONS_KEY = ["notifications"];
 const CONTACT_REQUESTS_KEY = ["contactRequests"];
 const UNREAD_COUNT_KEY = ["unreadCount"];
 
-// ─── Hook ──────────────────────────────────────────────────────────────────────
 export function useNotifications() {
   const queryClient = useQueryClient();
   const { liveCount } = useSocket();
   const { isAuthenticated } = useAuth();
 
-  // ── Queries ──────────────────────────────────────────────────────────────────
 
-  /** All notifications for the current user (first page, cursor = null). */
-  const notificationsQuery = useQuery<Notification[]>({
+  /** All notifications with infinite scroll pagination. */
+  const notificationsQuery = useInfiniteQuery({
     queryKey: NOTIFICATIONS_KEY,
-    queryFn: async () => {
-      const res = await fetchNotifications(null);
-      return res.notifications;
+    queryFn: async ({ pageParam }) => {
+      return await fetchNotifications(pageParam as string | null);
     },
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextCursor : undefined,
     staleTime: 0,
     enabled: isAuthenticated,
   });
 
-  /** Contact requests visible to the current user (first page). */
-  const contactRequestsQuery = useQuery<ContactRequest[]>({
+  /** Contact requests visible to the current user, with infinite scroll pagination. */
+  const contactRequestsQuery = useInfiniteQuery({
     queryKey: CONTACT_REQUESTS_KEY,
-    queryFn: async () => {
-      const res = await fetchContactRequests(null);
-      return res.contactRequests;
+    queryFn: async ({ pageParam }) => {
+      return await fetchContactRequests(pageParam as string | null);
     },
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
     staleTime: 0,
     enabled: isAuthenticated,
   });
@@ -66,7 +65,6 @@ export function useNotifications() {
     enabled: isAuthenticated,
   });
 
-  // ── WebSocket: sync live count pushed by the backend ─────────────────────────
   useEffect(() => {
     if (liveCount === null) return;
 
@@ -83,7 +81,6 @@ export function useNotifications() {
     queryClient.refetchQueries({ queryKey: CONTACT_REQUESTS_KEY });
   }, [liveCount, queryClient]);
 
-  // ── Mutations ─────────────────────────────────────────────────────────────────
 
   /**
    * Mark a single notification as read.
@@ -95,11 +92,36 @@ export function useNotifications() {
       await fetchNotificationById(id);
       return id;
     },
-    onSuccess: (id) => {
-      // Optimistic: flip isRead in the cached list
-      queryClient.setQueryData<Notification[]>(NOTIFICATIONS_KEY, (old) =>
-        old?.map((n) => (n.id === id ? { ...n, isRead: true } : n)) ?? []
+    onSuccess: (id: string) => {
+      const list = queryClient.getQueryData<{
+        pages: { notifications: Notification[]; nextCursor: string | null; hasMore: boolean }[];
+        pageParams: unknown[];
+      }>(NOTIFICATIONS_KEY);
+      const cached = list?.pages
+        .flatMap((page) => page.notifications)
+        .find((n) => n.id === id);
+
+      // Already read (or unknown) — the server did not decrement, so neither should we
+      if (cached?.isRead) return;
+
+      // Flip the row in the list cache so it stops rendering as unread
+      queryClient.setQueryData<{
+        pages: { notifications: Notification[]; nextCursor: string | null; hasMore: boolean }[];
+        pageParams: unknown[];
+      }>(NOTIFICATIONS_KEY, (old) =>
+        old
+          ? {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                notifications: page.notifications.map((n) =>
+                  n.id === id ? { ...n, isRead: true } : n
+                ),
+              })),
+            }
+          : old
       );
+
       // Decrement unread count
       queryClient.setQueryData<{
         total: { count: number; isCapped: boolean };
@@ -144,10 +166,20 @@ export function useNotifications() {
       return { id, action };
     },
     onSuccess: ({ id, action }) => {
-      // Remove the responded request from the local list
-      queryClient.setQueryData<ContactRequest[]>(
-        CONTACT_REQUESTS_KEY,
-        (old) => old?.filter((r) => r.id !== id) ?? []
+      // Remove the responded request from every cached page
+      queryClient.setQueryData<{
+        pages: { contactRequests: ContactRequest[]; nextCursor: string | null; hasMore: boolean }[];
+        pageParams: unknown[];
+      }>(CONTACT_REQUESTS_KEY, (old) =>
+        old
+          ? {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                contactRequests: page.contactRequests.filter((r) => r.id !== id),
+              })),
+            }
+          : old
       );
       if (action === "ACCEPTED" || action === "DECLINED") {
         queryClient.invalidateQueries({ queryKey: UNREAD_COUNT_KEY });
@@ -158,7 +190,6 @@ export function useNotifications() {
     },
   });
 
-  // ── Derived values ────────────────────────────────────────────────────────────
 
   const unreadCount = unreadCountQuery.data ?? {
     total: { count: 0, isCapped: false },
@@ -166,16 +197,33 @@ export function useNotifications() {
     contactRequests: { count: 0, isCapped: false },
   };
 
-  // ── Exposed API ───────────────────────────────────────────────────────────────
+  // Flatten all pages of notifications into a single array
+  const allNotifications: Notification[] = notificationsQuery.data?.pages.flatMap(
+    (page) => page.notifications
+  ) ?? [];
+
+
+  const allContactRequests: ContactRequest[] =
+    contactRequestsQuery.data?.pages.flatMap((page) => page.contactRequests) ?? [];
 
   return {
-    notifications: notificationsQuery.data ?? [],
-    contactRequests: contactRequestsQuery.data ?? [],
+    notifications: allNotifications,
+    contactRequests: allContactRequests,
     isLoading:
       notificationsQuery.isLoading || contactRequestsQuery.isLoading,
     isError:
       notificationsQuery.isError || contactRequestsQuery.isError,
     unreadCount,
+
+    // Infinite scroll for notifications
+    fetchNextPage: notificationsQuery.fetchNextPage,
+    hasNextPage: notificationsQuery.hasNextPage,
+    isFetchingNextPage: notificationsQuery.isFetchingNextPage,
+
+    // Infinite scroll for contact requests
+    fetchNextContactPage: contactRequestsQuery.fetchNextPage,
+    hasNextContactPage: contactRequestsQuery.hasNextPage,
+    isFetchingNextContactPage: contactRequestsQuery.isFetchingNextPage,
 
     /** Mark one notification as read (optimistic, detail fetch does the real mark). */
     markAsRead: (id: string) => markAsReadMutation.mutateAsync(id),
@@ -214,8 +262,8 @@ export function useNotifications() {
     // ── Legacy sandbox helpers (kept so the page component still compiles) ──────
     /** @deprecated use refetch() */
     clearAllState: async () => {
-      queryClient.setQueryData(NOTIFICATIONS_KEY, []);
-      queryClient.setQueryData(CONTACT_REQUESTS_KEY, []);
+      queryClient.setQueryData(NOTIFICATIONS_KEY, { pages: [], pageParams: [] });
+      queryClient.setQueryData(CONTACT_REQUESTS_KEY, { pages: [], pageParams: [] });
     },
     /** @deprecated use refetch() */
     resetAllState: async () => {

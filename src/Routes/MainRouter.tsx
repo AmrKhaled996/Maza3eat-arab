@@ -58,6 +58,7 @@ export default function MainRouter(): React.ReactElement {
             <Route element={<ProtectedRoute />}>
               <Route path="create-post" element={<CreatePostPage />} />
               <Route path="create-q&a" element={<QndACreatePage />} />
+              <Route path="profile/:id" element={<ProfilePostPage />} />
               <Route path="profile/:id/posts" element={<ProfilePostPage />} />
               <Route path="profile/:id/q&a" element={<ProfileQandAPage />} />
               <Route path="notifications" element={<NotificationsPage />} />

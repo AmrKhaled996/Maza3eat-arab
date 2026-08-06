@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import cn from "../../../utils/Cn";
-import { LocateFixedIcon } from "lucide-react";
 import { useLocale } from "../../../i18n/useLocale";
-import { useTranslation } from "react-i18next";
 
 const videos = [
   { vid: "/VideoSlider/1.mp4", name: "Lebanon, Beirut Corniche" },
@@ -31,7 +29,6 @@ export default function InfiniteSlider() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const lastendedVideoRef = useRef<HTMLVideoElement | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
   const { lang } = useLocale();
 
   const videosList = [...videos, ...videos];

@@ -4,12 +4,15 @@ import { getAdminUsers, banUser, unbanUser, updateUserTier, getAdminTiers, getAd
 import { Ban, CheckCircle, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useLocale } from "../../i18n/useLocale";
+import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import PromptModal from "../../Components/shared/PromptModal";
 import { safeFormatDate } from "../../utils/DateFormater";
 
 export default function AdminUsersPage() {
   const { t } = useTranslation();
+  const { lang } = useLocale();
   const [statusTab, setStatusTab] = useState<"active" | "banned">("active");
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
@@ -261,13 +264,13 @@ export default function AdminUsersPage() {
                 {filteredUsers.map((user: any, i: number) => (
                     <tr key={`${i}-${user.id}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                        <Link to={localizedPath(lang, `profile/${user.id}`)} className="flex items-center gap-3 group hover:text-primary">
+                          <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100 border border-gray-100" />
                           <div>
-                            <div className="font-semibold text-gray-900">{user.name}</div>
+                            <div className="font-semibold text-gray-900 group-hover:text-primary transition-colors">{user.name}</div>
                             <div className="text-sm text-gray-500">{user.email}</div>
                           </div>
-                        </div>
+                        </Link>
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: `${user.tier.badgeColor}20`, color: user.tier.badgeColor }}>
@@ -285,7 +288,7 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            to={`/admin/users/${user.id}`}
+                            to={localizedPath(lang, `admin/users/${user.id}`)}
                             className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
                           >
                             <Search className="w-4 h-4" /> {t("admin.view")}
@@ -376,26 +379,34 @@ export default function AdminUsersPage() {
                 <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                   <div>
                     <span className="text-xs text-gray-500">{t("admin.status", "Status")}: </span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${searchedUser.isBanned ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-                      {searchedUser.isBanned ? t("admin.banned", "Banned") : t("admin.active", "Active")}
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      searchedUser.isBanned === undefined ? "bg-gray-100 text-gray-700" :
+                      searchedUser.isBanned ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                    }`}>
+                      {searchedUser.isBanned === undefined
+                        ? (lang === "ar" ? "غير معروف" : "Unknown")
+                        : searchedUser.isBanned ? t("admin.banned", "Banned") : t("admin.active", "Active")}
                     </span>
                   </div>
 
-                  {searchedUser.isBanned ? (
-                    <button
-                      onClick={() => handleUnban(searchedUser.id)}
-                      className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" /> {t("admin.unban", "Unban")}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleBan(searchedUser.id)}
-                      className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      <Ban className="w-3.5 h-3.5" /> {t("admin.ban", "Ban")}
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {searchedUser.isBanned !== true && (
+                      <button
+                        onClick={() => handleBan(searchedUser.id)}
+                        className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        <Ban className="w-3.5 h-3.5" /> {t("admin.ban", "Ban")}
+                      </button>
+                    )}
+                    {searchedUser.isBanned !== false && (
+                      <button
+                        onClick={() => handleUnban(searchedUser.id)}
+                        className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" /> {t("admin.unban", "Unban")}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

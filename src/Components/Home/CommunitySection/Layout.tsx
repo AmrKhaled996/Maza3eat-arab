@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
-import HomeCommunitySectionMoreButton from "./MoreButton";
 import HomeCommunitySectionCreateButton from "../../shared/CreateButton";
 
 function HomeCommunitySectionLayout({ children }: PropsWithChildren) {

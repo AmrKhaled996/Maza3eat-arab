@@ -63,12 +63,11 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
   const { id: postIdparam } = useParams<{ id: string }>();
 
-  if (!postIdparam) return null;
-
-  const { data, isFetching, refetch } = useGetCommentsReplies(
-    comment?.id,
-    nextCursor,
-  );
+  const {
+    data,
+    isFetching,
+    refetch,
+  } = useGetCommentsReplies(comment?.id, nextCursor);
 
   const Highlight = () => {
     if (comment?.id === HighlightedCommentID) {
@@ -189,7 +188,6 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
-    const parentRect = rootRef.current!.offsetTop;
 
     const tops = repliesRef.current.map((reply) => {
       // return reply.offsetTop - parentRect;
@@ -225,7 +223,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
   useEffect(() => {
     if (data) {
-      setReplies((prev) => [...prev, ...data?.replies]);
+      setReplies((prev) => [...prev, ...(data?.replies ?? [])]);
       setNextCursor(data?.nextCursor);
       setHasMoreReplies(data?.hasMore);
     }

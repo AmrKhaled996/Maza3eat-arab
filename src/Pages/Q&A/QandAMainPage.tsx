@@ -95,7 +95,10 @@ function QandAMainPage() {
         )}
           <div ref={lastPost} />
         </div>
-        <QandAPopularQuestion limit={10} />
+        {/* wrapper stretches to the row height so the sticky card can travel */}
+        <div>
+          <QandAPopularQuestion limit={10} />
+        </div>
       </div>
     </MainPageLayout>
   );

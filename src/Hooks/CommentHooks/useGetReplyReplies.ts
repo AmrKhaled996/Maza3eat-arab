@@ -7,7 +7,7 @@ import {
 
 function useGetReplysReplys(replyId: string, cursor: string = "") {
   return useQuery({
-    queryKey: ["get-reply-replies", replyId],
+    queryKey: ["get-reply-replies", replyId, cursor],
     queryFn: () => {
       if (cursor) {
         return getReplyRepliesWithCursor(replyId, cursor);

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import NavigationBar from "../../Components/shared/NavigationBar";
@@ -9,6 +10,8 @@ import RichTextEditor from "../../Components/shared/RichTextEditor";
 import { createQuestion } from "../../Apis/Qus&AnsApi/QandAApis";
 import { createAdminQuestion } from "../../Apis/AdminApi";
 import cn from "../../utils/Cn";
+import { getSuggestedTags, type TagItem } from "../../Apis/TagsApi";
+import SubmissionConfirmModal from "../../Components/shared/SubmissionConfirmModal";
 
 export default function QndACreatePage() {
   const { t } = useTranslation("common");
@@ -16,6 +19,7 @@ export default function QndACreatePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -23,20 +27,39 @@ export default function QndACreatePage() {
   const [tagInput, setTagInput] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tagSuggestions, setTagSuggestions] = useState<TagItem[]>([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const handleAddTag = () => {
-    const clean = tagInput.trim().replace(/^#+/, "");
+  useEffect(() => {
+    if (!tagInput.trim()) {
+      setTagSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const results = await getSuggestedTags(tagInput);
+        setTagSuggestions(results);
+      } catch {
+        setTagSuggestions([]);
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [tagInput]);
+
+  const handleAddTag = (tagName?: string) => {
+    const clean = (tagName || tagInput).trim().replace(/^#+/, "");
     if (clean && !tags.includes(clean)) {
       setTags([...tags, clean]);
     }
     setTagInput("");
+    setTagSuggestions([]);
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter((t) => t !== tagToRemove));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -55,13 +78,25 @@ export default function QndACreatePage() {
       return;
     }
 
+    if (isAdmin) {
+      executeSubmit();
+    } else {
+      setShowConfirmModal(true);
+    }
+  };
+
+  const executeSubmit = async () => {
+    setShowConfirmModal(false);
     setSubmitting(true);
     try {
       if (isAdmin) {
         await createAdminQuestion({ title: title.trim(), content: content.trim(), tags });
+        queryClient.invalidateQueries({ queryKey: ["adminQuestions"] });
+        queryClient.invalidateQueries({ queryKey: ["questions"] });
         navigate(localizedPath(lang, "admin/questions"));
       } else {
         const res = await createQuestion(title.trim(), content.trim(), tags);
+        queryClient.invalidateQueries({ queryKey: ["questions"] });
         if (res.data?.id) {
           navigate(localizedPath(lang, `q&a/${res.data.id}`));
         } else {
@@ -91,7 +126,7 @@ export default function QndACreatePage() {
         </button>
 
         {/* Form Box */}
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleFormSubmit} className="space-y-8">
           {/* Title Section */}
           <div>
             <label className="mb-2 block text-sm font-bold text-gray-800">
@@ -146,26 +181,44 @@ export default function QndACreatePage() {
               ))}
             </div>
 
-            <div className="mt-2 flex gap-2">
-              <input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddTag();
-                  }
-                }}
-                placeholder={t("createQuestion.tagPlaceholder")}
-                className="min-w-0 flex-1 rounded-xl border border-gray-200/90 bg-white/90 px-4 py-2.5 text-sm outline-none ring-1 ring-transparent transition focus:border-primary/40 focus:ring-primary/15"
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                className="shrink-0 rounded-xl border border-dashed border-primary/35 bg-transparent px-4 py-2.5 text-sm font-semibold transition hover:border-primary/50 cursor-pointer"
-              >
-                <span className="gradient-text">{t("createQuestion.addTag")}</span>
-              </button>
+            <div className="mt-2 relative">
+              <div className="flex gap-2">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  placeholder={t("createQuestion.tagPlaceholder")}
+                  className="min-w-0 flex-1 rounded-xl border border-gray-200/90 bg-white/90 px-4 py-2.5 text-sm outline-none ring-1 ring-transparent transition focus:border-primary/40 focus:ring-primary/15"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddTag()}
+                  className="shrink-0 rounded-xl border border-dashed border-primary/35 bg-transparent px-4 py-2.5 text-sm font-semibold transition hover:border-primary/50 cursor-pointer"
+                >
+                  <span className="gradient-text">{t("createQuestion.addTag")}</span>
+                </button>
+              </div>
+
+              {/* Tag Autocomplete Suggestions */}
+              {tagSuggestions.length > 0 && (
+                <div className="absolute top-full inset-x-0 mt-1.5 z-20 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 max-h-48 overflow-y-auto">
+                  {tagSuggestions.map((item) => (
+                    <button
+                      key={item.name}
+                      type="button"
+                      onClick={() => handleAddTag(item.name)}
+                      className="w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-between cursor-pointer font-medium"
+                    >
+                      <span>#{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -186,6 +239,13 @@ export default function QndACreatePage() {
           </button>
         </form>
       </div>
+
+      <SubmissionConfirmModal
+        isOpen={showConfirmModal}
+        isSubmitting={submitting}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={executeSubmit}
+      />
     </div>
   );
 }

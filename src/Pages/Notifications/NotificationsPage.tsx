@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useNotifications } from "../../Hooks/useNotifications";
@@ -43,6 +43,12 @@ export default function NotificationsPage() {
     markAsRead,
     respondToContactRequest,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextContactPage,
+    hasNextContactPage,
+    isFetchingNextContactPage,
   } = useNotifications();
 
   // Contact method modal state for accepting requests
@@ -147,7 +153,7 @@ export default function NotificationsPage() {
   // Generate HTML-like text for notification item
   const renderNotificationText = (n: Notification) => {
     const senderName = n.sender?.name || (lang === "ar" ? "الإدارة" : "Admin");
-    const count = n.aggregatorCount || 0;
+    const count = (n.aggregatorCount || 1) - 1;
     const othersText = count > 0 ? ` ${t("notifications.andOthers", { count })}` : "";
 
     if (lang === "ar") {
@@ -219,12 +225,24 @@ export default function NotificationsPage() {
             </span>
           );
         case "ADMIN_ANNOUNCEMENT":
-          return <span>إعلان جديد من الإدارة — <span className="text-blue-600 font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              <strong className="font-extrabold text-blue-600">إعلان رسمى: </strong>
+              {n.body || n.title || "إعلان جديد من الإدارة"}
+            </span>
+          );
         default:
           return <span>إشعار جديد</span>;
       }
     } else {
       switch (n.type) {
+        case "ADMIN_ANNOUNCEMENT":
+          return (
+            <span>
+              <strong className="font-extrabold text-blue-600">Official Announcement: </strong>
+              {n.body || n.title || "New announcement from platform administration"}
+            </span>
+          );
         case "QUESTION_LIKE":
           return (
             <span>
@@ -291,8 +309,6 @@ export default function NotificationsPage() {
               Congratulations! Your tier has been upgraded 🎉
             </span>
           );
-        case "ADMIN_ANNOUNCEMENT":
-          return <span>New Admin Announcement — <span className="text-blue-600 font-semibold">{t("notifications.seeItNow")}</span></span>;
         default:
           return <span>New notification</span>;
       }
@@ -450,7 +466,7 @@ export default function NotificationsPage() {
                             AD
                           </div>
                         )}
-                        <div className={`absolute -bottom-1.5 -inset-e-1.5 p-1 rounded-full ${iconConfig.bgColor} border border-white shadow-sm flex items-center justify-center`}>
+                        <div className={`absolute -bottom-1.5 -end-1.5 p-1 rounded-full ${iconConfig.bgColor} border border-white shadow-sm flex items-center justify-center`}>
                           {iconConfig.icon}
                         </div>
                       </div>
@@ -492,6 +508,14 @@ export default function NotificationsPage() {
                   );
                 })}
               </div>
+            )}
+
+            {/* Infinite scroll sentinel */}
+            {hasNextPage && (
+              <InfiniteScrollSentinel
+                onIntersect={() => fetchNextPage()}
+                isFetching={isFetchingNextPage}
+              />
             )}
           </div>
         )}
@@ -546,15 +570,12 @@ export default function NotificationsPage() {
                     {/* Request Details */}
                     <div className="flex-1 space-y-1">
                       <div className="text-sm text-gray-700 leading-relaxed">
-                        {req.direction === "RECEIVED" ? (
-                          <span>
-                            أرسل لك <strong className="font-extrabold text-gray-900">{req.user.name}</strong> طلب تواصل
-                          </span>
-                        ) : (
-                          <span>
-                            قبل <strong className="font-extrabold text-gray-900">{req.user.name}</strong> طلب التواصل الخاص بك
-                          </span>
-                        )}
+                        <span>
+                          <strong className="font-extrabold text-gray-900">{req.user.name}</strong>{" "}
+                          {req.direction === "RECEIVED"
+                            ? t("notifications.sentContactRequest")
+                            : t("notifications.acceptedContactRequest")}
+                        </span>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2.5">
@@ -572,7 +593,14 @@ export default function NotificationsPage() {
                         {/* Interactive trigger label */}
                         {req.direction === "RECEIVED" && req.status === "PENDING" && (
                           <button
-                            onClick={() => setReasonModalReq(req)}
+                            onClick={async () => {
+                              // The list endpoint does not carry `reason` — only the
+                              // detail endpoint does, so merge it onto the list row.
+                              const detailed = await fetchContactRequestById(req.id);
+                              setReasonModalReq(
+                                detailed ? { ...req, reason: detailed.reason } : req
+                              );
+                            }}
                             className="text-xs font-bold text-primary hover:underline hover:cursor-pointer"
                           >
                             {t("notifications.viewReason")}
@@ -582,12 +610,15 @@ export default function NotificationsPage() {
                         {req.direction === "SENT" && req.status === "ACCEPTED" && (
                           <button
                             onClick={async () => {
+                              // The detail endpoint returns no user objects, so keep the
+                              // populated user/direction/status from the list row and only
+                              // take the fields it actually supplies.
                               const detailed = await fetchContactRequestById(req.id);
-                              if (detailed) {
-                                setContactInfoModalReq(detailed);
-                              } else {
-                                setContactInfoModalReq(req);
-                              }
+                              setContactInfoModalReq(
+                                detailed
+                                  ? { ...req, reason: detailed.reason, contactInfo: detailed.contactInfo }
+                                  : req
+                              );
                             }}
                             className="text-xs font-bold text-emerald-600 hover:underline hover:cursor-pointer flex items-center gap-1"
                           >
@@ -615,6 +646,14 @@ export default function NotificationsPage() {
                 ))}
               </div>
             )}
+
+            {/* Infinite scroll sentinel */}
+            {hasNextContactPage && (
+              <InfiniteScrollSentinel
+                onIntersect={() => fetchNextContactPage()}
+                isFetching={isFetchingNextContactPage}
+              />
+            )}
           </div>
         )}
 
@@ -634,7 +673,7 @@ export default function NotificationsPage() {
       {reasonModalReq && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in">
           <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative animate-scale-up">
-            <div className="absolute top-4 inset-e-4 flex items-center gap-1">
+            <div className="absolute top-4 end-4 flex items-center gap-1">
               <div className="relative">
                 <button
                   onClick={() => setIsReportMenuOpen(!isReportMenuOpen)}
@@ -733,7 +772,7 @@ export default function NotificationsPage() {
           <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative animate-scale-up">
             <button
               onClick={() => setContactInfoModalReq(null)}
-              className="absolute top-4 inset-e-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
+              className="absolute top-4 end-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
@@ -810,7 +849,7 @@ export default function NotificationsPage() {
           <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden border border-gray-100 shadow-2xl relative animate-scale-up">
             <button
               onClick={() => setAcceptModalReq(null)}
-              className="absolute top-4 inset-e-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
+              className="absolute top-4 end-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors hover:cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
@@ -891,6 +930,44 @@ export default function NotificationsPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Sentinel div that triggers a callback when it scrolls into view */
+function InfiniteScrollSentinel({
+  onIntersect,
+  isFetching,
+}: {
+  onIntersect: () => void;
+  isFetching: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetching) {
+          onIntersect();
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [onIntersect, isFetching]);
+
+  return (
+    <div ref={ref} className="flex justify-center py-6">
+      {isFetching && (
+        <div className="flex gap-1.5">
+          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
         </div>
       )}
     </div>

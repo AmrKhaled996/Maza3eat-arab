@@ -1,8 +1,10 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { DEFAULT_LOCALE } from "../i18n/config";
 
+export const API_BASE_URL = "/api/v1";
+
 export const axiosInstance = axios.create({
-  baseURL: "/api/v1",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -42,7 +44,9 @@ axiosInstance.interceptors.response.use(
 
       try {
         if (!refreshPromise) {
-          refreshPromise = axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`,
+          // Same relative API root as axiosInstance itself, sent with bare axios
+          // so this call can never re-enter the response interceptor.
+          refreshPromise = axios.post(`${API_BASE_URL}/auth/refresh-token`,
               {},
               {
                 withCredentials: true,

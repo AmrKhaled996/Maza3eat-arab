@@ -53,21 +53,36 @@ interface NotificationDetailResponse {
 // ─── Mapper ───────────────────────────────────────────────────────────────────
 
 /** Converts the backend notification shape to the frontend Notification type */
-function mapNotification(n: BackendNotification): Notification {
+function mapNotification(n: any): Notification {
+  const bodyText =
+    n.body ||
+    n.message ||
+    n.content ||
+    n.text ||
+    n.announcement?.message ||
+    n.announcement?.content ||
+    n.data?.message ||
+    n.data?.content ||
+    undefined;
+
+  const titleText = n.title || n.announcement?.title || n.data?.title || undefined;
+
   return {
     id: n.id,
     type: n.type,
     isRead: n.isRead,
-    createdAt: n.lastActivityAt,
+    createdAt: n.lastActivityAt || n.createdAt,
     aggregatorCount: n.numberOfActors,
+    title: titleText,
+    body: bodyText,
     sender: n.lastActor
       ? {
           id: n.lastActor.id,
           name: n.lastActor.name,
           avatar: n.lastActor.avatar,
           tier: {
-            name: n.lastActor.tier.name,
-            badgeColor: n.lastActor.tier.badgeColor,
+            name: n.lastActor.tier?.name || "Member",
+            badgeColor: n.lastActor.tier?.badgeColor || "#2563eb",
           },
         }
       : undefined,

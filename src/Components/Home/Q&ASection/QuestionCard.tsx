@@ -156,7 +156,7 @@ export function QuestionCard({ question }: { question: Question }) {
         </div>
 
         <button className="text-sm font-semibold mt-1 hover:opacity-75 transition-opacity flex items-end gap-2 text-primary">
-          <ArrowRight className="w-4 h-4" />{" "}
+          <ArrowRight className={`w-4 h-4 ${lang === "ar" ? "rotate-180" : ""}`} />{" "}
           {t("home.viewAnswers", { count: answerCount })}
         </button>
       </div>
