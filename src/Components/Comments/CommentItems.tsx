@@ -44,10 +44,11 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const [nextCursor, setNextCursor] = useState("");
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
-const [searchParams] = useSearchParams();
-
-const HighlightedCommentID = searchParams.get("highlighted");
+  const highlightRef = useRef<HTMLDivElement>(null);
   
+  const [searchParams] = useSearchParams();
+  const HighlightedCommentID = searchParams.get("highlighted");
+
   const timeoutRef = useRef<number | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,20 +65,17 @@ const HighlightedCommentID = searchParams.get("highlighted");
 
   if (!postIdparam) return null;
 
-  const {
-    data,
-    isFetching,
-    refetch,
-  } = useGetCommentsReplies(comment?.id, nextCursor);
+  const { data, isFetching, refetch } = useGetCommentsReplies(
+    comment?.id,
+    nextCursor,
+  );
 
   const Highlight = () => {
-    console.log("url",HighlightedCommentID,"comment",comment.id)
     if (comment?.id === HighlightedCommentID) {
-
-      return "border-blue-300 bg-sky-100"
+      return "border-blue-300 bg-sky-100";
     } else {
-  
-      return "border-[#E5E7EB] bg-[#f7f7f7]"
+      
+      return "border-[#E5E7EB] bg-[#f7f7f7]";
     }
   };
 
@@ -124,16 +122,18 @@ const HighlightedCommentID = searchParams.get("highlighted");
       setIsSubmitting(true);
 
       const response = await createReplyToComment(content, comment?.id);
-
+     
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
+      setShowReplies(true);
     } catch (error) {
       console.error(error);
       console.error("Failed to create comment");
     } finally {
       setIsSubmitting(false);
+      setReplying(false);
     }
-  };      
+  };
 
   const handleDelete = async () => {
     if (!postIdparam || !comment?.id || isDeleting) return;
@@ -166,7 +166,9 @@ const HighlightedCommentID = searchParams.get("highlighted");
     }
 
     if (reason.length > MAX_REPORT_LENGTH) {
-      setReportingError(t("comments.errors.maxChars", { count: MAX_REPORT_LENGTH }));
+      setReportingError(
+        t("comments.errors.maxChars", { count: MAX_REPORT_LENGTH }),
+      );
       return;
     }
 
@@ -174,14 +176,13 @@ const HighlightedCommentID = searchParams.get("highlighted");
       setIsReporting(true);
 
       await reportComment(comment.id, reason);
-      console.log("the report is reported with id:",comment.id,"reason:",reason )
+
       setReportingError("");
       setOpenReportDialog(false);
     } catch (err) {
       console.error(err);
       setReportingError(t("comments.errors.failedReport"));
-    }
-    finally {
+    } finally {
       setIsReporting(false);
     }
   };
@@ -230,14 +231,16 @@ const HighlightedCommentID = searchParams.get("highlighted");
     }
   }, [data]);
   useEffect(() => {
-    if(HighlightedCommentID === comment?.id){
+    if (HighlightedCommentID === comment?.id) {
+      setShowReplies(true);
       setIsHighligthed(true);
     }
-  },[])
+  }, [HighlightedCommentID]);
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={comment?.id}>
-      <div className={`relative w-9 mx-4 ${lang === "ar"?"ml-4":"mr-4"} group`}>
-      
+      <div
+        className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
+      >
         <img
           src={comment?.author?.avatar}
           className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
@@ -285,9 +288,18 @@ const HighlightedCommentID = searchParams.get("highlighted");
       </div>
 
       <div className="flex-1 relative">
-       {IsHighligthed && <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />}
         {/* bubble */}
-        <div className={cn(` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,Highlight())}>
+        <div
+        ref={highlightRef}
+        className={cn(
+            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
+            Highlight(),
+          )}
+          >
+            {IsHighligthed && (
+              <div 
+              className={`absolute inset-x-30 inset-80 top-0 h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_100_100ms_forwards] `} />
+            )}
           <div className="flex gap-2 items-center">
             <span className="font-bold">{comment?.author?.name}</span>
             <Badge
@@ -328,7 +340,9 @@ const HighlightedCommentID = searchParams.get("highlighted");
             }}
             className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
           >
-            <Reply className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `} />
+            <Reply
+              className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
+            />
             {t("comments.reply")}
           </button>
           <div className="relative inline-block">
@@ -413,7 +427,9 @@ const HighlightedCommentID = searchParams.get("highlighted");
                 }}
                 className="text-slate-600 font-semibold mt-3 mb-2"
               >
-                {t("comments.viewMoreReplies", { count: comment?.repliesCount })}
+                {t("comments.viewMoreReplies", {
+                  count: comment?.repliesCount,
+                })}
               </button>
             )}
 
@@ -480,5 +496,3 @@ const HighlightedCommentID = searchParams.get("highlighted");
     </div>
   );
 }
-
-

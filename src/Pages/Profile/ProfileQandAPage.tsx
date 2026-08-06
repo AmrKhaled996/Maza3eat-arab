@@ -5,25 +5,57 @@ import type { Question } from "../../Types/Question";
 import { QuestionCard } from "../../Components/Q&A/QuestionCard";
 import BounceLoading from "../../Components/shared/BounceLoading";
 import { useParams } from "react-router-dom";
+import QuestionCardSkeleton from "../../Components/Q&A/QuestionCardSkeleton";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../i18n/useLocale";
+import { useAuth } from "../../Context/Auth";
+import { MoreHorizontal, Trash2 } from "lucide-react";
+import cn from "../../utils/Cn";
+import DeleteQuestionDialog from "../../Components/Profile/DeleteQuestionDialog";
+import { deleteUserQuestion } from "../../Apis/ProfileApi/profile-api";
 
 function ProfileQandAPage() {
   const [QuestionsData, setQuestionsData] = useState<Question[]>([]);
 
-    const {id:userId} = useParams() as {id: string};
+  const [settingsOpen, setSettingsOpen] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState<boolean | null>(null);
+  const [deleteId, setDeleteId] = useState<string>("");
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const { t } = useTranslation();
+  const {lang} =useLocale();
+  const { id: userId } = useParams() as { id: string };
+
+  const {user}= useAuth();
 
   const lastPost = useRef<HTMLDivElement>(null);
-  const params = new URLSearchParams(window.location.search);
 
   const {
     data,
     isLoading,
-    error,
     isFetchingNextPage,
     fetchNextPage,
     isFetching,
-    refetch,
   } = useGetQuestionsPosts(userId);
-  // Infinite scrolling with Intersection Observer
+
+    const handleDelete = async(id: string) => {
+  
+      try{
+        if(!id) return;
+        setDeleteLoading(true);
+        await deleteUserQuestion({questionId: id});
+        const newQuestions = QuestionsData.filter((q) => q.id !== id);
+        setQuestionsData(newQuestions);
+        
+      }
+      catch(err){
+        console.log(err);
+      }
+      finally{
+        setDeleteLoading(false);
+        setDeleteOpen(false);
+      }
+  
+    };
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
@@ -49,22 +81,55 @@ function ProfileQandAPage() {
     }
   }, [data]);
   return (
-    <ProfileContainer tab="q&a">
+    <ProfileContainer tab="Q&A" key={userId}>
       <div className="flex flex-col gap-5">
         {QuestionsData.map((q: Question) => (
-          <QuestionCard key={q.id} question={q} />
+          <div key={q.id} className="flex gap-1">
+            <div className="w-full">
+
+            <QuestionCard key={q.id} question={q} />
+            </div>
+            {userId === user?.id && (
+              <div
+                key={q.id}
+                onClick={() =>
+                  setSettingsOpen((prev) => (prev === q.id ? null : q.id))
+                }
+                className="p-2 bg-white rounded-full h-fit hover:cursor-pointer hover:shadow-2xs hover:opacity-80 transition-all duration-300 relative"
+              >
+                <MoreHorizontal />
+                {settingsOpen === q.id && (
+                  <div className={cn(`absolute top-11 z-20 `, lang === "en" ? "right-0" : "left-0")}>
+                    <div className="bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-20">
+                      <button 
+                      onClick={() => {
+                        setDeleteOpen(true);
+                        setDeleteId(q.id);
+                      }}
+                      className="text-red-500 hover:text-red-600 hover:cursor-pointer  hover:opacity-80 transition-all duration-300 flex items-center gap-2 z-20">
+                        <Trash2 /> {t("profile.menuDelete")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         ))}
         {(isLoading || isFetchingNextPage) && (
           <div className="flex flex-col gap-5">
-            {/* <Questionskeleton />
-            <Questionskeleton />
-            <Questionskeleton /> */}
+            <QuestionCardSkeleton />
+            <QuestionCardSkeleton />
+            <QuestionCardSkeleton />
 
             <BounceLoading />
           </div>
         )}
         <div ref={lastPost} />
       </div>
+       {deleteOpen && (
+        <DeleteQuestionDialog open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={() => handleDelete(deleteId)} loading={deleteLoading} />
+      )}
     </ProfileContainer>
   );
 }

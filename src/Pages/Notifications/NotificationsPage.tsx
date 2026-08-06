@@ -28,6 +28,7 @@ import {
   Megaphone,
   Award,
 } from "lucide-react";
+import { fetchNotificationById } from "../../Apis/NotificationApi";
 
 export default function NotificationsPage() {
   const { lang } = useLocale();
@@ -304,7 +305,43 @@ export default function NotificationsPage() {
     }
 
     // Navigate to the notification detail for all types (server marks it read)
-    navigate(localizedPath(lang, `notifications/${n.id}`));
+    if(n.type === "ANSWER" || n.type === "COMMENT" || n.type === "COMMENT_REPLY" || n.type === "COMMENT_REPLY_REPLY" || n.type === "ANSWER_REPLY" || n.type === "ANSWER_REPLY_REPLY"){
+
+  await fetchNotificationById(n.id).then((res:any) => {
+
+
+      switch (res?.notification?.type) {
+          case "ANSWER":
+
+            return (
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+            );
+          case "COMMENT":
+            return (
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+            );
+          case "COMMENT_REPLY":
+            return (
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+            );
+            case "ANSWER_REPLY":
+            return (
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+            );
+            case "COMMENT_REPLY_REPLY":
+              return (
+                navigate(localizedPath(lang, `replies`),{state:{reply: res?.notification?.parentReply}})
+              );
+          case "ANSWER_REPLY_REPLY":
+            return (
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}`),{state:{reply: res?.notification?.parentReply}})
+            );
+          default:
+            // return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));
+      }
+    })
+  }
+  // return navigate(localizedPath(lang, `notifications/${n.id}`));
   };
 
   return (

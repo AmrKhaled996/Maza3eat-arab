@@ -4,15 +4,15 @@ import { getAnswersByQuestionId, getAnswersByQuestionIdWithCursor } from "../../
 
 
 
-function useGetAnswersByQuestionId( questionId: string ,cursor:string ="") {
+function useGetAnswersByQuestionId( questionId: string ,cursor:string ="" , excludeAnswerId?: string) {
     return  useInfiniteQuery({
         queryKey: ["get-question-answer"],
         queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){
-        return getAnswersByQuestionIdWithCursor(questionId, pageParam);
+        return getAnswersByQuestionIdWithCursor(questionId, pageParam, excludeAnswerId);
       }
-      return  getAnswersByQuestionId(questionId)},
+      return  getAnswersByQuestionId(questionId, excludeAnswerId)},
     initialPageParam: cursor,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
   });

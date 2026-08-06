@@ -73,7 +73,6 @@ export default function ReplyItem({
   const { data, isFetching } = useGetReplyReplies(reply?.id, nextCursor);
 
   const Highlight = () => {
-    console.log("url", HighlightedCommentID, "comment", reply.id);
     if (reply?.id === HighlightedCommentID) {
       // setIsHighligthed(true);
       return "border-blue-300 bg-sky-100";
@@ -107,8 +106,6 @@ export default function ReplyItem({
       setIsLiking(false);
     }
   };
-
-  /** */
   const handleReplying = async () => {
     const content = replyInputValue.trim();
 
@@ -128,15 +125,17 @@ export default function ReplyItem({
       setIsSubmitting(true);
 
       const response = await createReplyToReply(content, reply?.id);
-
+      
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
+      setShowReplies(true);
     } catch (error) {
       console.error(error);
       console.error("Failed to create reply");
     } finally {
       setIsSubmitting(false);
       setReplying(false);
+      
     }
   };
 
@@ -181,12 +180,7 @@ export default function ReplyItem({
       setIsReporting(true);
 
       await reportReply(reply.id, reason);
-      console.log(
-        "the report is reported with id:",
-        reply.id,
-        "reason:",
-        reason,
-      );
+
       setReportingError("");
       setOpenReportDialog(false);
     } catch (err) {
@@ -199,7 +193,7 @@ export default function ReplyItem({
 
   const handleShowReplies = () => {
     if (replies[0]?.depth % 3 === 0)
-      navigate(localizedPath(lang, `replies/${reply?.id}`), {
+      navigate(localizedPath(lang, `replies`), {
         state: { reply: reply, postId: data.postId },
       });
     if (showReplies) return;
@@ -242,15 +236,7 @@ export default function ReplyItem({
     return () => observer.disconnect();
   }, [rootRef, replying]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     const replies = data.pages.flatMap((page: any) => page.replies);
-  //     setReplies(replies);
-  //     console.log("loading");
-  //     if (isFetching) {
-  //     }
-  //   }
-  // }, [data]);
+
   useEffect(() => {
     if (data) {
       setReplies(data?.replies);
@@ -449,7 +435,7 @@ export default function ReplyItem({
                 onClick={() => handleShowReplies()}
                 className="text-slate-600 font-semibold mt-3  mb-3"
               >
-                {t("comments.repliesCount", { count: replies?.length })}
+                {t("comments.viewMoreReplies", { count: " " })}
               </button>
             )}
 

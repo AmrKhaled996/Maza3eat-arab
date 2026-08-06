@@ -39,7 +39,7 @@ export function QuestionCard({ question }: { question: Question }) {
         <div 
         onClick={(e) => {
             e.preventDefault();
-            navigate(localizedPath(lang, `profile/${question.author.id}`));
+            navigate(localizedPath(lang, `profile/${question.author.id}/posts`));
           }}
         className="flex flex-wrap items-center gap-2 mb-3">
           <img

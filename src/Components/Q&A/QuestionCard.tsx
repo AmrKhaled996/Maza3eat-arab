@@ -45,14 +45,14 @@ export function QuestionCard({ question }: { question: Question }) {
     >
       <div className="p-5">
         {/* Author row */}
-        <div
+        {question?.author && <div
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            navigate(localizedPath(lang, `profile/${question.author.id}`));
+            navigate(localizedPath(lang, `profile/${question.author.id}/posts`));
           }}
           className="flex flex-wrap items-center gap-2 mb-3"
-        >
+         >
           <img
             src={question?.author?.avatar}
             alt={question?.author?.name}
@@ -79,7 +79,7 @@ export function QuestionCard({ question }: { question: Question }) {
               ? FormatPublishDate(question.publishDate)
               : ""}
           </span>
-        </div>
+        </div>}
 
         {/* Question */}
         <h3 className="text-base font-extrabold text-gray-900 mb-2 leading-snug">

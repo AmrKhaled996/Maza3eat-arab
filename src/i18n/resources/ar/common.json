@@ -309,6 +309,30 @@
     },
     "showDiscussion": "عرض المنشور كاملا"
   },
+  "profile":{
+    "menuProfile": "الملف الشخصي",
+    "menuPosts": "المنشورات",
+    "menuQuestions": "الأسئلة",
+    "menuDelete": "حذف ",
+    "menucontact": "تواصل",
+    "deletePostDialog": {
+      "title": "حذف المنشور",
+      "message": "هل انت متاكد من حذف المنشور؟",
+      "deleteButton": "حذف"
+    },
+    "deleteQuestionDialog": {
+      "title": "حذف السؤال",
+      "message": "هل انت متاكد من حذف السؤال؟",
+      "deleteButton": "حذف"
+    },
+    "contactDialog": {
+      "title": "طلب تواصل",
+      "description": "أرسل طلب تواصل إلى هذا المستخدم، وسيتواصل معك بعد ذلك.",
+      "messageSent" :"رسالة",
+      "contactButton": "ارسال",
+      "inputPlaceholder": "اكتب رسالة..."
+    }
+    },
   "admin": {
     "dashboard": "لوحة التحكم",
     "users": "المستخدمين",

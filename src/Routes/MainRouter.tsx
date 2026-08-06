@@ -21,6 +21,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { SUPPORTED_LOCALES } from "../i18n/config";
 import { localizedPath } from "../i18n/paths";
 import RepliesThreadPage from "../Pages/Comments/RepliesThreadPage";
+import AnswerRepliesThreadPage from "../Pages/Answers/AnswerRepliesThreadPage";
 
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminModeratorsPage from "../Pages/Admin/AdminModeratorsPage";
@@ -66,7 +67,8 @@ export default function MainRouter(): React.ReactElement {
             <Route path="q&a/:id" element={<QandAPage />} />
             <Route path="featured" element={<FeaturedMainPage />} />
             <Route path="about" element={<AboutPage />} />
-            <Route path="replies/:id" element={<RepliesThreadPage />} />
+            <Route path="replies" element={<RepliesThreadPage />} />
+            <Route path="answer-replies" element={<AnswerRepliesThreadPage />} />
 
             <Route path="admin" element={<AdminProtectedRoute />}>
               <Route element={<AdminLayout />}>

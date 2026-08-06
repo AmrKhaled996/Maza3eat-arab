@@ -17,7 +17,7 @@ export default function PostAuthorCard({ post }: PostAuthorCardProps) {
 
   return (
     <div
-      onClick={() => navigate(localizedPath(lang, `profile/${post.author.id}`))}
+      onClick={() => navigate(localizedPath(lang, `profile/${post.author.id}/posts`))}
       className="flex items-start gap-3 hover:opacity-80 cursor-pointer transition-opacity"
       dir="rtl"
     >

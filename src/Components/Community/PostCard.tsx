@@ -29,20 +29,20 @@ function PostCard({ post }: { post: Post }) {
     const {lang} = useLocale();
   return (
     <div
-      onClick={() => navigate(localizedPath(lang, `post/${post.id}`))}
+      onClick={() => navigate(localizedPath(lang, `post/${post?.id}`))}
       className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col sm:flex-row gap-0 md:min-h-80 md:max-h-80 hover:cursor-pointer group"
     >
       {/* Image */}
       <div className="relative sm:w-52 md:w-80 shrink-0 overflow-hidden group-hover:scale-103 transition-transform duration-700 ease-in-out">
         <img
-          src={post.image.url}
-          alt={post.title}
+          src={post?.image.url}
+          alt={post?.title}
           className="w-full sm:w-full h-52 sm:h-full object-cover min-h-52 max-h-80 rounded-xl rounded-b-none "
         />
         {post?.image?.remainingImages !== undefined &&
-          post.image.remainingImages > 1 && (
+          post?.image.remainingImages > 1 && (
             <span className="absolute w-8 h-8 top-3 right-3 bg-black/50 text-white text-xs font-bold px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center justify-center">
-              {post.image.remainingImages}
+              {post?.image.remainingImages}
               <Plus size={24} strokeWidth={3} className=" font-bold" />
             </span>
           )}
@@ -54,43 +54,44 @@ function PostCard({ post }: { post: Post }) {
         dir="rtl"
       >
         {/* Author */}
-        <div 
+        {post?.author &&
+          <div 
           onClick={(e)=> {
             e.preventDefault()
             e.stopPropagation()
-            navigate(localizedPath(lang,`profile/${post.author.id}`))
+            navigate(localizedPath(lang,`profile/${post?.author.id}/posts`))
           }}
           className="flex flex-wrap items-center gap-2 mb-3">
           <img
-            src={post.author.avatar}
-            alt={post.author.name}
+            src={post?.author.avatar}
+            alt={post?.author.name}
             className="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow outline-3"
-            style={{ outlineColor: post.author.badgeColor }}
+            style={{ outlineColor: post?.author.badgeColor }}
           />
           <span className="text-sm font-bold text-gray-800">
-            {post.author.name}
+            {post?.author.name}
           </span>
-          <Badge tier={post.author.tierName} color={post.author.badgeColor} />
+          <Badge tier={post?.author.tierName} color={post?.author.badgeColor} />
 
           <span className={cn(` text-xs text-gray-400` , lang === "ar" ? "mr-auto ml-2" : "ml-auto mr-2")}>
-            {post?.publishDate ? FormatPublishDate(post.publishDate) : ""}
+            {post?.publishDate ? FormatPublishDate(post?.publishDate) : ""}
           </span>
-        </div>
+        </div>}
 
         {/* Title */}
         <h3 className="text-base sm:text-lg font-extrabold text-gray-900 mb-2 leading-snug line-clamp-2 text-safe">
-          {post.title}
+          {post?.title}
         </h3>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-3 mb-3">
-          {post.tags.map((t: TagType, i) => (
+          {post?.tags.map((t: TagType, i) => (
             <Tag key={i} label={t.name} />
           ))}
         </div>
 
         <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 overflow-hidden my-4 px-2 text-safe">
-          {stripHtml(post.content || "")}
+          {stripHtml(post?.content || "")}
         </p>
 
         {/* Footer */}

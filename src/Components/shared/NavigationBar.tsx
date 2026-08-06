@@ -124,7 +124,7 @@ function NavigationBar({
   return (
     <>
       <nav
-        className={` top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
+        className={`z-50 top-0 left-0 right-0  flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
       >
         <div
           className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
@@ -303,6 +303,14 @@ function NavigationBar({
                     className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
                     role="menu"
                   >
+                    <Link
+                      to={localizedPath(lang, `profile/${user.id}/posts`)}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("profile.menuProfile")}
+                    </Link>
                     <Link
                       to={localizedPath(lang, "create-post")}
                       role="menuitem"
@@ -509,6 +517,13 @@ function NavigationBar({
                   className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
                   role="menu"
                 >
+                  <Link
+                    to={localizedPath(lang, `profile/${user?.id}/posts`)}
+                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    onClick={() => setProfileOpen(false)}
+                    >
+                    {t("profile.menuProfile")}
+                  </Link>
                   <Link
                     to={localizedPath(lang, "create-post")}
                     role="menuitem"

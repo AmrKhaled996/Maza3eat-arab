@@ -61,7 +61,7 @@ function PostCard({ post }: { post: Post }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            navigate(localizedPath(lang, `profile/${post.author.id}`));
+            navigate(localizedPath(lang, `profile/${post.author.id}/posts`));
           }}
           className="flex flex-wrap items-center gap-2 mb-3"
         >

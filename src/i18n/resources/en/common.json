@@ -315,6 +315,32 @@
     
 
   },
+  "profile": {
+    "menuProfile": "Profile",
+    "menuPosts": "Posts",
+    "menuQuestions": "Q&A",
+    "menuDelete": "Delete",
+    "menucontact": "Contact",
+    "deletePostDialog": {
+      "title": "Delete Post",
+      "message": "Are you sure you want to delete your post? This action cannot be undone.",
+      "deleteButton": "Delete"
+    },
+    "deleteQuestionDialog": {
+      "title": "Delete Question",
+      "message": "Are you sure you want to delete your question? This action cannot be undone.",
+      "deleteButton": "Delete"
+    },
+    "contactDialog": {
+      "title": "Contact Request ",
+      "description": "Send a Contact request to this user, then they will get in touch with you.",
+      "inputPlaceholder": "Enter your message here...",
+      "messageSent": "message",
+      "contactButton": "Send"
+    }
+
+  },
+
   "admin": {
     "dashboard": "Dashboard",
     "users": "Users",

@@ -3,7 +3,8 @@ import { getUserProfile } from "../../Apis/ProfileApi/profile-api";
 
 export default function useGetProfile( userId: string){
     return useQuery({
-        queryKey: ['profile'],
-        queryFn:()=> getUserProfile({userId: userId}),
+        queryKey: ['profile',userId],
+        queryFn: () => getUserProfile({ userId: userId! }),
+    enabled: !!userId,
     })
 }

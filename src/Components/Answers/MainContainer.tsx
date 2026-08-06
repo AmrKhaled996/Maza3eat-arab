@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Answer as AnswerType } from "../../Types/Answer";
 import AnswerInput from "./AnswerInput";
 import AnswerItem from "./AnswerItems";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import useGetAnswersByPostId from "../../Hooks/AnswerHooks/useGetAnswersByPostId";
 import { useAuth } from "../../Context/Auth";
 
@@ -12,11 +12,16 @@ export default function AnswersSection() {
   const { user } = useAuth();
   const { id: questionIdparam } = useParams<{ id: string }>();
   const lastAnswerRef = useRef<HTMLDivElement>(null);
+  const [nextCursor, setNextCursor] = useState("");
+  const HighlightedAnswer = useLocation().state?.answer;
+  const [searchParams] = useSearchParams();
+
+  const HighlightedAnswerID = searchParams.get("highlighted") || "";
 
   if (!questionIdparam) return null;
 
   const { data, isLoading, isFetchingNextPage, fetchNextPage, isFetching } =
-    useGetAnswersByPostId(questionIdparam);
+    useGetAnswersByPostId(questionIdparam, nextCursor, HighlightedAnswerID);
 
 
 
@@ -25,7 +30,7 @@ export default function AnswersSection() {
   };
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && !isFetchingNextPage) {
         console.log("is fetching answers");
         fetchNextPage();
       }
@@ -42,6 +47,7 @@ export default function AnswersSection() {
     if (data) {
       const allAnswers = data.pages.flatMap((page: any) => page?.answers);
       setAnswers(allAnswers);
+      setNextCursor(data?.pages[data?.pages.length - 1]?.nextCursor);
       console.log("loading");
       if (isFetching) {
       }
@@ -63,6 +69,7 @@ export default function AnswersSection() {
           ))
         ) : (
           <div>
+            {HighlightedAnswer && <AnswerItem key={HighlightedAnswer?.id} answer={HighlightedAnswer} />}
             {answers?.map((c) => (
               <AnswerItem key={c.id} answer={c} />
             ))}

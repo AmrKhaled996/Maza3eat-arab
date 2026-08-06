@@ -1,3 +1,7 @@
+import type { Answer } from "./Answer";
+import type { Comment } from "./Comment";
+import type { Reply } from "./Reply";
+
 export type NotificationType =
   | "QUESTION_LIKE"
   | "POST_LIKE"
@@ -35,6 +39,13 @@ export interface Notification {
   resourceId?: string;
   sender?: NotificationSender;
   aggregatorCount?: number;
+  
+  postId?: string;
+  questionId?: string;
+  parentReply?: Reply;
+  comment?: Comment;
+  answer?: Answer;
+  reply?: Reply;
 }
 
 export type ContactRequestStatus = "PENDING" | "ACCEPTED" | "DECLINED";

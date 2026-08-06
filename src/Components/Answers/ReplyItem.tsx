@@ -13,8 +13,8 @@ import {
   likeToReply,
   reportReply,
   unlikeToReply,
-} from "../../Apis/CommentsApi/CommentReplies";
-import useGetReplyReplies from "../../Hooks/CommentHooks/useGetReplyReplies";
+} from "../../Apis/AnswersApi/AnswerReplies";
+import useGetReplysReplys from "../../Hooks/AnswerHooks/useGetReplyReplies";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { localizedPath } from "../../i18n/paths";
 import DeleteThreadDialog from "./DeleteItemDialog";
@@ -70,10 +70,9 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching } = useGetReplyReplies(reply?.id, nextCursor);
+  const { data, isFetching } = useGetReplysReplys(reply?.id, nextCursor);
 
   const Highlight = () => {
-    console.log("url", HighlightedCommentID, "comment", reply.id);
     if (reply?.id === HighlightedCommentID) {
       // setIsHighligthed(true);
       return "border-blue-300 bg-sky-100";
@@ -120,7 +119,7 @@ export default function ReplyItem({
     }
 
     if (content.length > 1000) {
-      console.error("Comment is too long");
+      console.error("Answer is too long");
       return;
     }
 
@@ -131,6 +130,7 @@ export default function ReplyItem({
 
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
+      setShowReplies(true);
     } catch (error) {
       console.error(error);
       console.error("Failed to create reply");
@@ -166,13 +166,13 @@ export default function ReplyItem({
     const reason = reportValue.trim();
 
     if (!reason) {
-      setReportingError(t("comments.errors.enterReason"));
+      setReportingError(t("answers.errors.enterReason"));
       return;
     }
 
     if (reason.length > MAX_REPORT_LENGTH) {
       setReportingError(
-        t("comments.errors.maxChars", { count: MAX_REPORT_LENGTH }),
+        t("answers.errors.maxChars", { count: MAX_REPORT_LENGTH }),
       );
       return;
     }
@@ -181,17 +181,14 @@ export default function ReplyItem({
       setIsReporting(true);
 
       await reportReply(reply.id, reason);
-      console.log(
-        "the report is reported with id:",
-        reply.id,
-        "reason:",
-        reason,
-      );
+
       setReportingError("");
       setOpenReportDialog(false);
     } catch (err) {
       console.error(err);
-      setReportingError(t("comments.errors.failedReport"));
+      setReportingError(t("answers.errors.failedReport"));
+    } finally {
+      setIsReporting(false);
     }
   };
 
@@ -199,12 +196,13 @@ export default function ReplyItem({
 
   const handleShowReplies = () => {
     if (replies[0]?.depth % 3 === 0)
-      navigate(localizedPath(lang, `replies/${reply?.id}`), {
+      navigate(localizedPath(lang, `answer-replies`), {
         state: { reply: reply, postId: data.postId },
       });
     if (showReplies) return;
     setShowReplies(true);
   };
+
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
@@ -366,7 +364,7 @@ export default function ReplyItem({
             <Reply
               className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
             />
-            {t("comments.reply")}
+            {t("answers.reply")}
           </button>
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
@@ -396,7 +394,7 @@ export default function ReplyItem({
                     onClick={() => setOpenReportDialog(true)}
                     className="block w-full px-4 py-2 hover:bg-gray-100 hover:cursor-pointer"
                   >
-                    {t("comments.report")}
+                    {t("answers.report")}
                   </button>
                 )}
 
@@ -405,7 +403,7 @@ export default function ReplyItem({
                     onClick={() => setOpenDeleteDialog(true)}
                     className="block w-full px-4 py-2 text-red-600 hover:bg-red-50 hover:cursor-pointer"
                   >
-                    {t("comments.delete")}
+                    {t("answers.delete")}
                   </button>
                 )}
               </div>
@@ -422,7 +420,7 @@ export default function ReplyItem({
                 setreplyInputValue(e.target.value);
               }}
               onKeyDown={(e) => e.key === "Enter" && {}}
-              placeholder={t("comments.writeReplyPlaceholder")}
+              placeholder={t("answers.writeReplyPlaceholder")}
               className="flex-1 border border-slate-400 rounded-full px-3 py-2 text-sm focus:border-primary focus:outline-primary text-gray-700 placeholder-gray-400 resize-none min-h-5 h-10 scrollbar-hide line-clamp-3"
             />
             <button
@@ -434,7 +432,7 @@ export default function ReplyItem({
                   <LoaderIcon className="animate-spin" />
                 </>
               ) : (
-                t("comments.publish")
+                t("answers.publish")
               )}
             </button>
           </div>
@@ -448,7 +446,7 @@ export default function ReplyItem({
                 onClick={() => handleShowReplies()}
                 className="text-slate-600 font-semibold mt-3  mb-3"
               >
-                {t("comments.repliesCount", { count: replies?.length })}
+                {t("answers.viewMoreReplies", { count: " " })}
               </button>
             )}
 
@@ -475,7 +473,7 @@ export default function ReplyItem({
                     onClick={() => handleShowReplies()}
                     className="text-slate-600 font-semibold mt-3  mb-3"
                   >
-                    {t("comments.showMore")}
+                    {t("answers.showMore")}
                   </button>
                 )}
               </div>

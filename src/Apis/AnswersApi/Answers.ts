@@ -18,11 +18,14 @@ export async function createAnswers(content: string, questionId: string) {
 export async function getAnswersByQuestionIdWithCursor(
   questionId: string,
   cursor: string,
+  excludeAnswerId?: string,
 ) {
   try {
-    const response = await axiosInstance.get(
-      `/questions/${questionId}/answers?&cursor=${cursor}`,
-    );
+    const response = await axiosInstance.get(`/questions/${questionId}/answers`, {
+      params: excludeAnswerId
+        ? { cursor: cursor, excludeAnswerId: excludeAnswerId }
+        : { cursor: cursor },
+    });
 
     return response.data.data;
   } catch (error) {
@@ -36,9 +39,14 @@ export async function getAnswersByQuestionIdWithCursor(
   }
 }
 
-export async function getAnswersByQuestionId(questionId: string) {
+export async function getAnswersByQuestionId(
+  questionId: string,
+  excludeAnswerId?: string,
+) {
   try {
-    const response = await axiosInstance.get(`/questions/${questionId}/answers`);
+    const response = await axiosInstance.get(`/questions/${questionId}/answers`, {
+      params: excludeAnswerId ? { excludeAnswerId: excludeAnswerId } : {},
+    });
 
     return response.data.data;
   } catch (error) {

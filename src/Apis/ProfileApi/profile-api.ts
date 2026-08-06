@@ -52,3 +52,34 @@ export async function getUserQuestions({
 
   return response.data.data;
 }
+
+
+export async function deleteUserPost({postId}: {postId: string}) {
+  try {
+  await axiosInstance.delete(`/posts/${postId}`);
+
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error fetching user Profile",
+      axiosError.response?.data || axiosError.message,
+    );
+    throw error;
+  }
+
+  
+}
+
+export async function deleteUserQuestion({questionId}: {questionId: string}) {
+  try {
+  await axiosInstance.delete(`/questions/${questionId}`);
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    console.error(
+      "Error fetching user Profile",
+      axiosError.response?.data || axiosError.message,
+    );
+    throw error;
+  }
+  
+}

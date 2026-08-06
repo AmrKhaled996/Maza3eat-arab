@@ -46,6 +46,7 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
   const [nextCursor, setNextCursor] = useState("");
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
+  const highlightRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
 
   const HighlightedAnswerID = searchParams.get("highlighted");
@@ -72,7 +73,6 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
   );
 
   const Highlight = () => {
-    console.log("url", HighlightedAnswerID, "answer", answer.id);
     if (answer?.id === HighlightedAnswerID) {
       return "border-blue-300 bg-sky-100";
     } else {
@@ -184,11 +184,13 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
 
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
+      setShowReplies(true);
     } catch (error) {
       console.error(error);
       console.error("Failed to create answer");
     } finally {
       setIsSubmitting(false);
+      setReplying(false);
     }
   };
 
@@ -293,9 +295,10 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
   }, [data]);
   useEffect(() => {
     if (HighlightedAnswerID === answer?.id) {
+      setShowReplies(true);
       setIsHighligthed(true);
     }
-  }, []);
+  }, [HighlightedAnswerID]);
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
       <div
@@ -348,16 +351,19 @@ export default function AnswerItem({ answer }: { answer: Answer }) {
       </div>
 
       <div className="flex-1 relative">
-        {IsHighligthed && (
-          <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />
-        )}
         {/* bubble */}
         <div
+          ref={highlightRef}
           className={cn(
             ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
             Highlight(),
           )}
         >
+          {IsHighligthed && (
+            <div 
+              className={`absolute inset-x-30 inset-80 top-0 h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_100_100ms_forwards] `}
+            />
+          )}
           <div className="flex gap-2 items-center">
             <span className="font-bold">{answer?.author?.name}</span>
             <Badge
