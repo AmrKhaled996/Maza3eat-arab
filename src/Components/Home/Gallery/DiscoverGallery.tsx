@@ -16,6 +16,7 @@ import img11 from "../../../assets/images/gallery/pexels-mographe-30374224.webp"
 import img12 from "../../../assets/images/gallery/saudi.webp";
 
 import logoRight from "../../../assets/images/gallery/logo-right.gif";
+import { useLocale } from "../../../i18n/useLocale";
 
 /**
  * Cards fill the full height of their row and only vary in width. Mixing card
@@ -68,10 +69,11 @@ function MarqueeRow({
   direction: "left" | "right";
   height: string;
 }) {
+  const {lang} = useLocale();
   // The keyframe shifts the track by -50%, so EACH HALF must be wider than the
   // viewport — otherwise the tail of the track runs out mid-screen and leaves a
   // blank gap. Three copies per half (six total) covers ultra-wide monitors.
-  const half = [...images, ...images, ...images];
+  const half =lang==="en"? [...images, ...images, ...images]:[...images, ...images, ...images].reverse();
   const track = [...half, ...half];
 
   return (
@@ -91,6 +93,7 @@ function MarqueeRow({
 
 function DiscoverGallery() {
   const { t } = useTranslation("common");
+  const {lang} = useLocale();
 
   return (
     <section className="relative py-12 md:py-16 overflow-hidden bg-gray-50/60 [content-visibility:auto]">
@@ -125,7 +128,7 @@ function DiscoverGallery() {
         </div>
 
         {/* dir="ltr" keeps the marquee travelling the same way in both locales */}
-        <div dir="ltr" className="flex flex-col gap-3 sm:gap-4 w-full">
+        <div dir={ "ltr"} className="flex flex-col gap-3 sm:gap-4 w-full marquee-track">
           <MarqueeRow images={row1} direction="left" height="h-40 sm:h-48 md:h-56" />
           <MarqueeRow images={row2} direction="right" height="h-32 sm:h-40 md:h-44" />
         </div>

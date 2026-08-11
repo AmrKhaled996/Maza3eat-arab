@@ -7,7 +7,7 @@ import { useCommuintySearch } from "../../Hooks/CommunityHooks/useCommunitySearc
 import PostSkeleton from "../../Components/Community/PostSkeleton";
 import BounceLoading from "../../Components/shared/BounceLoading";
 import MainPageLayout from "../../Components/Community/MainPageLayout";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import SectionHeader from "../../Components/Community/SectionHeader";
 import TrendingTags from "../../Components/shared/TrendingTags";
 
@@ -19,6 +19,7 @@ export default function CommunityMainPage() {
   const lastPost = useRef<HTMLDivElement>(null);
   const params = new URLSearchParams(window.location.search);
   const searchParam = params.get("search") || "";
+  const location = useLocation();
 
   const {
     data,
@@ -61,7 +62,7 @@ export default function CommunityMainPage() {
   }, [isFetching]);
 
   return (
-    <MainPageLayout>
+    <MainPageLayout key={location.pathname + location.search}>
       <SearchHeroSection
         searchValue={searchValue}
         setSearchValue={setSearchValue}
@@ -77,10 +78,10 @@ export default function CommunityMainPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Posts List Column */}
         <div className="lg:col-span-8 space-y-5">
-          {postsData.map((p: Post) => (
+          {!searchLoading && postsData.map((p: Post) => (
             <PostCard key={p.id} post={p} />
           ))}
-          {(isLoading || isFetchingNextPage) && (
+          {(isLoading || isFetchingNextPage||searchLoading) && (
             <div className="flex flex-col gap-5">
               <PostSkeleton />
               <PostSkeleton />

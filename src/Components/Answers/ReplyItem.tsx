@@ -20,6 +20,7 @@ import { localizedPath } from "../../i18n/paths";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import cn from "../../utils/Cn";
+import { useAuth } from "../../Context/Auth";
 
 export default function ReplyItem({
   reply,
@@ -33,6 +34,7 @@ export default function ReplyItem({
   const { lang } = useLocale();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {user} = useAuth();
 
   const [liked, setLiked] = useState(Boolean(reply?.likedByMe));
   const [likes, setLikes] = useState(reply?.likesCount);
@@ -360,7 +362,7 @@ export default function ReplyItem({
             {likes}
           </button>
 
-          <button
+          {user?.id &&<button
             onClick={() => {
               setReplying(!replying);
             }}
@@ -370,7 +372,7 @@ export default function ReplyItem({
               className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
             />
             {t("answers.reply")}
-          </button>
+          </button>}
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
               reply?.permissions?.canReport) && (

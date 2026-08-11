@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HeadProvider } from "react-head";
 import { AuthProvider } from "./Context/Auth.tsx";
 import { SocketProvider } from "./Context/SocketContext.tsx";
+import { ToastProvider } from "./Context/Toast.tsx";
 
 const client = new QueryClient();
 createRoot(document.getElementById("root")!).render(
@@ -15,10 +16,12 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={client}>
       <HeadProvider>
         <AuthProvider>
+          <ToastProvider>
           <SocketProvider>
             <MainRouter />
             <App />
           </SocketProvider>
+          </ToastProvider>
         </AuthProvider>
       </HeadProvider>
     </QueryClientProvider>

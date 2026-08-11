@@ -3,113 +3,186 @@ import cn from "../../../utils/Cn";
 import { useLocale } from "../../../i18n/useLocale";
 
 const videos = [
-  { vid: "/VideoSlider/1.mp4", name: "Lebanon, Beirut Corniche" },
-  { vid: "/VideoSlider/2.mp4", name: "KSA, Red Sea" },
-  { vid: "/VideoSlider/3.mp4", name: "Oman, Jebel Akhdar" },
-  { vid: "/VideoSlider/4.mp4", name: "Egypt, Khan el-Khalili" },
-  { vid: "/VideoSlider/5.mp4", name: "Morocco, Chefchaouen" },
-  { vid: "/VideoSlider/6.mp4", name: "Jordan, Petra" },
-  { vid: "/VideoSlider/7.mp4", name: "Jordan, Wadi Rum" },
-  { vid: "/VideoSlider/8.mp4", name: "UAE,Dubai downtown" },
-  { vid: "/VideoSlider/9.mp4", name: "Egypt, Ras El Hekma" },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360787/1.mp4",
+    name: "Lebanon, Beirut Corniche",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360803/2.mp4",
+    name: "KSA, Red Sea",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360711/3.mp4",
+    name: "Oman, Jebel Akhdar",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360830/4.mp4",
+    name: "Egypt, Khan el-Khalili",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360732/5.mp4",
+    name: "Morocco, Chefchaouen",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360709/6.mp4",
+    name: "Jordan, Petra",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360810/7.mp4",
+    name: "Jordan, Wadi Rum",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360844/8.mp4",
+    name: "UAE,Dubai downtown",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360850/9.mp4",
+    name: "Egypt, Ras El Hekma",
+  },
 ];
 
 const ArVideos = [
-  { vid: "/VideoSlider/1.mp4", name: "لبنان، كورنيش بيروت" },
-  { vid: "/VideoSlider/2.mp4", name: "السعودية، البحر الأحمر" },
-  { vid: "/VideoSlider/3.mp4", name: "عُمان، الجبل الأخضر" },
-  { vid: "/VideoSlider/4.mp4", name: "مصر، خان الخليلي" },
-  { vid: "/VideoSlider/5.mp4", name: "المغرب، شفشاون" },
-  { vid: "/VideoSlider/6.mp4", name: "الأردن، البتراء" },
-  { vid: "/VideoSlider/7.mp4", name: "الأردن، وادي رم" },
-  { vid: "/VideoSlider/8.mp4", name: "الإمارات، وسط مدينة دبي" },
-  { vid: "/VideoSlider/9.mp4", name: "مصر، رأس الحكمة" },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360787/1.mp4",
+    name: "لبنان، كورنيش بيروت",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360803/2.mp4",
+    name: "السعودية، البحر الأحمر",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360711/3.mp4",
+    name: "عُمان، الجبل الأخضر",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360830/4.mp4",
+    name: "مصر، خان الخليلي",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360732/5.mp4",
+    name: "المغرب، شفشاون",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360709/6.mp4",
+    name: "الأردن، البتراء",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360810/7.mp4",
+    name: "الأردن، وادي رم",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360844/8.mp4",
+    name: "الإمارات، وسط مدينة دبي",
+  },
+  {
+    vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360850/9.mp4",
+    name: "مصر، رأس الحكمة",
+  },
 ];
 export default function InfiniteSlider() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const lastendedVideoRef = useRef<HTMLVideoElement | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const { lang } = useLocale();
+  const currentlyPlayingRef = useRef<HTMLVideoElement | null>(null);
 
   const videosList = [...videos, ...videos];
   const ArVideosList = [...ArVideos, ...ArVideos];
+  const currentList = lang === "ar" ? ArVideosList : videosList;
 
   useEffect(() => {
-    const handleScroll = () => {
-      const center = window.innerWidth / 2;
-      const CENTER_THRESHOLD = window.innerWidth * 0.05;
+    let animationFrameId: number;
 
-      let nextVideo: HTMLVideoElement | null = null;
+    const handleScroll = () => {
+      if (!sliderRef.current) return;
+
+      // While a video is playing, do nothing else — just wait for it to end
+      if (currentlyPlayingRef.current) {
+        animationFrameId = requestAnimationFrame(handleScroll);
+        return;
+      }
+
+      const center = window.innerWidth / 2;
+      const CENTER_THRESHOLD = 4; // small px tolerance, exact-ish center
+
+      let nextVideo: any = null;
       let closestDistance = Infinity;
 
       videoRefs.current.forEach((video) => {
         if (!video) return;
-        if (video === lastendedVideoRef.current) return; // skip ended video
-
-        const rect = video.getBoundingClientRect();
+        const rect = (video as HTMLVideoElement).getBoundingClientRect();
         const videoCenter = rect.left + rect.width / 2;
         const distance = Math.abs(center - videoCenter);
-
         if (distance < closestDistance) {
           closestDistance = distance;
-          nextVideo = video;
+          nextVideo = video as HTMLVideoElement;
         }
       });
 
-      // ✅ If the ended video is still closest (slider hasn't moved away yet), do nothing
-      if (!nextVideo) return;
+      // Reset the "skip" flag once that video has drifted away from center
+      if (
+        lastendedVideoRef.current &&
+        (nextVideo !== lastendedVideoRef.current ||
+          closestDistance > CENTER_THRESHOLD * 5)
+      ) {
+        lastendedVideoRef.current = null;
+      }
 
-      videoRefs.current.forEach((video) => {
-        if (!video) return;
+      if (
+        nextVideo &&
+        closestDistance < CENTER_THRESHOLD &&
+        nextVideo !== lastendedVideoRef.current
+      ) {
+        // Lock immediately so no other frame can pick a video while this plays
+        currentlyPlayingRef.current = nextVideo;
+        sliderRef.current.style.animationPlayState = "paused";
 
-        if (video === nextVideo) {
-          if (closestDistance < CENTER_THRESHOLD) {
-            if (video.paused) {
-              video.play();
-              sliderRef.current?.style.setProperty(
-                "animation-play-state",
-                "paused",
-              );
-
-              video.onended = () => {
-                lastendedVideoRef.current = video;
-                sliderRef.current?.style.setProperty(
-                  "animation-play-state",
-                  "running",
-                );
-              };
-            }
+        // Force-stop every other video, no matter what state we think they're in
+        videoRefs.current.forEach((v) => {
+          if (v && v !== nextVideo) {
+            v.pause();
+            v.currentTime = 0;
           }
-        } else {
-          if (video !== lastendedVideoRef.current) {
-            video.pause();
-            video.currentTime = 0;
+        });
+
+        nextVideo.play().catch(() => {
+          // play() failed (e.g. autoplay blocked) — release the lock so slider keeps moving
+          currentlyPlayingRef.current = null;
+          sliderRef.current!.style.animationPlayState = "running";
+        });
+
+        nextVideo.onended = () => {
+          lastendedVideoRef.current = nextVideo;
+          currentlyPlayingRef.current = null;
+          if (sliderRef.current) {
+            sliderRef.current.style.animationPlayState = "running";
           }
-        }
-      });
+        };
+      }
+
+      animationFrameId = requestAnimationFrame(handleScroll);
     };
 
-    const interval = setInterval(handleScroll, 200);
-    return () => clearInterval(interval);
-  }, []);
+    animationFrameId = requestAnimationFrame(handleScroll);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [lang]);
 
   return (
     <div className="overflow-hidden w-full py-10">
       <div ref={sliderRef} className={cn("flex w-max gap-4 scrollSlider")}>
-        {(lang === "ar" ? ArVideosList : videosList).map((vid, index) => (
+        {currentList.map((vid, index) => (
           <div key={index} className="relative aspect-9/16 w-72 shrink-0">
             <video
               ref={(el) => {
                 videoRefs.current[index] = el;
               }}
+              src={vid.vid}
               muted
               playsInline
               disablePictureInPicture
               className="absolute w-full h-full object-cover rounded-xl"
-            >
-              <source src={vid.vid} type="video/mp4" />
-            </video>
-            <div className="absolute top-2 left-2  opacity-80  z-2000000000 ">
+            />
+            <div className="absolute top-2 left-2  opacity-80  z-20 ">
               <button className="flex items-center gap-3 text-sm font-bold  rounded-full bg-black/30 pt-2 ">
                 <span className=" text-white font-bold px-6 pb-1 text-center align-middle flex items-center justify-between gap-2 ">
                   <svg

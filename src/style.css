@@ -170,7 +170,7 @@ html[dir="rtl"] .footer-tagline {
   animation: navApperance 0.5s ease-in-out;
 }
 
-@keyframes marquee-left {
+@keyframes marquee-left  {
   0% {
     transform: translateX(0%);
   }
@@ -186,6 +186,10 @@ html[dir="rtl"] .footer-tagline {
   100% {
     transform: translateX(0%);
   }
+}
+.marquee-track {
+  direction: ltr; /* force this regardless of page language */
+  display: flex;
 }
 
 .animate-marquee-left {
@@ -232,12 +236,30 @@ html[dir="rtl"] .footer-tagline {
   }
 }
 
+@keyframes scroll-ltr {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-rtl {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50%);
+  }
+}
+
 html[dir="rtl"] .scrollSlider {
-  animation: scroll-rtl 10s linear infinite;
+  animation: scroll-rtl 15s linear infinite;
 }
 
 html[dir="ltr"] .scrollSlider {
-  animation: scroll-ltr 10s linear infinite;
+  animation: scroll-ltr 15s linear infinite;
 }
 @keyframes navApperance {
   0% {

@@ -23,10 +23,12 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
 import { CheckCircle2 } from "lucide-react";
 import { localizedPath } from "../../i18n/paths";
+import { useAuth } from "../../Context/Auth";
 
 export default function AnswerItem({ answer, isFirst = false }: { answer: Answer; isFirst?: boolean }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
+  const {user} = useAuth();
 
   const [voted, setVoted] = useState(answer?.myVote);
   const [votes, setVotes] = useState(answer?.totalVoteValue);
@@ -413,7 +415,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
             {votes}
           </button> */}
 
-          <button
+          {user?.id &&<button
             onClick={() => {
               setReplying(!replying);
             }}
@@ -423,7 +425,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
               className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
             />
             {t("answers.reply")}
-          </button>
+          </button>}
           <div className="relative inline-block">
             {(answer?.permissions?.canDelete ||
               answer?.permissions?.canReport) && (

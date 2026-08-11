@@ -81,10 +81,10 @@ export default function FeaturedMainPage() {
 
       {/* Posts */}
       <div className="flex flex-col gap-5">
-        {postsData.map((p: Post) => (
+        {!searchLoading && !isLoading && postsData.map((p: Post) => (
           <PostCard key={p.id} post={p} />
         ))}
-        {(isLoading || isFetchingNextPage) && (
+        {(isLoading || isFetchingNextPage||searchLoading) && (
           <div className="flex flex-col gap-5">
             <PostSkeleton />
             <PostSkeleton />

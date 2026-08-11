@@ -127,21 +127,24 @@ function NavigationBar({
         className={`z-50 top-0 left-0 right-0  flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
       >
         <div
-          className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-8 py-4`}
+          onClick={()=>navigate(localizedPath(lang, ""))}
+          className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer`}
         >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <path
-              d="M14 2L17.5 7.5L24 6L22 12.5L28 16L22 19.5L24 26L17.5 24.5L14 30L10.5 24.5L4 26L6 19.5L0 16L6 12.5L4 6L10.5 7.5Z"
-              fill="#2563eb"
-            />
-          </svg>
+          <img
+            src="/logo-right.gif"
+            alt="logo"
+            className="w-16 h-16"
+            loading="lazy"
+            decoding="async"
+          />
           <Link to={localizedPath(lang, "")}>
-            <span
-              className="font-extrabold text-lg tracking-tight"
-              style={{ color: "#2563eb" }}
-            >
-              Loooogooo
-            </span>
+            <img
+            src="/logo-left.png"
+            alt="logo"
+            className="w-16 h-16"
+            loading="lazy"
+            decoding="async"
+          />
           </Link>
         </div>
 
@@ -316,7 +319,7 @@ function NavigationBar({
                       className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
                       onClick={() => setProfileOpen(false)}
                     >
-                      {t("profile.menuProfile")}
+                      {t("profileNav.menuProfile")}
                     </Link>
                     <Link
                       to={localizedPath(lang, "create-post")}
@@ -325,6 +328,14 @@ function NavigationBar({
                       onClick={() => setProfileOpen(false)}
                     >
                       {t("createPost.menuCreatePost")}
+                    </Link>
+                    <Link
+                      to={localizedPath(lang, "create-q&a")}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("home.qnaAsk")}
                     </Link>
                     <div className="border-t border-gray-100 my-1" />
                     <button
@@ -549,6 +560,14 @@ function NavigationBar({
                     onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
                   >
                     {t("createPost.menuCreatePost")}
+                  </Link>
+                  <Link
+                    to={localizedPath(lang, "create-q&a")}
+                    role="menuitem"
+                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
+                  >
+                    {t("home.qnaAsk")}
                   </Link>
                   <div className="border-t border-gray-100 my-1" />
                   <button

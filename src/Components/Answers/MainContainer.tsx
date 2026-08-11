@@ -57,7 +57,7 @@ export default function AnswersSection() {
   if (!questionIdparam) return null;
 
   return (
-    <div className="max-w-2xl mx-auto" dir="rtl">
+    <div className="max-w-2xl mx-auto mt-6" dir="rtl">
       {user && (
         <div className="w-full">
           <AnswerInput onAddAnswer={handleAddAnswer} />

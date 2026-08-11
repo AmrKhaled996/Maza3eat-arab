@@ -1,4 +1,7 @@
 {
+  "error":{
+    "tryAgain":"حدث خطأ, الرجاء إعادة المحاولة"
+  },
   "meta": {
     "homeTitle": "الرئيسية - مزاعيط العرب"
   },
@@ -177,7 +180,7 @@
     "popular": "الأكثر شيوعاً",
     "latest": "الأحدث",
     "searchPlaceholder": "ابحث عن تجارب...",
-    "morePost": "قراءة المقال كاملاً"
+    "morePost": "قراءة المنشور كاملاً"
   },
   "login": {
     "meta": "تسجيل الدخول - مزاعيط العرب",
@@ -289,7 +292,8 @@
     "minutesAgo": "منذ {{count}} دقيقة",
     "hoursAgo": "منذ {{count}} ساعة",
     "yesterday": "أمس",
-    "daysAgo": "منذ {{count}} أيام"
+    "daysAgo": "منذ {{count}} أيام",
+    "successContactRequestAccepted": "تم قبول طلب التواصل بنجاح"
   },
   "common": {
     "actions": {
@@ -355,7 +359,7 @@
     },
     "showDiscussion": "عرض المنشور كاملا"
   },
-  "profile":{
+  "profileNav":{
     "menuProfile": "الملف الشخصي",
     "menuPosts": "المنشورات",
     "menuQuestions": "الأسئلة",

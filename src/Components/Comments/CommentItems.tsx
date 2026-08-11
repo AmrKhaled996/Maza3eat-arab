@@ -21,10 +21,13 @@ import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import { useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
+import { useAuth } from "../../Context/Auth";
+import Avatar from "../shared/Avatar";
 
 export default function CommentItem({ comment }: { comment: Comment }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
+  const {user} = useAuth();
 
   const [liked, setLiked] = useState(comment?.likedByMe);
   const [likes, setLikes] = useState(comment?.likesCount);
@@ -239,7 +242,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       >
-        <img
+        <Avatar
           src={comment?.author?.avatar}
           className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
           style={{ outlineColor: comment?.author?.tier.badgeColor }}
@@ -253,7 +256,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
                 className="absolute  bg-[#B4B8C0] group-hover:bg-blue-400 transition-colors duration-300 left-1/2 -translate-x-1/2 w-[1.5px] max-w-[1.5px] min-w-[1.5px] z-10"
                 style={{
                   top: "36px",
-                  height: `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
+                  height:  `${replyHeights?.[replyHeights?.length - 1] - 113}px`,
                 }}
               />
               {replyHeights?.map((_, index) => {
@@ -261,7 +264,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
                   <svg
                     key={index}
                     width={41}
-                    height={repliesRef.current[index]?.offsetHeight}
+                    height={repliesRef.current[index]?.offsetHeight+8}
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -332,7 +335,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
             {likes}
           </button>
 
-          <button
+          {user?.id &&<button
             onClick={() => {
               setReplying(!replying);
             }}
@@ -342,7 +345,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
               className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
             />
             {t("comments.reply")}
-          </button>
+          </button>}
           <div className="relative inline-block">
             {(comment?.permissions?.canDelete ||
               comment?.permissions?.canReport) && (

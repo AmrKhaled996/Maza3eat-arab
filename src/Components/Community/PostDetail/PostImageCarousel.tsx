@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Post } from "../../../Types/Post";
 import cn from "../../../utils/Cn";
+import { useLocale } from "../../../i18n/useLocale";
 
 interface PostImageCarouselProps {
   post: Post | undefined;
@@ -13,6 +14,7 @@ const SWIPE_THRESHOLD = 50;
 
 export default function PostImageCarousel({ post }: PostImageCarouselProps) {
   const { t } = useTranslation("common");
+  const { lang } = useLocale();
   const [mainIndex, setMainIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
@@ -25,9 +27,13 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
   }
 
   // Handle single or multiple images if post has an array
-  const images = Array.isArray((post as any).images) && (post as any).images.length > 0
-    ? (post as any).images.map((url: string, i: number) => ({ url, name: `image-${i}` }))
-    : [post.image];
+  const images =
+    Array.isArray((post as any).images) && (post as any).images.length > 0
+      ? (post as any).images.map((url: string, i: number) => ({
+          url,
+          name: `image-${i}`,
+        }))
+      : [post.image];
 
   const handlePrev = () => {
     setMainIndex((i) => (i === 0 ? images.length - 1 : i - 1));
@@ -63,7 +69,12 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
         <div
           dir="ltr"
           className="flex h-full w-full transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${mainIndex * 100}%)` }}
+          style={{
+            transform:
+              lang === "ar"
+                ? `translateX(${mainIndex * 100}%)`
+                : `translateX(-${mainIndex * 100}%)`,
+          }}
         >
           {images.map((img: any, i: number) => (
             <img
@@ -84,14 +95,22 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
               className="absolute start-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 backdrop-blur-md p-2.5 text-white hover:bg-white/40 transition-all duration-300 shadow-lg cursor-pointer hover:scale-110 active:scale-95"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-5 w-5" />
+              {lang === "ar" ? (
+                <ChevronRight className="h-5 w-5" />
+              ) : (
+                <ChevronLeft className="h-5 w-5" />
+              )}
             </button>
             <button
               onClick={handleNext}
               className="absolute end-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 backdrop-blur-md p-2.5 text-white hover:bg-white/40 transition-all duration-300 shadow-lg cursor-pointer hover:scale-110 active:scale-95"
               aria-label="Next image"
             >
-              <ChevronRight className="h-5 w-5" />
+              {lang === "ar" ? (
+                <ChevronLeft className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
             </button>
 
             {/* Dots Indicator */}
@@ -102,7 +121,9 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
                   onClick={() => setMainIndex(idx)}
                   className={cn(
                     "h-2 rounded-full transition-all duration-300 cursor-pointer",
-                    idx === mainIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
+                    idx === mainIndex
+                      ? "w-6 bg-white"
+                      : "w-2 bg-white/50 hover:bg-white/80",
                   )}
                 />
               ))}
@@ -130,7 +151,9 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
               onClick={() => setMainIndex(i)}
               className={cn(
                 "relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 transition-all cursor-pointer",
-                i === mainIndex ? "border-primary ring-2 ring-primary/20 scale-105" : "border-transparent opacity-70 hover:opacity-100"
+                i === mainIndex
+                  ? "border-primary ring-2 ring-primary/20 scale-105"
+                  : "border-transparent opacity-70 hover:opacity-100",
               )}
             >
               <img

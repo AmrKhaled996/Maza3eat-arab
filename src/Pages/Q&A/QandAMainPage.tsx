@@ -80,19 +80,20 @@ function QandAMainPage() {
       {/* Questions */}
       <div className="grid grid-cols-3 gap-6">
         <div className="flex flex-col gap-5 col-span-2">
-          {QuestionsData.map((q: Question) => (
-            <QuestionCard key={q.id} question={q} />
-          ))}
-          {(isLoading || isFetchingNextPage) && (
-          <div className="flex flex-col gap-5">
-            <QuestionCardSkeleton />
-            <QuestionCardSkeleton />
-            <QuestionCardSkeleton />
+          {!searchLoading &&
+            !isLoading &&
+            QuestionsData.map((q: Question) => (
+              <QuestionCard key={q.id} question={q} />
+            ))}
+          {(isLoading || isFetchingNextPage || searchLoading) && (
+            <div className="flex flex-col gap-5">
+              <QuestionCardSkeleton />
+              <QuestionCardSkeleton />
+              <QuestionCardSkeleton />
 
-
-            <BounceLoading />
+              <BounceLoading />
             </div>
-        )}
+          )}
           <div ref={lastPost} />
         </div>
         {/* wrapper stretches to the row height so the sticky card can travel */}

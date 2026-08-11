@@ -20,6 +20,8 @@ import { localizedPath } from "../../i18n/paths";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import cn from "../../utils/Cn";
+import { useToast } from "../../Context/Toast";
+import { useAuth } from "../../Context/Auth";
 
 export default function ReplyItem({
   reply,
@@ -33,6 +35,8 @@ export default function ReplyItem({
   const { lang } = useLocale();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {toast} = useToast();
+  const {user} =useAuth()
 
   const [liked, setLiked] = useState(Boolean(reply?.likedByMe));
   const [likes, setLikes] = useState(reply?.likesCount);
@@ -72,7 +76,7 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching } = useGetReplyReplies(reply?.id, pageCursor);
+  const { data, isFetching ,refetch } = useGetReplyReplies(reply?.id, pageCursor);
 
   const Highlight = () => {
     if (reply?.id === HighlightedCommentID) {
@@ -133,9 +137,10 @@ export default function ReplyItem({
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
       setShowReplies(true);
+      toast.success("Reply created successfully");
     } catch (error) {
       console.error(error);
-      console.error("Failed to create reply");
+      toast.error(t("error.tryAgain"));
     } finally {
       setIsSubmitting(false);
       setReplying(false);
@@ -150,7 +155,7 @@ export default function ReplyItem({
       setIsDeleting(true);
 
       await deleteReply(reply.id);
-
+      setReplies((prev) => [ ...prev.filter((r) => r.id !== reply.id) ]);
       setOpenDeleteDialog(false);
     } catch (err) {
       console.error(err);
@@ -349,7 +354,7 @@ export default function ReplyItem({
             {likes}
           </button>
 
-          <button
+          {user?.id && <button
             onClick={() => {
               setReplying(!replying);
             }}
@@ -359,7 +364,7 @@ export default function ReplyItem({
               className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
             />
             {t("comments.reply")}
-          </button>
+          </button>}
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
               reply?.permissions?.canReport) && (

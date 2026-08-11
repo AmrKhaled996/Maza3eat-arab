@@ -1,4 +1,7 @@
 {
+  "error":{
+    "tryAgain": "Something went wrong, Try Again"
+  },
   "meta": {
     "homeTitle": "Home - Maza3eat Arab"
   },
@@ -289,7 +292,8 @@
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "yesterday": "Yesterday",
-    "daysAgo": "{{count}} days ago"
+    "daysAgo": "{{count}} days ago",
+    "successContactRequestAccepted": "Contact Request Accepted Successfully"
   },
   "common": {
     "actions": {
@@ -355,7 +359,7 @@
     },
     "showDiscussion": "Show Full Discussion"
   },
-  "profile": {
+  "profileNav": {
     "menuProfile": "Profile",
     "menuPosts": "Posts",
     "menuQuestions": "Q&A",

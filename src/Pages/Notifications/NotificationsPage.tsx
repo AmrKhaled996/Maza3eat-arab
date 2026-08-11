@@ -29,11 +29,14 @@ import {
   Award,
 } from "lucide-react";
 import { fetchNotificationById } from "../../Apis/NotificationApi";
+import { useToast } from "../../Context/Toast";
+import { Title } from "react-head";
 
 export default function NotificationsPage() {
   const { lang } = useLocale();
   const { t } = useTranslation("common");
   const navigate = useNavigate();
+  const {toast} = useToast();
 
   const {
     notifications,
@@ -362,6 +365,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50/50">
+      <Title>{t("notifications.title")}</Title>
       <NavigationBar page="notifications" solidNav />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
@@ -689,11 +693,13 @@ export default function NotificationsPage() {
                         try {
                           const { reportContactRequest } = await import('../../Apis/ContactRequestApi');
                           await reportContactRequest(reasonModalReq.id, "Inappropriate contact request message");
-                          alert(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
+                          // alert(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
+                          toast.success(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
                           setReasonModalReq(null);
                         } catch (err: any) {
                           const msg = err?.response?.data?.message || (lang === "ar" ? "فشل الإبلاغ" : "Failed to report");
                           alert(msg);
+                          toast.error(lang === "ar" ? "فشل الإبلاغ" : "Failed to report");
                         } finally {
                           setIsReporting(false);
                           setIsReportMenuOpen(false);
@@ -807,7 +813,7 @@ export default function NotificationsPage() {
                 </div>
 
                 {/* Phone row */}
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+                {/* <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
                   <Phone className="h-5 w-5 text-gray-400 shrink-0" />
                   <div>
                     <span className="block text-[10px] text-gray-400 uppercase font-semibold">{t("notifications.phone")}</span>
@@ -815,7 +821,7 @@ export default function NotificationsPage() {
                       {contactInfoModalReq.contactInfo?.phone || "n/a"}
                     </a>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="space-y-2.5">
@@ -909,13 +915,20 @@ export default function NotificationsPage() {
                   }
                   onClick={async () => {
                     if (!contactMethodValue.trim()) return;
-                    await respondToContactRequest({
-                      id: acceptModalReq.id,
-                      action: "ACCEPTED",
-                      contactMethod: { type: contactMethodType, value: contactMethodValue.trim() },
-                    });
-                    setAcceptModalReq(null);
-                    setContactMethodValue("");
+                    try {
+                      
+                      await respondToContactRequest({
+                        id: acceptModalReq.id,
+                        action: "ACCEPTED",
+                        contactMethod: { type: contactMethodType, value: contactMethodValue.trim() },
+                      });
+                      setAcceptModalReq(null);
+                      setContactMethodValue("");
+                      toast.success(t("notifications.successContactRequestAccepted"));
+                    } catch (error) {
+                      console.error(error);
+                      toast.error(t("error.tryAgain"))
+                    }
                   }}
                   className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
                 >
