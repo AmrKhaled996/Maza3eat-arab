@@ -5,6 +5,7 @@ import { useAuth } from "../../Context/Auth";
 import { LoaderIcon } from "lucide-react";
 import type { Comment } from "../../Types/Comment";
 import { useTranslation } from "react-i18next";
+import Avatar from "../shared/Avatar";
 
 function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
   const { t } = useTranslation();
@@ -48,9 +49,9 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
 
   return (
     <div className="flex items-center max-w-xl justify-center mx-auto gap-3 mb-8 bg-white rounded-2xl p-3 w-full ">
-      <img
+      <Avatar
         src={user?.avatar}
-        alt={user?.name}
+        name={user?.name}
         className="w-10 h-10 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0"
         style={{ outlineColor: user?.tier?.badgeColor }}
       />

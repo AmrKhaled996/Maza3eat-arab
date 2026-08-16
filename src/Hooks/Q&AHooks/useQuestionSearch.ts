@@ -8,7 +8,7 @@ export function useQuestionsSearch(
   cursor: string ="",
 ) {
   return useInfiniteQuery({
-    queryKey: ["Question-search-cursor"],
+    queryKey: ["Question-search-cursor", searchTerm, sortBy],
     queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){

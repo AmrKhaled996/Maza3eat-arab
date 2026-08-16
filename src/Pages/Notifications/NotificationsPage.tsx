@@ -16,7 +16,6 @@ import {
   ShieldCheck,
   Check,
   X,
-  Phone,
   Mail,
   ExternalLink,
   RefreshCw,
@@ -333,19 +332,19 @@ export default function NotificationsPage() {
           case "ANSWER":
 
             return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}#${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
             );
           case "COMMENT":
             return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}#${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
             );
           case "COMMENT_REPLY":
             return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}#${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
             );
             case "ANSWER_REPLY":
             return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}#${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
             );
             case "COMMENT_REPLY_REPLY":
               return (
@@ -356,11 +355,11 @@ export default function NotificationsPage() {
               navigate(localizedPath(lang, `post/${res?.notification?.postId}`),{state:{reply: res?.notification?.parentReply}})
             );
           default:
-            // return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));
+            return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));
       }
     })
   }
-  // return navigate(localizedPath(lang, `notifications/${n.id}`));
+  return navigate(localizedPath(lang, `notifications/${n.id}`));
   };
 
   return (

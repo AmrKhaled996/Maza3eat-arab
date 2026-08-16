@@ -21,6 +21,7 @@ import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
 import cn from "../../utils/Cn";
 import { useAuth } from "../../Context/Auth";
+import Avatar from "../shared/Avatar";
 
 export default function ReplyItem({
   reply,
@@ -106,6 +107,7 @@ export default function ReplyItem({
     } catch (error) {
       setLiked(wasLiked);
       setLikes(previousLikes);
+      console.error(error);
     } finally {
       setIsLiking(false);
     }
@@ -271,7 +273,8 @@ export default function ReplyItem({
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
-        <img
+        <Avatar
+          name={reply?.author?.name}
           src={reply?.author?.avatar}
           className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 relative z-30 ${lang === "ar" ? "ml-4" : "mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}

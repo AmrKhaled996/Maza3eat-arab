@@ -22,8 +22,8 @@ export default function TrendingTags({ limit = 10 }: { limit?: number }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-xs space-y-4 sticky top-28">
-      <div className="flex items-center gap-2 text-gray-900 font-bold border-b border-gray-100 pb-3">
+    <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-xs space-y-4 sticky top-28  ">
+      <div className="flex items-center gap-2 text-gray-900 font-bold border-b border-gray-100 pb-3 ">
         <TrendingUp className="w-4 h-4 text-primary" />
         <span className="text-sm">{t("community.trendingTags", "Trending Tags")}</span>
       </div>

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import ContactDialog from "./ContactDialog";
 import { createContactRequest } from "../../Apis/ContactRequestApi";
 import { useAuth } from "../../Context/Auth";
+import Avatar from "../shared/Avatar";
 
 function ProfileContainer({
   children,
@@ -30,7 +31,7 @@ function ProfileContainer({
   const { id: userId } = useParams() as { id: string };
   const {user}=useAuth();
 
-  const { data: profileUser, isLoading } = useGetProfile(userId) as {
+  const { data: profileUser } = useGetProfile(userId) as {
     data: UserProfileData;
     isLoading: boolean;
   };
@@ -80,9 +81,9 @@ function ProfileContainer({
           <aside className="flex flex-col items-center gap-3 sm:w-36 flex-shrink-0">
             {/* أفاتار */}
             <div className="relative">
-              <img
+              <Avatar
                 src={profileUser?.avatar}
-                alt={profileUser?.name}
+                name={profileUser?.name}
                 className="w-20 h-20 rounded-full object-cover   shadow-lg  outline-4  outline-white"
                 style={{ outlineColor: profileUser?.tier?.badgeColor }}
               />

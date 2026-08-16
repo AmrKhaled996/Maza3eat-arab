@@ -8,7 +8,7 @@ export function useFeaturedSearch(
   cursor: string ="",
 ) {
   return useInfiniteQuery({
-    queryKey: ["Featured-search-cursor"],
+    queryKey: ["Featured-search-cursor", searchTerm, sortBy],
     queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){

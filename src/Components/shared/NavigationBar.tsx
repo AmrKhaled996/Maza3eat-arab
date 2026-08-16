@@ -15,6 +15,7 @@ import { useAuth } from "../../Hooks/Auth";
 import { useNotifications } from "../../Hooks/useNotifications";
 import { Badge } from "./Tag";
 import cn from "../../utils/Cn";
+import Avatar from "./Avatar";
 
 function NavigationBar({
   page,
@@ -131,17 +132,17 @@ function NavigationBar({
           className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer`}
         >
           <img
-            src="/logo-right.gif"
+            src="/logo-v3.gif"
             alt="logo"
             className="w-16 h-16"
             loading="lazy"
             decoding="async"
           />
-          <Link to={localizedPath(lang, "")}>
+          <Link to={localizedPath(lang, "")} >
             <img
-            src="/logo-left.png"
+            src="/logo-new.png"
             alt="logo"
-            className="w-16 h-16"
+            className="w-16 h-16 "
             loading="lazy"
             decoding="async"
           />
@@ -154,7 +155,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "featured")}
             className={cn(
-              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
+              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"}  font-semibold nav-link-text group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
               handlePage("featured"),
             )}
           >
@@ -163,7 +164,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "community")}
             className={cn(
-              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("community"),
             )}
           >
@@ -172,7 +173,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "q&a")}
             className={cn(
-              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
             )}
           >
@@ -181,7 +182,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "about")}
             className={cn(
-              ` text-md font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("about"),
             )}
           >
@@ -264,7 +265,7 @@ function NavigationBar({
           {isAuthenticated && (
             <Link
               to={localizedPath(lang, "notifications")}
-              className={`relative ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
+              className={`relative ${effectiveScrolled || page === "community" || page === "q&a" || page === "featured" ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
             >
               <svg
                 width="24"
@@ -285,7 +286,7 @@ function NavigationBar({
           )}
 
           <div
-            className="relative"
+            className="relative flex justify-center items-center"
             ref={profileWrapRef}
             onMouseEnter={() => isAuthenticated && setProfileOpen(true)}
             onMouseLeave={() => setProfileOpen(false)}
@@ -300,10 +301,10 @@ function NavigationBar({
                   aria-expanded={profileOpen}
                   aria-haspopup="true"
                 >
-                  <img
-                    src={user.avatar || "https://i.pravatar.cc/40?img=12"}
-                    alt={user.name}
-                    className="h-9 w-9 rounded-full object-cover"
+                  <Avatar
+                    src={user?.avatar || "https://i.pravatar.cc/40?img=12"}
+                    name={user?.name}
+                    className="h-9 w-9 rounded-full object-cover min-w-9"
                   />
                 </button>
                 {profileOpen && (
@@ -341,7 +342,7 @@ function NavigationBar({
                     <button
                       type="button"
                       role="menuitem"
-                      className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50"
+                      className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50 hover:cursor-pointer transition-all duration-300"
                       onClick={async () => {
                         setProfileOpen(false);
                         await logout();
@@ -384,7 +385,7 @@ function NavigationBar({
         </div>
 
         <button
-          className={`md:hidden ${effectiveScrolled ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
+          className={`md:hidden ${effectiveScrolled || page === "community" || page === "q&a" || page === "featured" ? "text-primary" : "text-white"} hover:opacity-80 hover:cursor-pointer transition-opacity`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <svg

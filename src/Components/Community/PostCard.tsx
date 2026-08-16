@@ -9,6 +9,7 @@ import { localizedPath } from "../../i18n/paths";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
 import cn from "../../utils/Cn";
+import Avatar from "../shared/Avatar";
 
 function stripHtml(html: string) {
   if (!html) return "";
@@ -62,9 +63,9 @@ function PostCard({ post }: { post: Post }) {
             navigate(localizedPath(lang,`profile/${post?.author.id}/posts`))
           }}
           className="flex flex-wrap items-center gap-2 mb-3">
-          <img
+          <Avatar
             src={post?.author.avatar}
-            alt={post?.author.name}
+            name={post?.author.name}
             className="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow outline-3"
             style={{ outlineColor: post?.author.badgeColor }}
           />

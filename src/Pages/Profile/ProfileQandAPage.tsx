@@ -34,7 +34,6 @@ function ProfileQandAPage() {
     isLoading,
     isFetchingNextPage,
     fetchNextPage,
-    isFetching,
   } = useGetQuestionsPosts(userId);
 
     const handleDelete = async(id: string) => {
@@ -76,8 +75,7 @@ function ProfileQandAPage() {
       const allQuestions = data.pages.flatMap((page: any) => page.questions);
       setQuestionsData(allQuestions);
       console.log("loading");
-      if (isFetching) {
-      }
+
     }
   }, [data]);
   return (

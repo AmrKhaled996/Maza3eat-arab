@@ -37,31 +37,7 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const {lang} = useLocale();
-  const [toasts, setToasts] = useState<Toast[]>([
-    {
-    id: Date.now() + Math.random(),
-    type: "success",
-    message: "Welcome to Majlkdjkl;sjf;jasdfjklsafjlksf klsfjsdlkjf;lsdfljsv slkdjvkljvl;sjdvlsv ljfvksdvjlksdvkl za3eat",
-    
-  },
-  {
-    id: Date.now() + Math.random(),
-    type: "info",
-    message: "Welcome to Maza3eat",
-    
-  },
-  {
-    id: Date.now() + Math.random(),
-    type: "warning",
-    message: "Welcome to Maza3eat",
-  },
-  {
-    id: Date.now() + Math.random(),
-    type: "error",
-    message: "Welcome to Maza3eat",
-  },
-
-]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));

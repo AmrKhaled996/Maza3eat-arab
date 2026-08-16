@@ -49,8 +49,6 @@ export default function FeaturedMainPage() {
       const allPosts = data.pages.flatMap((page: any) => page.posts);
       setPostsData(allPosts);
       console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
 

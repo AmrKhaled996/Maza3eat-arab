@@ -22,6 +22,7 @@ import ReportDialog from "./ReportDialog";
 import cn from "../../utils/Cn";
 import { useToast } from "../../Context/Toast";
 import { useAuth } from "../../Context/Auth";
+import Avatar from "../shared/Avatar";
 
 export default function ReplyItem({
   reply,
@@ -76,7 +77,7 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching ,refetch } = useGetReplyReplies(reply?.id, pageCursor);
+  const { data, isFetching  } = useGetReplyReplies(reply?.id, pageCursor);
 
   const Highlight = () => {
     if (reply?.id === HighlightedCommentID) {
@@ -108,6 +109,7 @@ export default function ReplyItem({
     } catch (error) {
       setLiked(wasLiked);
       setLikes(previousLikes);
+      console.error(error);
     } finally {
       setIsLiking(false);
     }
@@ -263,8 +265,9 @@ export default function ReplyItem({
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
-        <img
+        <Avatar
           src={reply?.author?.avatar}
+          name={reply?.author?.name}
           className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 relative z-30 ${lang === "ar" ? "ml-4" : "mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />

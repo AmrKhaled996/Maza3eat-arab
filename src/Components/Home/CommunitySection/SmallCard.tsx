@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
 import PostsComments from "../../../assets/images/icons/PostComments";
+import Avatar from "../../shared/Avatar";
 
 function HomeCommunitySectionSmallCard(props: Post) {
   const post: Post = props;
@@ -34,9 +35,9 @@ function HomeCommunitySectionSmallCard(props: Post) {
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <img
+            <Avatar
               src={post?.author?.avatar}
-              alt={post?.author?.name}
+              name={post?.author?.name}
               style={{ outlineColor: post.author.badgeColor }}
               className={`w-8 h-8 rounded-full outline-3  object-cover ring-2 ring-white shadow`}
             />

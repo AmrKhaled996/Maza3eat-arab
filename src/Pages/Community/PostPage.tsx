@@ -99,7 +99,7 @@ export default function PostPage() {
           </div>
 
           {/* Right Sidebar - Date (col-span-3) */}
-          <div className="lg:col-span-3 order-3 space-y-6">
+          <div className="lg:col-span-3 order-3 space-y-6 ">
             {post.publishDate && (
               <div className="bg-white rounded-xl p-6 ">
                 <div className="flex flex-row items-center gap-3">
@@ -113,7 +113,10 @@ export default function PostPage() {
             {/* Advertisement & Trending Tags — direct children of the stretched
                 grid column so TrendingTags' own `sticky` has room to travel */}
             <Advertisement ad={adData} />
+           
+
             <TrendingTags limit={10} />
+           
           </div>
         </div>
         <CommentsSection />

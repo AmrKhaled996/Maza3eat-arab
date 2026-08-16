@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
+import Avatar from "../shared/Avatar";
 
 function stripHtml(html: string) {
   if (!html) return "";
@@ -48,9 +49,9 @@ export function QuestionCard({ question }: { question: Question }) {
           }}
           className="flex items-center gap-3 group"
         >
-          <img
+          <Avatar
             src={question?.author?.avatar || "/default-avatar.png"}
-            alt={question?.author?.name}
+            name={question?.author?.name}
             className="w-10 h-10 rounded-full object-cover border border-gray-100 ring-2 ring-gray-50 group-hover:scale-105 transition-transform"
           />
           <div>

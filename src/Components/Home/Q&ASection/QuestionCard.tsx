@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
+import Avatar from "../../shared/Avatar";
 // import { FormatPublishDate } from "../../../utils/DateFormater";
 // import { useEffect } from "react";
 
@@ -42,9 +43,9 @@ export function QuestionCard({ question }: { question: Question }) {
             navigate(localizedPath(lang, `profile/${question.author.id}/posts`));
           }}
         className="flex flex-wrap items-center gap-2 mb-3">
-          <img
+          <Avatar
             src={question?.author?.avatar}
-            alt={question?.author?.name}
+            name={question?.author?.name}
             className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow outline-2"
             style={{ outlineColor: question?.author?.badgeColor }}
           />
@@ -107,9 +108,9 @@ export function QuestionCard({ question }: { question: Question }) {
           className="rounded-l-xl p-3 mb-2 bg-[#effff4] relative before:content-[''] before:block before:absolute  before:top-0 before:right-0 before:w-0.75 before:rounded-r-xl before:h-full before:bg-[#22C55E] "
         >
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <img
+            <Avatar
               src={question?.topAnswer?.author?.avatar}
-              alt={question?.topAnswer?.author?.name}
+              name={question?.topAnswer?.author?.name}
               className="w-7 h-7 rounded-full object-cover ring-1 ring-white outline-2"
               style={{
                 outlineColor: question.topAnswer?.author?.tier?.badgeColor,

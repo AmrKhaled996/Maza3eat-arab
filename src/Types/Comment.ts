@@ -9,7 +9,8 @@ export interface Comment {
   repliesCount: number;
   createdAt: Date;
   author: Author;
-  likedByMe: boolean;
+  likedByMe?: boolean;
+  islikedByMe?: boolean;
   permissions: Permissions,
   replies?: Reply[];
 }

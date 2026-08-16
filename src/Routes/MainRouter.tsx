@@ -39,6 +39,8 @@ import AdminReportDetails from "../Pages/Admin/Details/AdminReportDetails";
 import AdminTiersPage from "../Pages/Admin/AdminTiersPage";
 import AdminAdsPage from "../Pages/Admin/AdminAdsPage";
 import AdminAnnouncementsPage from "../Pages/Admin/AdminAnnouncementsPage";
+import PendingPostPage from "../Pages/Community/PendingPostPage";
+import PendingQuestionPage from "../Pages/Q&A/PendingQuestionPage";
 
 export default function MainRouter(): React.ReactElement {
   return (
@@ -55,6 +57,7 @@ export default function MainRouter(): React.ReactElement {
             <Route path="banned" element={<BannedPage />} />
             <Route path="community" element={<CommunityMainPage />} />
             <Route path="post/:id" element={<PostPage />} />
+            <Route path="pending/post" element={<PendingPostPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="create-post" element={<CreatePostPage />} />
               <Route path="create-q&a" element={<QndACreatePage />} />
@@ -66,6 +69,7 @@ export default function MainRouter(): React.ReactElement {
             <Route path="profile/:id/q&a" element={<ProfileQandAPage />} />
             <Route path="q&a" element={<QandAMainPage />} />
             <Route path="q&a/:id" element={<QandAPage />} />
+            <Route path="pending/question" element={<PendingQuestionPage />} />
             <Route path="featured" element={<FeaturedMainPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="replies" element={<RepliesThreadPage />} />

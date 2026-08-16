@@ -92,6 +92,12 @@
     "errorTagLength": "Each tag must be between 3 and 30 characters.",
     "menuCreatePost": "Create post"
   },
+  "pendingPost": {
+    "meta": "Pending Post - Maza3eat Arab",
+    "title": "Pending Post",
+    "subtitle": "your post is under review now and you will be notified once approved. You can see your pending and accepted posts from your profile.",
+    "cta": "Go to Profile"
+  },
   "footer": {
     "taglineTitle": "Every traveler has a story worth telling.",
     "taglineSubtitle": "Share your trips and experiences with the Maza3eat Arab community.",
@@ -249,6 +255,12 @@
     "likesLabel_few": "{{count}} Likes",
     "likesLabel_many": "{{count}} Likes",
     "likesLabel_other": "{{count}} Likes"
+  },
+  "pendingQuestion": {
+    "meta": "Pending Question - Maza3eat Arab",
+    "title": "Pending Question",
+    "subtitle": "your Question is under review now and you will be notified once approved. You can see your pending and accepted Questions from your profile.",
+    "cta": "Go to Profile"
   },
   "notifications": {
     "title": "Notifications & Contact Requests",

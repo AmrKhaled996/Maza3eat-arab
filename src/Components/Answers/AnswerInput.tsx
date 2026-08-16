@@ -5,6 +5,7 @@ import { useAuth } from "../../Context/Auth";
 import { LoaderIcon } from "lucide-react";
 import type { Answer } from "../../Types/Answer";
 import { useTranslation } from "react-i18next";
+import Avatar from "../shared/Avatar";
 
 function AnswerInput({onAddAnswer}:{onAddAnswer:(answer:Answer)=>void}) {
   const { t } = useTranslation();
@@ -46,9 +47,9 @@ function AnswerInput({onAddAnswer}:{onAddAnswer:(answer:Answer)=>void}) {
 
   return (
     <div className="flex items-center max-w-xl justify-center mx-auto gap-3 mb-8 bg-white rounded-2xl p-3 w-full ">
-      <img
+      <Avatar
         src={user?.avatar}
-        alt={user?.name}
+        name={user?.name}
         className="w-10 h-10 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0"
         style={{ outlineColor: user?.tier?.badgeColor }}
       />

@@ -1,5 +1,5 @@
 import { QuestionCard } from "./QuestionCard";
-import HomeQandAPostsAdvertisement from "./Advertisement";
+import HomeQuestionsAdvertisement from "./Advertisement";
 import HomeQandALayout from "./Layout";
 import type { Question } from "../../../Types/Question";
 import useHomeQuestions from "../../../Hooks/HomeHooks/useHomeQuestion";
@@ -8,8 +8,8 @@ import HomeQandAPostsSectionMoreButton from "./MoreButton";
 import QuestionCardSkeleton from "../../Q&A/QuestionCardSkeleton";
 import type { Advertisement } from "../../../Types/Advertisement";
 
-export default function QAForum({ad}:{ad?:Advertisement}) {
-  const { data: questions , isLoading } = useHomeQuestions();
+export default function QAForum({ ad }: { ad?: Advertisement }) {
+  const { data: questions, isLoading } = useHomeQuestions();
 
   return (
     <HomeQandALayout>
@@ -20,8 +20,10 @@ export default function QAForum({ad}:{ad?:Advertisement}) {
           {questions?.map((q: Question) => (
             <QuestionCard key={q.id} question={q} />
           ))}
-           {isLoading && Array.from({ length: 2 }).map((_, index) => <QuestionCardSkeleton key={index} />)} 
-           
+          {isLoading &&
+            Array.from({ length: 2 }).map((_, index) => (
+              <QuestionCardSkeleton key={index} />
+            ))}
         </div>
 
         {/* Sidebar — popular questions and the ad stick together as one block */}
@@ -29,10 +31,10 @@ export default function QAForum({ad}:{ad?:Advertisement}) {
           <div className="sticky top-28 flex flex-col gap-5">
             {/* Popular Questions */}
 
-            <QandAPopularQuestion limit={3} />
+            <QandAPopularQuestion limit={3} location={"home"} />
 
             {/* Sponsored */}
-            {ad&&<HomeQandAPostsAdvertisement ad={ad} />}
+            {ad && <HomeQuestionsAdvertisement ad={ad} />}
           </div>
         </div>
       </div>

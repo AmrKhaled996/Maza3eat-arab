@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import HomeCommunitySectionCreateButton from "../shared/CreateButton";
+import { useLocation } from "react-router-dom";
 
 
 
@@ -11,8 +12,9 @@ function SectionHeader({
   setSortBy: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const { t } = useTranslation("common");
+    const location = useLocation();
   return (
-    <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5">
+    <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5" key={location.pathname + location.search}>
       <div>
         <h2 className="text-fluid-section font-extrabold text-gray-900 text-safe">
           {t("CommunityMainPage.communityTitle")}

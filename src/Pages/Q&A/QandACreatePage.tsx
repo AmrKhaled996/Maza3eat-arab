@@ -12,11 +12,13 @@ import { createAdminQuestion } from "../../Apis/AdminApi";
 import cn from "../../utils/Cn";
 import { getSuggestedTags, type TagItem } from "../../Apis/TagsApi";
 import SubmissionConfirmModal from "../../Components/shared/SubmissionConfirmModal";
+import { useToast } from "../../Context/Toast";
 
 export default function QndACreatePage() {
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const navigate = useNavigate();
+  const {toast} = useToast();
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
   const queryClient = useQueryClient();
@@ -97,14 +99,16 @@ export default function QndACreatePage() {
       } else {
         const res = await createQuestion(title.trim(), content.trim(), tags);
         queryClient.invalidateQueries({ queryKey: ["questions"] });
+        toast.success(lang === "ar" ? "تم انشاء السؤال بنجاح" : "Question created successfully");
         if (res.data?.id) {
-          navigate(localizedPath(lang, `q&a/${res.data.id}`));
+          navigate(localizedPath(lang, `pending/question`));
         } else {
           navigate(localizedPath(lang, "q&a"));
         }
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || "Request failed");
+      toast.error(lang === "ar" ? "حدث خطأ ما ، لم يتم انشاء السؤال" : "Something went wrong , question not created");
     } finally {
       setSubmitting(false);
     }

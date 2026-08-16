@@ -32,9 +32,7 @@ export interface AuthUser {
 export async function getMe(): Promise<AuthUser> {
   const response = await axiosInstance.get<{ status: string; data: AuthUser }>(
     "/users/me",
-    {
-      _skipAuthRedirect: true,
-    } as never
+
   );
   return response.data.data;
 }
@@ -50,8 +48,5 @@ export async function logout(): Promise<void> {
  * Refreshes the access token using the refresh token cookie.
  */
 export async function refreshToken(): Promise<void> {
-  await axiosInstance.post("/auth/refresh-token", {
-    _skipAuthRedirect: true,
-    
-  });
+  await axiosInstance.post("/auth/refresh-token", {_skipAuthRedirect: true,});
 }

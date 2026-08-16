@@ -20,6 +20,7 @@ import type { Advertisement as ContentAdvertisement } from "../../Types/Advertis
 import AnswersSection from "../../Components/Answers/MainContainer";
 import { Title } from "react-head";
 import { playLikeSound } from "../../utils/sounds";
+import { Tag } from "../../Components/shared/Tag";
 
 export default function QandAPage() {
   const { id } = useParams<{ id: string }>();
@@ -144,12 +145,11 @@ export default function QandAPage() {
               {/* Tags */}
               <div className="flex flex-wrap gap-2 pt-2">
                 {question.tags.map((tag: any) => (
-                  <span
-                    key={tag.name}
-                    className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full"
-                  >
-                    #{tag.name}
-                  </span>
+                  <Tag
+                  label={`#${tag.name}`}
+                  dir="q&a"
+                  key={tag.name}
+                  />
                 ))}
               </div>
 

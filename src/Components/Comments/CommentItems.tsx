@@ -29,7 +29,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const { t } = useTranslation();
   const {user} = useAuth();
 
-  const [liked, setLiked] = useState(comment?.likedByMe);
+  const [liked, setLiked] = useState(comment?.likedByMe||comment?.islikedByMe);
   const [likes, setLikes] = useState(comment?.likesCount);
   const [isLiking, setIsLiking] = useState(false);
 
@@ -51,6 +51,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   
   const [searchParams] = useSearchParams();
   const HighlightedCommentID = searchParams.get("highlighted");
+  const [hasScrolledToHash, setHasScrolledToHash] = useState(false);
 
   const timeoutRef = useRef<number | null>(null);
 
@@ -68,6 +69,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
   const {
     data,
+    isLoading,
     isFetching,
     refetch,
   } = useGetCommentsReplies(comment?.id, nextCursor);
@@ -101,6 +103,8 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     } catch (error) {
       setLiked(wasLiked);
       setLikes(previousLikes);
+      console.error(error);
+      
     } finally {
       setIsLiking(false);
     }
@@ -237,12 +241,34 @@ export default function CommentItem({ comment }: { comment: Comment }) {
       setIsHighligthed(true);
     }
   }, [HighlightedCommentID]);
+
+  useEffect(() => {
+    if (hasScrolledToHash) return;
+  if (isLoading || !data) return;
+
+  const hash = window.location.hash;
+
+  if (!hash) return;
+
+  const element = document.getElementById(hash.substring(1));
+
+  if (!element) return;
+  setHasScrolledToHash(true);
+  
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+}, [data,isLoading]);
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={comment?.id}>
+    <div className="flex max-w-2xl  scroll-mt-20" dir="rtl" ref={rootRef} id={comment?.id} key={comment?.id}>
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       >
         <Avatar
+          name={comment?.author?.name}
           src={comment?.author?.avatar}
           className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
           style={{ outlineColor: comment?.author?.tier.badgeColor }}

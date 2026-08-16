@@ -39,6 +39,7 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
     } catch (error) {
       setLiked(wasLiked);
       setLikes(previousLikes);
+      console.error(error);
     }
   };
 
@@ -52,6 +53,7 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
         });
       } catch (err) {
         // User cancelled share
+        console.error("Failed to share:", err);
       }
     } else {
       // Fallback: copy to clipboard

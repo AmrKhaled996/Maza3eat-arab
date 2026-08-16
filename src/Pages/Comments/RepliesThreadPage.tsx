@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import ReplyItem from "../../Components/Comments/ReplyItem";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { Reply } from "../../Types/Reply";
-import HomeQandAPostsAdvertisement from "../../Components/Home/Q&ASection/Advertisement";
+import HomeQandAPostsAdvertisement from "../../Components/Home/Q&ASection/AdvertisementReplies";
 import QandAPopularQuestion from "../../Components/shared/PopularQuestion";
 import NavigationBar from "../../Components/shared/NavigationBar";
 import { localizedPath } from "../../i18n/paths";

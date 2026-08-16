@@ -2,6 +2,7 @@ import type { Post } from "../../../Types/Post";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
+import Avatar from "../../shared/Avatar";
 
 interface PostAuthorCardProps {
   post: Post | undefined;
@@ -21,10 +22,10 @@ export default function PostAuthorCard({ post }: PostAuthorCardProps) {
       className="flex items-start gap-3 hover:opacity-80 cursor-pointer transition-opacity"
       dir="rtl"
     >
-      <img
+      <Avatar
         src={post.author.avatar}
-        alt={post.author.name}
-        className="w-12 h-12 rounded-full object-cover ring-2 ring-white outline-3 shadow flex-shrink-0"
+        name={post.author.name}
+        className="w-12 h-12 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0"
         style={{ outlineColor: post.author.badgeColor }}
       />
       <div className="flex-1 min-w-0">

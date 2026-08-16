@@ -55,7 +55,7 @@ function GalleryCard({ img }: { img: GalleryImage }) {
         loading="lazy"
         decoding="async"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 }
@@ -93,7 +93,7 @@ function MarqueeRow({
 
 function DiscoverGallery() {
   const { t } = useTranslation("common");
-  const {lang} = useLocale();
+
 
   return (
     <section className="relative py-12 md:py-16 overflow-hidden bg-gray-50/60 [content-visibility:auto]">

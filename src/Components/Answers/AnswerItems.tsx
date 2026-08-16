@@ -24,6 +24,7 @@ import cn from "../../utils/Cn";
 import { CheckCircle2 } from "lucide-react";
 import { localizedPath } from "../../i18n/paths";
 import { useAuth } from "../../Context/Auth";
+import Avatar from "../shared/Avatar";
 
 export default function AnswerItem({ answer, isFirst = false }: { answer: Answer; isFirst?: boolean }) {
   const { lang } = useLocale();
@@ -52,6 +53,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
   const [searchParams] = useSearchParams();
 
   const HighlightedAnswerID = searchParams.get("highlighted");
+  const [hasScrolledToHash, setHasScrolledToHash] = useState(false);
 
   const timeoutRef = useRef<number | null>(null);
 
@@ -67,7 +69,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
 
   const { id: questionIdparam } = useParams<{ id: string }>();
 
-  const { data, isFetching, refetch } = useGetAnswersReplies(
+  const { data,isLoading, isFetching, refetch } = useGetAnswersReplies(
     answer?.id,
     nextCursor,
   );
@@ -118,6 +120,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
     } catch (error) {
       setVoted(previousVote);
       setVotes(previousTotal);
+      console.log(error)
     } finally {
       setIsVoting(false);
     }
@@ -300,13 +303,36 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
       setIsHighligthed(true);
     }
   }, [HighlightedAnswerID]);
+
+  
+    useEffect(() => {
+      if (hasScrolledToHash) return;
+    if (isLoading || !data) return;
+  
+    const hash = window.location.hash;
+  
+    if (!hash) return;
+  
+    const element = document.getElementById(hash.substring(1));
+  
+    if (!element) return;
+    setHasScrolledToHash(true);
+    
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [data,isLoading]);
   return (
     <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       > 
         <Link to={localizedPath(lang, `profile/${answer?.author?.id}`)}>
-          <img
+          <Avatar
+            name={answer?.author?.name}
             src={answer?.author?.avatar}
             className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30 cursor-pointer hover:opacity-90 transition-opacity"
             style={{ outlineColor: answer?.author?.tier.badgeColor }}

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../../i18n/useLocale";
 import { localizedPath } from "../../../i18n/paths";
 import PostsComments from "../../../assets/images/icons/PostComments";
+import Avatar from "../../shared/Avatar";
 
 function HomeCommunitySectionBigCard(props: Post) {
   const post: Post = props;
@@ -32,9 +33,9 @@ function HomeCommunitySectionBigCard(props: Post) {
       <div className="p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <img
+            <Avatar
               src={post?.author?.avatar}
-              alt={post?.author?.name}
+              name={post?.author?.name}
               style={{ outlineColor: post?.author?.badgeColor }}
               className={`w-9 h-9 rounded-full outline-3  object-cover ring-2 ring-white shadow`}
               loading="lazy"

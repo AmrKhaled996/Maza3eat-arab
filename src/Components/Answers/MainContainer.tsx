@@ -18,10 +18,10 @@ export default function AnswersSection() {
 
   const HighlightedAnswerID = searchParams.get("highlighted") || "";
 
-  if (!questionIdparam) return null;
+
 
   const { data, isLoading, isFetchingNextPage, fetchNextPage, isFetching } =
-    useGetAnswersByPostId(questionIdparam, nextCursor, HighlightedAnswerID);
+    useGetAnswersByPostId(questionIdparam ?? "", nextCursor, HighlightedAnswerID);
 
 
 
@@ -49,8 +49,6 @@ export default function AnswersSection() {
       setAnswers(allAnswers);
       setNextCursor(data?.pages[data?.pages.length - 1]?.nextCursor);
       console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
 

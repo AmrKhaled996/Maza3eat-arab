@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 
 function SearchHeroSection({
@@ -18,6 +18,7 @@ function SearchHeroSection({
   const [searchParams, setSearchParams] = useSearchParams();
   const search= searchParams.get("search") || "";
   const [searchval, setsearchval] = useState<string>(search);
+  const location = useLocation();
 
   const handleSearch = () => {
   
@@ -41,7 +42,7 @@ function SearchHeroSection({
 }, [search]);
 
   return (
-    <div className="h-[70vh] flex flex-col items-center justify-center ">
+    <div className="h-[70vh] flex flex-col items-center justify-center " key={location.pathname + location.search}>
       {/* Hero heading */}
       <div className="text-center mb-10 ">
         <h1 className="text-4xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-3">

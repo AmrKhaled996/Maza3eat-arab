@@ -10,7 +10,7 @@ export function useCommuintySearch(
   cursor: string ="",
 ) {
   return useInfiniteQuery({
-    queryKey: ["community-search-cursor"],
+    queryKey: ["community-search-cursor", searchTerm, sortBy],
     queryFn: ({ pageParam = cursor }) =>{
   
       if(pageParam){

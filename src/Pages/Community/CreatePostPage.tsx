@@ -29,6 +29,7 @@ import cn from "../../utils/Cn";
 import RichTextEditor from "../../Components/shared/RichTextEditor";
 import { getSuggestedTags, type TagItem } from "../../Apis/TagsApi";
 import SubmissionConfirmModal from "../../Components/shared/SubmissionConfirmModal";
+import { useToast } from "../../Context/Toast";
 
 const MAX_IMAGES = 6;
 
@@ -40,6 +41,7 @@ export default function CreatePostPage() {
   const { t } = useTranslation("common");
   const { lang } = useLocale();
   const navigate = useNavigate();
+  const {toast} = useToast();
   const location = useLocation();
   const fileInputId = useId();
   const isAdmin = location.pathname.includes("/admin");
@@ -186,14 +188,16 @@ export default function CreatePostPage() {
         const res = await createPost(formData);
         queryClient.invalidateQueries({ queryKey: ["posts"] });
         const id = res.data?.data?.id;
+        toast.success(lang === "ar" ? "تم انشاء المنشور بنجاح" : "Post created successfully");
         if (id) {
-          navigate(localizedPath(lang, `post/${id}`));
+          navigate(localizedPath(lang, `pending/post`));
         } else {
           navigate(localizedPath(lang, "community"));
         }
       }
     } catch (err) {
       setError(getCreatePostErrorMessage(err));
+      toast.error(lang === "ar" ? "حدث خطأ ما ، لم يتم انشاء المنشور" : "Something went wrong , post not created");
     } finally {
       setSubmitting(false);
     }

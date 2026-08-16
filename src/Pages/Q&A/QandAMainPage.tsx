@@ -48,8 +48,6 @@ function QandAMainPage() {
       const allQuestions = data.pages.flatMap((page: any) => page.questions);
       setQuestionsData(allQuestions);
       console.log("loading");
-      if (isFetching) {
-      }
     }
   }, [data]);
 

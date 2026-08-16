@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
-function QandAPopularQuestion({ limit }: { limit: number }) {
+function QandAPopularQuestion({ limit,location="" }: { limit: number,location?:string }) {
   const navigate = useNavigate(); 
   const { t } = useTranslation("common");
   const {lang} =useLocale(); 
@@ -13,7 +13,7 @@ function QandAPopularQuestion({ limit }: { limit: number }) {
   } = useHomePopularQuestions(limit);
 
   return (
-    <div className="bg-white rounded-3xl p-5 shadow-xs border border-gray-100 sticky top-28">
+    <div className={`bg-white rounded-3xl p-5 shadow-xs border border-gray-100 top-28 ${location!=="home" && "sticky"}`}>
       <h3 className="font-bold text-gray-900 mb-4 text-base">
         {t("home.qnaPopularTitle")}
       </h3>

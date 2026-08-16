@@ -2,10 +2,10 @@ import { ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Advertisement } from "../../../Types/Advertisement";
 
-function HomeQuestionsAdvertisement({ad}:{ad?:Advertisement}) {
+function HomeQandAPostsAdvertisement({ad}:{ad?:Advertisement}) {
   const { t } = useTranslation("common");
   return (
-    <div className="rounded-2xl py-5 px-8 text-white shadow-md relative overflow-hidden bg-linear-to-br from-[#22C55E] to-[#14B8A6] w-full  max-w-100 h-fit">
+    <div className="rounded-2xl py-5 px-8 text-white shadow-md relative overflow-hidden bg-linear-to-br advertisement2 w-100  max-w-100 h-fit">
       <span className="text-[10px] font-semibold uppercase text-white  mb-4 block ">
         {t("home.sponsored")}
       </span>
@@ -23,8 +23,8 @@ function HomeQuestionsAdvertisement({ad}:{ad?:Advertisement}) {
       <button 
        onClick={()=>{window.open(`${ad?.link}`, `_blank`)}}
       className="w-full bg-white text-sm font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 hover:cursor-pointer transition-opacity">
-        <span className="bg-white bg-linear-to-r from-[#22C55E] to-[#14B8A6] bg-clip-text text-transparent flex items-center gap-2 ">
-          {ad?.buttonText}
+        <span className="bg-white bg-linear-to-r  from-[#22C55E] to-[#14B8A6] bg-clip-text text-transparent flex items-center gap-2 ">
+          {ad?.buttonText||t("home.adCta")}{" "}
           <ArrowUpRight size={16} className=" text-[#22c55e]" />
         </span>
       </button>
@@ -32,4 +32,4 @@ function HomeQuestionsAdvertisement({ad}:{ad?:Advertisement}) {
   );
 }
 
-export default HomeQuestionsAdvertisement;
+export default HomeQandAPostsAdvertisement;

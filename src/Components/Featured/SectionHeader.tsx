@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 function SectionHeader({
   sortBy,
@@ -8,8 +9,9 @@ function SectionHeader({
   setSortBy: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const { t } = useTranslation("common");
+  const location = useLocation();
   return (
-    <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5">
+    <div className="flex flex-wrap items-start sm:items-center justify-between gap-4 mb-5" key={location.pathname + location.search}>
       <div>
         <h2 className="text-3xl font-extrabold text-gray-900">
           {t("FeaturedMainPage.featuredTitle")}

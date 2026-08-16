@@ -5,7 +5,7 @@ type AvatarProps = {
   src?: string | null;
   className?: string;
   style?: React.CSSProperties;
-};
+} & React.ImgHTMLAttributes<HTMLImageElement>;
 
 const colors = [
   "bg-red-500",
@@ -35,6 +35,7 @@ export default function Avatar({
   src,
   className = "h-10 w-10",
   style,
+  ...props
 }: AvatarProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -55,6 +56,7 @@ export default function Avatar({
           alt={name}
           className="h-full w-full object-cover"
           onError={() => setImageError(true)}
+          {...props}
         />
       ) : (
         <span>{initial}</span>
