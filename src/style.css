@@ -191,6 +191,12 @@ html[dir="rtl"] .footer-tagline {
   direction: ltr; /* force this regardless of page language */
   display: flex;
 }
+.force-ltr {
+  direction: ltr;
+}
+.force-rtl {
+  direction: rtl;
+}
 
 .animate-marquee-left {
   display: flex;
@@ -274,10 +280,6 @@ html[dir="ltr"] .scrollSlider {
 .quill-container {
   @apply transition-all duration-200;
 }
-
-/* .quill-container:focus-within {
-  @apply ring-2 ring-primary/20;
-} */
 
 .quill-container .ql-toolbar.ql-snow {
   @apply border border-gray-200 bg-gray-50/50 px-4 py-3;

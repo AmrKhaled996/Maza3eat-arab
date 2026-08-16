@@ -19,7 +19,7 @@ import {
 } from "../../Apis/CommentsApi/Comment";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
 import { useAuth } from "../../Context/Auth";
 import Avatar from "../shared/Avatar";
@@ -28,6 +28,9 @@ export default function CommentItem({ comment }: { comment: Comment }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
   const {user} = useAuth();
+  const location = useLocation();
+  const HighlightedReply = location.state?.reply;
+  const HighlightedReplyParentId = location.state?.commentId;
 
   const [liked, setLiked] = useState(comment?.likedByMe||comment?.islikedByMe);
   const [likes, setLikes] = useState(comment?.likesCount);
@@ -67,12 +70,14 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
   const { id: postIdparam } = useParams<{ id: string }>();
 
+   
+
   const {
     data,
     isLoading,
     isFetching,
     refetch,
-  } = useGetCommentsReplies(comment?.id, nextCursor);
+  } = useGetCommentsReplies(comment?.id, nextCursor,HighlightedCommentID ?? "");
 
   const Highlight = () => {
     if (comment?.id === HighlightedCommentID) {
@@ -236,7 +241,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     }
   }, [data]);
   useEffect(() => {
-    if (HighlightedCommentID === comment?.id) {
+    if (HighlightedReplyParentId === comment?.id) {
       setShowReplies(true);
       setIsHighligthed(true);
     }
@@ -325,7 +330,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
           >
             {IsHighligthed && (
               <div 
-              className={`absolute inset-x-30 inset-80 top-0 h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_100_100ms_forwards] `} />
+              className={`absolute inset-x-30 inset-80 top-0 h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_8_100ms_forwards] `} />
             )}
           <div className="flex gap-2 items-center">
             <span className="font-bold">{comment?.author?.name}</span>
@@ -462,6 +467,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
 
             {showReplies && (
               <div className="mt-3  ">
+                { HighlightedReply && HighlightedReplyParentId === comment.id && <ReplyItem key={HighlightedReply.id} reply={HighlightedReply} />}
                 {replies?.map((r, index) => {
                   return (
                     <div

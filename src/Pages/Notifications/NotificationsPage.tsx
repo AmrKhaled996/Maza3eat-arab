@@ -323,7 +323,7 @@ export default function NotificationsPage() {
     }
 
     // Navigate to the notification detail for all types (server marks it read)
-    if(n.type === "ANSWER" || n.type === "COMMENT" || n.type === "COMMENT_REPLY" || n.type === "COMMENT_REPLY_REPLY" || n.type === "ANSWER_REPLY" || n.type === "ANSWER_REPLY_REPLY"){
+    if(n.type === "ANSWER" || n.type === "COMMENT" || n.type === "COMMENT_REPLY" || n.type === "COMMENT_REPLY_REPLY" || n.type === "ANSWER_REPLY" || n.type === "ANSWER_REPLY_REPLY"|| n.type === "POST_LIKE" || n.type === "QUESTION_LIKE"){
 
   await fetchNotificationById(n.id).then((res:any) => {
 
@@ -340,11 +340,11 @@ export default function NotificationsPage() {
             );
           case "COMMENT_REPLY":
             return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}#${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply,commentId: res?.notification?.comment?.id}})
             );
             case "ANSWER_REPLY":
             return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}#${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply}})
             );
             case "COMMENT_REPLY_REPLY":
               return (
@@ -354,12 +354,20 @@ export default function NotificationsPage() {
             return (
               navigate(localizedPath(lang, `post/${res?.notification?.postId}`),{state:{reply: res?.notification?.parentReply}})
             );
+          case "POST_LIKE":
+            return (
+              navigate(localizedPath(lang, `post/${res?.notification?.postId}#like`))
+            );
+          case "QUESTION_LIKE":
+            return (
+              navigate(localizedPath(lang, `post/${res?.notification?.questionId}#like`))
+            );
           default:
             return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));
       }
     })
   }
-  return navigate(localizedPath(lang, `notifications/${n.id}`));
+  else return navigate(localizedPath(lang, `notifications/${n.id}`));
   };
 
   return (

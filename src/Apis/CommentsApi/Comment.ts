@@ -63,10 +63,13 @@ export async function getCommentsByPostId(
 export async function getCommentRepliesWithCursor(
   commentId: string,
   cursor: string,
+  excludeReplyId?: string,
 ) {
   try {
     const response = await axiosInstance.get(`/comments/${commentId}/replies`, {
-      params: { cursor: cursor },
+      params: excludeReplyId
+        ? { cursor: cursor, excludeReplyId: excludeReplyId }
+        : { cursor: cursor },
     });
 
     return response.data.data;
@@ -80,9 +83,15 @@ export async function getCommentRepliesWithCursor(
     throw error;
   }
 }
-export async function getCommentReplies(commentId: string) {
+export async function getCommentReplies(commentId: string,
+  excludeReplyId?: string
+) {
   try {
-    const response = await axiosInstance.get(`/comments/${commentId}/replies`);
+    const response = await axiosInstance.get(`/comments/${commentId}/replies`, {
+      params: excludeReplyId
+        ? { excludeReplyId: excludeReplyId }
+        : {},
+    });
 
     return response.data.data;
   } catch (error) {

@@ -256,6 +256,8 @@ export default function NotificationDetailPage() {
         };
       case "POST_APPROVAL":
       case "QUESTION_APPROVAL":
+      case "POST_LIKE":
+      case "QUESTION_LIKE":
         return {
           icon: <CheckCircle2 className="h-6 w-6 text-white" />,
           bgColor: "bg-green-500",
@@ -382,10 +384,15 @@ export default function NotificationDetailPage() {
               ) : (
                 <p className="text-lg leading-relaxed text-gray-600">
                   {lang === "ar"
-                    ? notification.type === "POST_APPROVAL"
+                    ?
+                     notification.type === "POST_APPROVAL"
                       ? "تمت الموافقة على منشورك بنجاح من قبل فريق الإدارة. يمكنك الآن الاطلاع عليه والتفاعل مع الأعضاء."
                       : notification.type === "QUESTION_APPROVAL"
                       ? "تمت الموافقة على سؤالك بنجاح من قبل فريق الإدارة."
+                      : notification.type === "POST_LIKE"
+                      ? "تم وضع أعجاب على منشورك من قبل زائر او اكثر."
+                      : notification.type === "QUESTION_LIKE"
+                      ? "تم وضع أعجاب على سؤالك من قبل زائر او اكثر."
                       : notification.type === "POST_REJECTION"
                       ? "تم رفض منشورك من قبل فريق الإدارة."
                       : notification.type === "QUESTION_REJECTION"
@@ -399,6 +406,10 @@ export default function NotificationDetailPage() {
                     ? "Your post has been successfully approved by the administration team. You can view it now and interact with other members."
                     : notification.type === "QUESTION_APPROVAL"
                     ? "Your question has been successfully approved by the administration team."
+                    : notification.type === "POST_LIKE"
+                    ? "You have received a like from a visitor or more."
+                    : notification.type === "QUESTION_LIKE"
+                    ? "You have received a like from a visitor or more."
                     : notification.type === "POST_REJECTION"
                     ? "Your post was rejected by the administration team."
                     : notification.type === "QUESTION_REJECTION"

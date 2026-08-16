@@ -1,5 +1,5 @@
 import { Heart, Share2, Bookmark } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Post } from "../../../Types/Post";
 import  { likeToPost } from "../../../Apis/PostsApi/actionPost";
@@ -70,12 +70,31 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
     setIsSaved(!isSaved);
   };
 
+  useEffect(() => {
+
+  const hash = window.location.hash;
+
+  if (!hash) return;
+
+  const element = document.getElementById(hash.substring(1));
+
+  if (!element) return;
+  
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+}, [])
+
   return (
     <div className="bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-xs flex gap-3 justify-between">
       {/* Like Button */}
       <button
         onClick={handleLike}
         aria-pressed={liked}
+        id={"like"}
         className={`group flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-full font-bold text-sm transition-all duration-300 cursor-pointer active:scale-95 ${
           liked
             ? "bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-lg shadow-red-500/20"

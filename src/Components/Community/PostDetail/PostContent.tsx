@@ -1,6 +1,7 @@
 import type { Post } from "../../../Types/Post";
 import { Tag } from "../../../Components/shared/Tag";
 import "react-quill-new/dist/quill.snow.css";
+import { useLocale } from "../../../i18n/useLocale";
 
 interface PostContentProps {
   post: Post | undefined;
@@ -8,6 +9,7 @@ interface PostContentProps {
 }
 
 export default function PostContent({ post, hideTitle = false }: PostContentProps) {
+  const { lang } = useLocale();
   if (!post) {
     return null;
   }
@@ -20,10 +22,18 @@ export default function PostContent({ post, hideTitle = false }: PostContentProp
       )}
 
       {/* Content */}
-      <div className="ql-snow">
+      <div className="ql-snow ">
         <div
-          className="text-gray-700 leading-relaxed break-words ql-editor min-h-[200px] select-text"
-          dir="auto"
+          className={`text-gray-700 leading-relaxed wrap-break-word ql-editor min-h-[200px] select-text scrollbar-hide  prose prose-sm max-w-none
+    ${lang === "ar" ? "text-right prose-ul:pr-6 prose-ol:pr-6 prose-ul:pl-0 prose-ol:pl-0  " : "text-left force-ltr"}
+    leading-8
+    prose-p:my-2
+    prose-p:leading-8
+    prose-li:my-2
+    prose-li:leading-8`}
+
+          data-gramm="false"
+          data-value="left"
           style={{ padding: 0, border: "none" }}
           dangerouslySetInnerHTML={{ __html: post.content }}
         />

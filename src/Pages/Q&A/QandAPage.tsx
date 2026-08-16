@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -53,6 +53,26 @@ export default function QandAPage() {
     }
   };
 
+
+  
+  useEffect(() => {
+  
+    const hash = window.location.hash;
+  
+    if (!hash) return;
+  
+    const element = document.getElementById(hash.substring(1));
+  
+    if (!element) return;
+    
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [])
+  
   if (isQuestionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
@@ -80,6 +100,9 @@ export default function QandAPage() {
       </div>
     );
   }
+
+
+
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
@@ -159,6 +182,7 @@ export default function QandAPage() {
                   {/* Like Button */}
                   <button
                     onClick={handleLikeToggle}
+                    id="like"
                     className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer hover:text-red-500 ${
                       question.likedByMe ? "text-red-500" : ""
                     }`}

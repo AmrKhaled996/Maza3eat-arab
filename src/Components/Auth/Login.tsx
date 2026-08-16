@@ -1,9 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../Hooks/Auth";
 import { useState } from "react";
+import { localizedPath } from "../../i18n/paths";
+import { Link, useNavigate } from "react-router-dom";
+import { useLocale } from "../../i18n/useLocale";
 
 export default function Login() {
   const { t } = useTranslation("common");
+  const {lang}=useLocale();
+  const navigate =useNavigate();
   const { login } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -49,17 +54,27 @@ export default function Login() {
               </h1>
 
               {/* Logo */}
-              <div className="flex items-center gap-2 mt-2">
-                <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
-                  <path
-                    d="M14 2L17.5 7.5L24 6L22 12.5L28 16L22 19.5L24 26L17.5 24.5L14 30L10.5 24.5L4 26L6 19.5L0 16L6 12.5L4 6L10.5 7.5Z"
-                    fill="#2563eb"
-                  />
-                </svg>
-                <span className="font-extrabold text-xl text-primary tracking-tight">
-                  Loooogooo
-                </span>
-              </div>
+              <div
+                        onClick={()=>navigate(localizedPath(lang, ""))}
+                        className={`flex items-center gap-2 transition-colors  duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer`}
+                      >
+                        <img
+                          src="/logo-v3.gif"
+                          alt="logo"
+                          className="w-16 h-16"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <Link to={localizedPath(lang, "")} >
+                          <img
+                          src="/logo-new.png"
+                          alt="logo"
+                          className="w-16 h-16 "
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        </Link>
+                      </div>
             </div>
 
             {/* Google Sign-in Button */}

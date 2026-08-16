@@ -36,9 +36,9 @@ export default function ReplyItem({
   const { lang } = useLocale();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const {toast} = useToast();
-  const {user} =useAuth()
-
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isDeleted, setIsDeleted] = useState(false);
   const [liked, setLiked] = useState(Boolean(reply?.likedByMe));
   const [likes, setLikes] = useState(reply?.likesCount);
   const [isLiking, setIsLiking] = useState(false);
@@ -60,9 +60,11 @@ export default function ReplyItem({
   const [pageCursor, setPageCursor] = useState("");
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
-  const [searchParams] = useSearchParams();
+  const highlightRef = useRef<HTMLDivElement>(null);
 
-  const HighlightedCommentID = searchParams.get("highlighted");
+  const [searchParams] = useSearchParams();
+  const HighlightedReplyID = searchParams.get("highlighted");
+  const [hasScrolledToHash, setHasScrolledToHash] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,14 +79,12 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching  } = useGetReplyReplies(reply?.id, pageCursor);
+  const { data, isFetching, isLoading } = useGetReplyReplies(reply?.id, pageCursor);
 
   const Highlight = () => {
-    if (reply?.id === HighlightedCommentID) {
-      // setIsHighligthed(true);
+    if (reply?.id === HighlightedReplyID) {
       return "border-blue-300 bg-sky-100";
     } else {
-      // setIsHighligthed(false);
       return "border-[#E5E7EB] bg-[#f7f7f7]";
     }
   };
@@ -135,7 +135,7 @@ export default function ReplyItem({
       setIsSubmitting(true);
 
       const response = await createReplyToReply(content, reply?.id);
-      
+
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
       setShowReplies(true);
@@ -146,7 +146,6 @@ export default function ReplyItem({
     } finally {
       setIsSubmitting(false);
       setReplying(false);
-      
     }
   };
 
@@ -157,7 +156,6 @@ export default function ReplyItem({
       setIsDeleting(true);
 
       await deleteReply(reply.id);
-      setReplies((prev) => [ ...prev.filter((r) => r.id !== reply.id) ]);
       setOpenDeleteDialog(false);
     } catch (err) {
       console.error(err);
@@ -246,11 +244,12 @@ export default function ReplyItem({
     return () => observer.disconnect();
   }, [rootRef, replying]);
 
-
   useEffect(() => {
     if (data) {
       setReplies((prev) =>
-        pageCursor ? [...prev, ...(data?.replies ?? [])] : (data?.replies ?? []),
+        pageCursor
+          ? [...prev, ...(data?.replies ?? [])]
+          : (data?.replies ?? []),
       );
       setNextCursor(data?.nextCursor ?? "");
       setHasMoreReplies(!!data?.hasMore);
@@ -258,12 +257,34 @@ export default function ReplyItem({
   }, [data]);
 
   useEffect(() => {
-    if (HighlightedCommentID === reply?.id) {
+    if (HighlightedReplyID === reply?.id) {
+      setShowReplies(true);
       setIsHighligthed(true);
     }
-  }, []);
+  }, [HighlightedReplyID]);
+
+    useEffect(() => {
+      if (hasScrolledToHash) return;
+    if (isLoading || !data) return;
+  
+    const hash = window.location.hash;
+  
+    if (!hash) return;
+  
+    const element = document.getElementById(hash.substring(1));
+  
+    if (!element) return;
+    setHasScrolledToHash(true);
+    
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [data,isLoading])
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
+    <div className={`flex max-w-2xl scroll-mt-40 `} dir="rtl" ref={rootRef} id={reply?.id}>
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
         <Avatar
           src={reply?.author?.avatar}
@@ -288,7 +309,7 @@ export default function ReplyItem({
                   <svg
                     key={index}
                     width={41}
-                    height={repliesRef.current[index]?.offsetHeight}
+                    height={repliesRef.current[index]?.offsetHeight+8}
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -313,16 +334,19 @@ export default function ReplyItem({
       </div>
 
       <div className="flex-1 relative">
-        {IsHighligthed && (
-          <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />
-        )}
         {/* bubble */}
         <div
+          ref={highlightRef}
           className={cn(
-            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
+            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20 relative`,
             Highlight(),
           )}
         >
+          {IsHighligthed && (
+            <div
+              className={`absolute top-1/2 inset-x-30 inset-80  h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_8_100ms_forwards] `}
+            />
+          )}
           <div className="flex gap-2 items-center">
             <span className="font-bold">{reply?.author?.name}</span>
             <Badge
@@ -357,17 +381,19 @@ export default function ReplyItem({
             {likes}
           </button>
 
-          {user?.id && <button
-            onClick={() => {
-              setReplying(!replying);
-            }}
-            className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
-          >
-            <Reply
-              className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
-            />
-            {t("comments.reply")}
-          </button>}
+          {user?.id && (
+            <button
+              onClick={() => {
+                setReplying(!replying);
+              }}
+              className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
+            >
+              <Reply
+                className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
+              />
+              {t("comments.reply")}
+            </button>
+          )}
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
               reply?.permissions?.canReport) && (
@@ -390,7 +416,7 @@ export default function ReplyItem({
             )}
 
             {openMoreMenu && (
-              <div className="absolute right-0 bottom-full mb-2 w-40 rounded-lg  bg-white shadow-lg">
+              <div className="absolute right-0 bottom-full mb-2 w-40 rounded-lg  bg-white shadow-lg z-20">
                 {reply?.permissions?.canReport && (
                   <button
                     onClick={() => setOpenReportDialog(true)}
