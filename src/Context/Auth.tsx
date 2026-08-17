@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       const me = await getMe();
-      console.log("me",me)
       setUser(me);
     } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setUser(null);

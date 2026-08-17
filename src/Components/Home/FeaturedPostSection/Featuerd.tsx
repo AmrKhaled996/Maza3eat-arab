@@ -9,7 +9,6 @@ import HomeFeaturedPostsSectionMoreButton from "./MoreButton";
 
 function FeaturedPosts({ad}:{ad?:Advertisement}) {
   const { data: posts, isLoading } = useHomeFeatured();
-  // console.log("featuerd: ", posts);
   return (
     <HomeFeaturedPostsLayout>
       {/* Main grid */}

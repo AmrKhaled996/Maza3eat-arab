@@ -54,7 +54,7 @@ function parseMarkdown(text: string) {
     // Bullet list
     if (trimmed.startsWith("- ")) {
       return (
-        <li key={idx} className="ms-6 list-disc text-gray-700 my-1">
+        <li key={idx} className="ms-6 list-disc text-gray-700 my-1" style={{listStyleType: "none",paddingInline:0}}>
           {parseInlineMarkdown(trimmed.slice(2))}
         </li>
       );

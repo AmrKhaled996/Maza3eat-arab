@@ -4,6 +4,7 @@ import { getModerators, promoteToModerator, demoteModerator } from "../../Apis/A
 import { ShieldCheck, ArrowUpRight, ArrowDownRight, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function AdminModeratorsPage() {
   const { t } = useTranslation();
@@ -170,7 +171,7 @@ export default function AdminModeratorsPage() {
                   <tr key={`${i}-${user.id}`} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                        <Avatar src={user.avatar} name={user.name} className="w-10 h-10 rounded-full object-cover bg-gray-100" />
                         <div>
                           <div className="font-semibold text-gray-900">{user.name}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>

@@ -1,3 +1,4 @@
+import type { Post } from "../Types/Post";
 import { axiosInstance } from "./axiosInstance";
 
 export const getAdminUsers = async (status: "active" | "banned", cursor?: string | null) => {
@@ -40,9 +41,9 @@ export const deletePost = async (postId: string) => {
   return data.data;
 };
 
-export const getAdminQuestions = async (status: "PENDING" | "APPROVED", cursor?: string | null) => {
+export const getAdminQuestions = async (status: "PENDING" | "APPROVED", cursor?: string | null,searchQuery?: string) => {
   const { data } = await axiosInstance.get(`/admin/questions`, {
-    params: { status: status.toLowerCase(), cursor },
+    params: { status: status.toLowerCase(), cursor, search: searchQuery || undefined },
   });
   return data.data;
 };
@@ -150,8 +151,28 @@ export const getAdminUserById = async (userId: string) => {
 };
 
 export const getAdminPostById = async (postId: string) => {
-  const { data } = await axiosInstance.get(`/admin/posts/${postId}`);
-  return data.data;
+  const { data:postsData } = await axiosInstance.get(`/admin/posts/${postId}`);
+  const data = postsData.data as any;
+   return {
+                  id: postId,
+                  title: data.title,
+                  content: data.content,
+                  likesCount: data.likesCount,
+                  commentsCount: data.commentsCount,
+                  tags: data.tags,
+                  image: {
+                      url: data.images?.[0]?.imageUrl || "",
+                      name: data.images?.[0]?.originalName || "",
+                      remainingImages: Math.max((data.images?.length || 1) - 1, 0),
+                  },
+                  images: (data.images ?? []).map(
+                      (img: { imageUrl: string }) => img.imageUrl,
+                  ),
+                  author: data.author,
+                  publishDate: data.publishDate,
+                  likedByMe: data.likedByMe,
+                  status: data.status
+              } as Post;
 };
 
 export const createAdminPost = async (formData: FormData) => {

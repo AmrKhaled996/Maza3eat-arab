@@ -120,7 +120,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
     } catch (error) {
       setVoted(previousVote);
       setVotes(previousTotal);
-      console.log(error)
+      console.error(error)
     } finally {
       setIsVoting(false);
     }
@@ -240,12 +240,6 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
       setIsReporting(true);
 
       await reportAnswers(answer.id, reason);
-      console.log(
-        "the report is reported with id:",
-        answer.id,
-        "reason:",
-        reason,
-      );
       setReportingError("");
       setOpenReportDialog(false);
     } catch (err) {

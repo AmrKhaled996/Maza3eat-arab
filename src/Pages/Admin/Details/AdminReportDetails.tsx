@@ -8,6 +8,7 @@ import { safeFormatDate } from "../../../utils/DateFormater";
 import ConfirmModal from "../../../Components/shared/ConfirmModal";
 import { localizedPath } from "../../../i18n/paths";
 import { useLocale } from "../../../i18n/useLocale";
+import Avatar from "../../../Components/shared/Avatar";
 
 export default function AdminReportDetails() {
   const { id } = useParams();
@@ -158,7 +159,7 @@ export default function AdminReportDetails() {
                      <User className="w-4 h-4" /> {lang === "ar" ? "طلب تواصل" : "Contact Request"}
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                     <img src={report.contactRequest.requester?.avatar} alt="" className="w-12 h-12 rounded-full object-cover" />
+                     <Avatar src={report.contactRequest.requester?.avatar} name={report.contactRequest.requester?.name} className="w-12 h-12 rounded-full object-cover" />
                      <div>
                        <div className="font-bold text-gray-900">{report.contactRequest.requester?.name}</div>
                        <div className="text-sm text-gray-500">{report.contactRequest.reason}</div>
@@ -179,7 +180,7 @@ export default function AdminReportDetails() {
                to={localizedPath(lang, `profile/${report.reporter?.id || report.reporterId}`)}
                className="flex items-center gap-3 pt-2 group"
              >
-               <img src={report.reporter?.avatar} alt="" className="w-10 h-10 rounded-full object-cover border border-gray-100" />
+               <Avatar src={report.reporter?.avatar} name={report.reporter?.name} className="w-10 h-10 rounded-full object-cover border border-gray-100" />
                <div>
                  <div className="font-medium text-gray-900 group-hover:text-primary group-hover:underline">{report.reporter?.name}</div>
                  <div className="text-xs text-gray-500">{report.reporter?.email}</div>

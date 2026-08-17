@@ -344,7 +344,7 @@ export default function NotificationsPage() {
             );
             case "ANSWER_REPLY":
             return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply}})
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply,answerId: res?.notification?.answer?.id}})
             );
             case "COMMENT_REPLY_REPLY":
               return (
@@ -352,7 +352,7 @@ export default function NotificationsPage() {
               );
           case "ANSWER_REPLY_REPLY":
             return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}`),{state:{reply: res?.notification?.parentReply}})
+              navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.notification?.parentReply}})
             );
           case "POST_LIKE":
             return (
@@ -360,7 +360,7 @@ export default function NotificationsPage() {
             );
           case "QUESTION_LIKE":
             return (
-              navigate(localizedPath(lang, `post/${res?.notification?.questionId}#like`))
+              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}#like`))
             );
           default:
             return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));

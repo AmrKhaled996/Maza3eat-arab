@@ -27,7 +27,8 @@ export default function AdminPostDetails() {
     queryKey: ["adminPost", id],
     queryFn: () => getAdminPostById(id!),
     enabled: !!id,
-  });
+  }) as any;
+  console.log("post",post)
 
   const approveMutation = useMutation({
     mutationFn: () => updatePostStatus(id!, "APPROVED"),

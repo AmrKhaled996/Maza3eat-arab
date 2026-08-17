@@ -11,23 +11,23 @@ interface RichTextEditorProps {
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ direction: "rtl" }, { align: [] }],
-    ["link", "clean"],
+    // [{ list: "ordered" }, { list: "bullet" }],
+    // [{ direction: "rtl" }],
+    [{ align: [] }],
+    ["link"],
+    ["bold", "italic", "underline"],
   ],
 };
 
 const formats = [
-  "header",
   "bold",
   "italic",
   "underline",
-  "strike",
+  "header",
   "list",
-  "link",
   "direction",
   "align",
+  "link",
 ];
 
 export default function RichTextEditor({
@@ -45,6 +45,7 @@ export default function RichTextEditor({
       formats={formats}
       placeholder={placeholder}
       className={className}
+      
     />
   );
 }

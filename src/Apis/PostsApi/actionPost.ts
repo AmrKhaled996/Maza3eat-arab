@@ -2,7 +2,6 @@ import type { AxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 
 export async function likeToPost(postId: string) {
-        console.log("postid in here:",postId)
   try {
     return axiosInstance.post(`/posts/${postId}/like`);
   } catch (error) {
@@ -16,7 +15,6 @@ export async function likeToPost(postId: string) {
   }
 }
 export async function unlikeToPost(postId: string) {
-    console.log("postid in here:",postId)
   try {
     return axiosInstance.delete(`/posts/${postId}/like`);
   } catch (error) {

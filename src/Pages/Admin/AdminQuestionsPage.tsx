@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminQuestions, updateQuestionStatus, deleteQuestion } from "../../Apis/AdminApi";
-import { CheckCircle, Trash2, Eye } from "lucide-react";
+import { CheckCircle, Trash2, Eye, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
@@ -14,13 +14,14 @@ export default function AdminQuestionsPage() {
   const navigate = useNavigate();
   const { lang } = useLocale();
   const [statusTab, setStatusTab] = useState<"PENDING" | "APPROVED">("PENDING");
+  const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
 
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; type: "approve" | "delete"; questionId: string | null }>({ isOpen: false, type: "approve", questionId: null });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
-    queryKey: ["adminQuestions", statusTab],
-    queryFn: ({ pageParam }) => getAdminQuestions(statusTab, pageParam as string | null),
+    queryKey: ["adminQuestions", statusTab, searchQuery],
+    queryFn: ({ pageParam }) => getAdminQuestions(statusTab, pageParam as string | null,searchQuery),
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.nextCursor : undefined,
   });
@@ -48,12 +49,24 @@ export default function AdminQuestionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">{t("admin.questionsManagement")}</h2>
+         <div className="flex items-center gap-3">
+        <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder={t("admin.searchPosts", "Search posts...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm w-full sm:w-64"
+            />
+          </div>
         <button
           onClick={() => navigate(localizedPath(lang, "admin/questions/create"))}
           className="px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors"
         >
           + {t("admin.createQuestion", "Create Question")}
         </button>
+        </div>
       </div>
 
       <div className="flex gap-4 border-b border-gray-200">

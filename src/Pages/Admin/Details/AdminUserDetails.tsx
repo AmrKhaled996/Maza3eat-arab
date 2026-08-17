@@ -6,6 +6,7 @@ import { ArrowLeft, User, Calendar, Shield, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { localizedPath } from "../../../i18n/paths";
 import { useLocale } from "../../../i18n/useLocale";
+import Avatar from "../../../Components/shared/Avatar";
 
 export default function AdminUserDetails() {
   const { id } = useParams();
@@ -33,7 +34,7 @@ export default function AdminUserDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-            <img src={user.avatar} alt={user.name} className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-50 shadow-sm" />
+            <Avatar src={user.avatar} name={user.name} className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-50 shadow-sm" />
             <h3 className="mt-4 text-xl font-bold text-gray-900">{user.name}</h3>
             <p className="text-gray-500">{user.email}</p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 function HomeCommunitySectionAdd({ className ,ad }: { className?: string ,ad?:Advertisement }) {
     const { t } = useTranslation("common");
-    console.log("the ad", ad)
+
   return (
     <div className={`rounded-2xl h-fit mb-5 py-5 px-5 text-white shadow-md relative overflow-hidden bg-linear-to-br secondary-gradient  ${className}`}>
       <span className="text-[10px] font-semibold uppercase text-white  mb-4 block ">

@@ -35,7 +35,7 @@ export default function StoryMissionVision() {
           <ul className="space-y-2">
             {(["ourMissionPoint1", "ourMissionPoint2", "ourMissionPoint3"] as const).map(
               (key) => (
-                <li key={key} className="flex items-start gap-2 text-gray-600 text-[15px]">
+                <li key={key} className="flex items-start gap-2 text-gray-600 text-[15px]" style={{listStyleType: "none",paddingInline:0}}>
                   <CheckCircle size={18} className="text-green-500 mt-0.5 shrink-0" />
                   {t(`about.${key}`)}
                 </li>

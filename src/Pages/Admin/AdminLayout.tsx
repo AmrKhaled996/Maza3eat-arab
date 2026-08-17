@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../../Context/Auth";
 import { localizedPath } from "../../i18n/paths";
 import cn from "../../utils/Cn";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function AdminLayout() {
   const { t, i18n } = useTranslation();
@@ -77,7 +78,7 @@ export default function AdminLayout() {
         <div className="p-3 border-t border-gray-200 space-y-2">
           <div className="flex items-center gap-3 px-2">
             {user?.avatar ? (
-              <img src={user.avatar} alt="admin" className="w-8 h-8 rounded-full object-cover shadow-sm border border-gray-100" />
+              <Avatar src={user.avatar} name="admin" className="w-8 h-8 rounded-full object-cover shadow-sm border border-gray-100" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-gray-200" />
             )}

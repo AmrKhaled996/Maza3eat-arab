@@ -331,7 +331,9 @@ export default function CreatePostPage() {
             />
           </div>
 
-          <div className="quill-container">
+          <div className="quill-container"
+            dir={lang === "ar" ? "rtl" : "ltr"}
+          >
             <label className="mb-2 block text-sm font-bold text-gray-800">
               {t("createPost.contentLabel")}
             </label>
@@ -339,7 +341,8 @@ export default function CreatePostPage() {
               value={content}
               onChange={setContent}
               placeholder={t("createPost.contentPlaceholder")}
-              className="rounded-xl bg-white"
+              className={`rounded-xl bg-white   `}
+              
             />
           </div>
 

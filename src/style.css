@@ -193,6 +193,7 @@ html[dir="rtl"] .footer-tagline {
 }
 .force-ltr {
   direction: ltr;
+
 }
 .force-rtl {
   direction: rtl;
@@ -301,7 +302,8 @@ html[dir="ltr"] .scrollSlider {
   @apply border-primary;
 }
 
-.quill-container .ql-editor {
+  
+.quill-container .ql-editor html[dir="ltr"] {
   @apply px-6 py-5;
   min-height: 350px;
   font-size: 1.05rem;
@@ -309,6 +311,17 @@ html[dir="ltr"] .scrollSlider {
   direction: auto;
   text-align: inherit;
 }
+
+.quill-container[dir="rtl"] .ql-editor {
+  direction: rtl;
+  text-align: right;
+}
+
+.quill-container[dir="ltr"] .ql-editor {
+  direction: ltr;
+  text-align: left;
+}
+
 
 .quill-container .ql-editor.ql-blank::before {
   @apply left-6 right-6 font-normal not-italic text-gray-400;
@@ -347,6 +360,7 @@ html[dir="ltr"] .scrollSlider {
   height: auto;
   overflow-y: visible;
   padding: 0;
+  direction:rtl ;
 }
 
 .ql-editor p {
@@ -358,30 +372,28 @@ html[dir="ltr"] .scrollSlider {
   margin-bottom: 0.75rem;
   font-weight: 700;
 }
+li{
+    list-style-type: disc;
+    padding-inline:1.5rem ;
+}
 
-.ql-editor ul, .ql-editor ol {
+.ql-editor ul,
+.ql-editor ol {
+
   padding-left: 1.5rem;
   margin-bottom: 1rem;
 }
 
-html[dir="rtl"] .ql-editor ul, 
+html[dir="rtl"] .ql-editor ul,  
 html[dir="rtl"] .ql-editor ol {
-  padding-left: 0;
+  padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
 
-/* RTL improvements for Quill */
-[dir="rtl"] .ql-snow .ql-picker:not(.ql-direction) {
-  direction: ltr; /* Keep dropdowns LTR */
-}
-[dir="rtl"] .ql-snow .ql-picker:not(.ql-direction) .ql-picker-label {
-  padding: 2px 8px 2px 2px;
-}
-
-[dir="rtl"] .ql-editor ol,
+[dir="rtl"] .ql-editor ol, 
 [dir="rtl"] .ql-editor ul {
   padding-right: 1.5em;
-  padding-left: 0;
+  padding-left:1.5rem;
 }
 
 [dir="rtl"] .ql-editor li:not(.ql-direction-rtl) {
@@ -396,7 +408,6 @@ html[dir="rtl"] .ql-editor ol {
   text-align: right;
 }
 
-/* Fixes list bullet/number position */
 .ql-editor ol li:not(.ql-direction-rtl),
 .ql-editor ul li:not(.ql-direction-rtl) {
   padding-left: 1.5em;

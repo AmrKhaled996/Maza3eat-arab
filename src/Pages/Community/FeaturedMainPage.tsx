@@ -48,7 +48,6 @@ export default function FeaturedMainPage() {
     if (data) {
       const allPosts = data.pages.flatMap((page: any) => page.posts);
       setPostsData(allPosts);
-      console.log("loading");
     }
   }, [data]);
 
@@ -60,7 +59,6 @@ export default function FeaturedMainPage() {
 
   // Update searchLoading state based on isFetching
   useEffect(() => {
-    console.log("fetching");
     if (isFetchingNextPage||isLoading) return;
     setSearchLoading(isFetching);
   }, [isFetching]);

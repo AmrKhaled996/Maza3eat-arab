@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminPosts, updatePostStatus, deletePost } from "../../Apis/AdminApi";
-import { CheckCircle, Trash2, Eye, Search } from "lucide-react";
+import {  Trash2, Eye, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import { safeFormatDate } from "../../utils/DateFormater";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function AdminPostsPage() {
   const { t } = useTranslation();
@@ -38,6 +39,9 @@ export default function AdminPostsPage() {
   });
 
   const handleApprove = (postId: string) => {
+    setConfirmModal({ isOpen: true, type: "approve", postId });
+  };
+  const handleReject = (postId: string) => {
     setConfirmModal({ isOpen: true, type: "approve", postId });
   };
 
@@ -94,7 +98,7 @@ export default function AdminPostsPage() {
                   <th className="px-6 py-4 text-start">{t("admin.postDetails")}</th>
                   <th className="px-6 py-4 text-start">{t("admin.author")}</th>
                   <th className="px-6 py-4 text-start">{t("admin.date")}</th>
-                  <th className="px-6 py-4 text-end">{t("admin.actions")}</th>
+                  {statusTab === "APPROVED" &&<th className="px-6 py-4 text-end">{t("admin.actions")}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -113,33 +117,27 @@ export default function AdminPostsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <Link to={localizedPath(lang, `profile/${post.author.id}`)} className="flex items-center gap-2 group hover:text-primary">
-                          <img src={post.author.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-gray-100" />
+                          <Avatar src={post.author.avatar} name={post.author.name} className="w-8 h-8 rounded-full object-cover border border-gray-100" />
                           <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{post.author.name}</span>
                         </Link>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {safeFormatDate(post.createdAt)}
+                        {safeFormatDate(post?.publishDate)}
                       </td>
+                          {statusTab === "APPROVED" && (
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
-                          {statusTab !== "APPROVED" && (
-                            <button
-                              onClick={() => handleApprove(post.id)}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                              title="Approve"
-                            >
-                              <CheckCircle className="w-5 h-5" />
-                            </button>
-                          )}
+
                           <button
-                            onClick={() => handleDelete(post.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete"
+                          onClick={() => handleDelete(post.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       </td>
+                          )}
                     </tr>
                   ))
                 )}

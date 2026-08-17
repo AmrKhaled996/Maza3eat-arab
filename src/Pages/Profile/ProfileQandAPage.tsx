@@ -47,7 +47,7 @@ function ProfileQandAPage() {
         
       }
       catch(err){
-        console.log(err);
+        console.error(err);
       }
       finally{
         setDeleteLoading(false);
@@ -74,7 +74,6 @@ function ProfileQandAPage() {
     if (data) {
       const allQuestions = data.pages.flatMap((page: any) => page.questions);
       setQuestionsData(allQuestions);
-      console.log("loading");
 
     }
   }, [data]);

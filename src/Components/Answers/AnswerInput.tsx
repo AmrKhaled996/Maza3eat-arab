@@ -34,7 +34,6 @@ function AnswerInput({onAddAnswer}:{onAddAnswer:(answer:Answer)=>void}) {
       setIsSubmitting(true);
 
       const response = await createAnswers(content, questionIdparam);
-      console.log("the response", response);
       onAddAnswer(response?.data?.data);
       setAnswerValue("");
     } catch (error) {

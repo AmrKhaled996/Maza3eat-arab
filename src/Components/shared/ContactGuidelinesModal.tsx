@@ -40,9 +40,9 @@ export default function ContactGuidelinesModal({
             <span>{lang === "ar" ? "يرجى اتباع الإرشادات التالية:" : "Please follow these rules:"}</span>
           </p>
           <ul className="list-disc pl-4 space-y-1 text-amber-800/90">
-            <li>{lang === "ar" ? "احترم خصوصية جميع الأعضاء" : "Respect member privacy at all times."}</li>
-            <li>{lang === "ar" ? "لا ترسل رسائل مزعجة أو غير لائقة" : "Do not send spam, harassing or inappropriate messages."}</li>
-            <li>{lang === "ar" ? "قد تؤدي مخالفة القوانين إلى حظر حسابك فوراً" : "Violations will result in immediate account ban."}</li>
+            <li style={{listStyleType: "none",paddingInline:0}}>{lang === "ar" ? "احترم خصوصية جميع الأعضاء" : "Respect member privacy at all times."}</li>
+            <li style={{listStyleType: "none",paddingInline:0}}>{lang === "ar" ? "لا ترسل رسائل مزعجة أو غير لائقة" : "Do not send spam, harassing or inappropriate messages."}</li>
+            <li style={{listStyleType: "none",paddingInline:0}}>{lang === "ar" ? "قد تؤدي مخالفة القوانين إلى حظر حسابك فوراً" : "Violations will result in immediate account ban."}</li>
           </ul>
         </div>
 

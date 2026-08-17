@@ -36,7 +36,6 @@ function CommentInput({onAddComment}:{onAddComment:(comment:Comment)=>void}) {
       setIsSubmitting(true);
 
       const response = await createComment(content, postIdparam);
-      console.log("the response", response);
       onAddComment(response?.data?.data);
       setCommentValue("");
     } catch (error) {

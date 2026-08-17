@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAdminReports, updateReportStatus } from "../../Apis/AdminApi";
+import { getAdminReportById, getAdminReports, updateReportStatus } from "../../Apis/AdminApi";
 import { Trash2, Eye, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import { safeFormatDate } from "../../utils/DateFormater";
 import { localizedPath } from "../../i18n/paths";
 import { useLocale } from "../../i18n/useLocale";
+import Avatar from "../../Components/shared/Avatar";
+import type { Report } from "../../Types/Report";
 
 export default function AdminReportsPage() {
   const { t } = useTranslation();
   const { lang } = useLocale();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; reportId: string | null }>({ isOpen: false, reportId: null });
   const [detailModal, setDetailModal] = useState<{ isOpen: boolean; report: any | null }>({ isOpen: false, report: null });
@@ -64,6 +67,57 @@ export default function AdminReportsPage() {
     }
   };
 
+  const handleReportClick = async (report:Report) => {
+
+  
+      // Navigate to the notification detail for all types (server marks it read)
+      if(report.targetType === "ANSWER" || report.targetType === "COMMENT" || report.targetType === "COMMENT_REPLY" || report.targetType === "COMMENT_REPLY_REPLY" || report.targetType === "ANSWER_REPLY" || report.targetType === "ANSWER_REPLY_REPLY"|| report.targetType === "POST_LIKE" || report.targetType === "QUESTION_LIKE"){
+  
+    await getAdminReportById(report?.id).then((res:any) => {
+  
+  
+        switch (res?.targetType) {
+            case "ANSWER":
+  
+              return (
+                navigate(localizedPath(lang, `q&a/${res?.questionId}?highlighted=${res?.answer?.id}#${res?.answer?.id}`),{state:{answer: res?.answer}})
+              );
+            case "COMMENT":
+              return (
+                navigate(localizedPath(lang, `post/${res?.postId}?highlighted=${res?.comment?.id}#${res?.comment?.id}`),{state:{comment: res?.comment}})
+              );
+            case "COMMENT_REPLY":
+              return (
+                navigate(localizedPath(lang, `post/${res?.postId}?highlighted=${res?.reply?.id}#${res?.reply?.id}`),{state:{reply: res?.reply,commentId: res?.comment?.id}})
+              );
+              case "ANSWER_REPLY":
+              return (
+                navigate(localizedPath(lang, `q&a/${res?.questionId}?highlighted=${res?.reply?.id}#${res?.reply?.id}`),{state:{reply: res?.reply,answerId: res?.answer?.id}})
+              );
+              case "COMMENT_REPLY_REPLY":
+                return (
+                  navigate(localizedPath(lang, `replies`),{state:{reply: res?.parentReply}})
+                );
+            case "ANSWER_REPLY_REPLY":
+              return (
+                navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.parentReply}})
+              );
+            case "POST_LIKE":
+              return (
+                navigate(localizedPath(lang, `post/${res?.postId}#like`))
+              );
+            case "QUESTION_LIKE":
+              return (
+                navigate(localizedPath(lang, `q&a/${res?.questionId}#like`))
+              );
+            default:
+              return navigate(localizedPath(lang, `admin/reports/${report?.id}`));
+        }
+      })
+    }
+    };
+  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -94,7 +148,7 @@ export default function AdminReportsPage() {
                           to={localizedPath(lang, `profile/${report.reporter.id || report.reporterId}`)}
                           className="flex items-center gap-2 group hover:text-primary"
                         >
-                          <img src={report.reporter.avatar} alt="" className="w-8 h-8 rounded-full object-cover bg-gray-100" />
+                          <Avatar src={report.reporter.avatar} name={report.reporter.name} className="w-8 h-8 rounded-full object-cover bg-gray-100" />
                           <span className="text-sm font-medium text-gray-700 group-hover:text-primary group-hover:underline">{report.reporter.name}</span>
                         </Link>
                       </td>
@@ -180,7 +234,7 @@ export default function AdminReportsPage() {
                   to={localizedPath(lang, `profile/${detailModal.report.reporter.id || detailModal.report.reporterId}`)}
                   className="flex items-center gap-2 group"
                 >
-                  <img src={detailModal.report.reporter.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                  <Avatar src={detailModal.report.reporter.avatar} name={detailModal.report.reporter.name} className="w-7 h-7 rounded-full object-cover" />
                   <span className="text-sm font-medium text-gray-800 group-hover:text-primary group-hover:underline">{detailModal.report.reporter.name} ({detailModal.report.reporter.email})</span>
                 </Link>
               </div>
@@ -194,12 +248,12 @@ export default function AdminReportsPage() {
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-              <Link
-                to={localizedPath(lang, `admin/reports/${detailModal.report.id}`)}
+              <div
+                onClick={()=>{handleReportClick(detailModal.report)}}
                 className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
               >
                 <Eye className="w-4 h-4" /> {t("admin.goToFullReport", "Go to Full Report Page")}
-              </Link>
+              </div>
               
               <button
                 onClick={() => setDetailModal({ isOpen: false, report: null })}

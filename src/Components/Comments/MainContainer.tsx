@@ -31,7 +31,6 @@ const HighlightedCommentID = searchParams.get("highlighted")||"";
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !isFetchingNextPage) {
-        console.log("is fetching comments");
         fetchNextPage();
       }
     });

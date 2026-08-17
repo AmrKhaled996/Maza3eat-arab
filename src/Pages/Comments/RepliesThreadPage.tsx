@@ -9,6 +9,7 @@ import NavigationBar from "../../Components/shared/NavigationBar";
 import { localizedPath } from "../../i18n/paths";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
+import { Title } from "react-head";
 
 function RepliesThreadPage() {
   const { lang } = useLocale();
@@ -31,6 +32,7 @@ function RepliesThreadPage() {
   return (
     <div className="min-h-screen  max-w-7xl mx-auto">
       <NavigationBar page="" solidNav={true} />
+      <Title> {lang === "ar" ? "الردود":"Replies"}  </Title>
       {/* ================= Page ================= */}
       <main className="mx-auto max-w-362.5 px-6 py-6 mt-12">
         <div className="grid grid-cols-12 gap-4">

@@ -9,6 +9,7 @@ import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import PromptModal from "../../Components/shared/PromptModal";
 import { safeFormatDate } from "../../utils/DateFormater";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function AdminUsersPage() {
   const { t } = useTranslation();
@@ -175,7 +176,7 @@ export default function AdminUsersPage() {
             <Search className="w-4 h-4" /> {t("admin.searchProfileModal", "Ban/Unban by Profile Link")}
           </button>
 
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -184,7 +185,7 @@ export default function AdminUsersPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none w-full sm:w-64"
             />
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -265,7 +266,7 @@ export default function AdminUsersPage() {
                     <tr key={`${i}-${user.id}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <Link to={localizedPath(lang, `profile/${user.id}`)} className="flex items-center gap-3 group hover:text-primary">
-                          <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover bg-gray-100 border border-gray-100" />
+                          <Avatar src={user.avatar} name={user?.name} className="w-10 h-10 rounded-full object-cover bg-gray-100 border border-gray-100" />
                           <div>
                             <div className="font-semibold text-gray-900 group-hover:text-primary transition-colors">{user.name}</div>
                             <div className="text-sm text-gray-500">{user.email}</div>
@@ -368,7 +369,7 @@ export default function AdminUsersPage() {
             {searchedUser && (
               <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-4">
                 <div className="flex items-center gap-4">
-                  <img src={searchedUser.avatar} alt="" className="w-14 h-14 rounded-full object-cover bg-gray-200" />
+                  <Avatar src={searchedUser.avatar} name={searchedUser.name} className="w-14 h-14 rounded-full object-cover bg-gray-200" />
                   <div>
                     <h4 className="font-bold text-gray-900">{searchedUser.name}</h4>
                     <p className="text-xs text-gray-500">{searchedUser.email}</p>

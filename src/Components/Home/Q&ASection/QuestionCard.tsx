@@ -26,9 +26,6 @@ export function QuestionCard({ question }: { question: Question }) {
   const { lang } = useLocale();
   const answerCount = question?.answersCount ?? 0;
 
-  // useEffect(() => {
-  //   console.log("QuestionCard rendered with question:", question);
-  // }, [question]);
 
   return (
     <div

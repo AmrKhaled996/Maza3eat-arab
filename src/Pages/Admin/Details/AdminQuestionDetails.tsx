@@ -9,6 +9,7 @@ import PromptModal from "../../../Components/shared/PromptModal";
 import { safeFormatDate, FormatPublishDate } from "../../../utils/DateFormater";
 import { localizedPath } from "../../../i18n/paths";
 import { useLocale } from "../../../i18n/useLocale";
+import Avatar from "../../../Components/shared/Avatar";
 
 export default function AdminQuestionDetails() {
   const { id } = useParams();
@@ -91,9 +92,9 @@ export default function AdminQuestionDetails() {
                 to={localizedPath(lang, `profile/${question.author?.id}`)}
                 className="flex items-center gap-3 group"
               >
-                <img
+                <Avatar
                   src={question.author?.avatar || "/default-avatar.png"}
-                  alt={question.author?.name}
+                  name={question.author?.name}
                   className="w-12 h-12 rounded-full object-cover border border-gray-200"
                 />
                 <div>

@@ -4,10 +4,29 @@ import { useTranslation } from "react-i18next";
 import type { Post } from "../../../Types/Post";
 import cn from "../../../utils/Cn";
 import { useLocale } from "../../../i18n/useLocale";
+import type { Tag } from "../../../Types/Tag";
+import type { Image } from "../../../Types/Image";
+import type { Author } from "../../../Types/Author";
 
 interface PostImageCarouselProps {
   post: Post | undefined;
 }
+// interface PostDetailWithImage {
+//   id: string;
+//   title: string;
+//   content: string;
+//   likesCount: number;
+//   commentsCount: number;
+//   tags: Tag[];
+//   image: Image;
+//   images?: {
+//     imageUrl: string;
+//     originalName: string;
+//   }[];
+//   likedByMe?: boolean;
+//   author: Author;
+//   publishDate?: Date; 
+// }
 
 /** Minimum horizontal travel (px) before a touch counts as a swipe. */
 const SWIPE_THRESHOLD = 50;
@@ -17,7 +36,6 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
   const { lang } = useLocale();
   const [mainIndex, setMainIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
-
   if (!post?.image?.url) {
     return (
       <div className="rounded-3xl overflow-hidden bg-gray-100/80 aspect-[16/10] flex items-center justify-center border border-gray-100">
@@ -28,7 +46,7 @@ export default function PostImageCarousel({ post }: PostImageCarouselProps) {
 
   // Handle single or multiple images if post has an array
   const images =
-    Array.isArray((post as any).images) && (post as any).images.length > 0
+    Array.isArray(post.images) && post?.images?.length > 0
       ? (post as any).images.map((url: string, i: number) => ({
           url,
           name: `image-${i}`,

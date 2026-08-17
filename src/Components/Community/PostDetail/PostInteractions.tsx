@@ -30,7 +30,6 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
 
     try {
       if (wasLiked) {
-        console.log("postid in here:",post.id)
         await unlikeToPost(post.id);
       } else {
 

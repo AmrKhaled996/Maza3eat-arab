@@ -47,7 +47,6 @@ function QandAMainPage() {
     if (data) {
       const allQuestions = data.pages.flatMap((page: any) => page.questions);
       setQuestionsData(allQuestions);
-      console.log("loading");
     }
   }, [data]);
 
@@ -59,7 +58,6 @@ function QandAMainPage() {
 
   // Update searchLoading state based on isFetching
   useEffect(() => {
-    console.log("fetching");
     if (isFetchingNextPage || isLoading) return;
     setSearchLoading(isFetching);
   }, [isFetching]);

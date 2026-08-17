@@ -15,9 +15,7 @@ function searchParam(searchTerm: string) {
 
 export async function getQuestionsBySearch(searchTerm: string ,sortBy: string ) {
   try {
-    console.log("search ",searchTerm,"sort:",sortBy)
     const response = await axiosInstance.get(`/questions?sort=${sortBy}${searchParam(searchTerm)}`);
-    // console.log(response.data)
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{message: string}>;
@@ -34,9 +32,7 @@ export async function getQuestionsBySearch(searchTerm: string ,sortBy: string ) 
 export async function getQuestionsBySearchWithCursor(searchTerm: string ,sortBy: string, cursor:string ) {
 
   try {
-    console.log("search ",searchTerm,"sort:",sortBy)
     const response = await axiosInstance.get(`/questions?sort=${sortBy}${searchParam(searchTerm)}&cursor=${cursor}`);
-    // console.log(response.data)
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<{message: string}>;

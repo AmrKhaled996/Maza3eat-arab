@@ -16,7 +16,6 @@ export default function ProtectedRoute({
   const decoded: MyJwtPayload = jwtDecode(rawtoken) as MyJwtPayload;
   const role: string = decoded?.role as string;
 
-  console.log(decoded);
 
   if (!token) {
     return <Navigate to={`/${DEFAULT_LOCALE}/login`} replace />;

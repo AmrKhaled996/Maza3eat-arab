@@ -2,13 +2,17 @@ import type { Post } from "../../../Types/Post";
 import { Tag } from "../../../Components/shared/Tag";
 import "react-quill-new/dist/quill.snow.css";
 import { useLocale } from "../../../i18n/useLocale";
+import DOMPurify from "dompurify";
 
 interface PostContentProps {
   post: Post | undefined;
   hideTitle?: boolean;
 }
 
-export default function PostContent({ post, hideTitle = false }: PostContentProps) {
+export default function PostContent({
+  post,
+  hideTitle = false,
+}: PostContentProps) {
   const { lang } = useLocale();
   if (!post) {
     return null;
@@ -22,20 +26,28 @@ export default function PostContent({ post, hideTitle = false }: PostContentProp
       )}
 
       {/* Content */}
-      <div className="ql-snow ">
+      <div className="ql-snow " dir="rtl">
         <div
-          className={`text-gray-700 leading-relaxed wrap-break-word ql-editor min-h-[200px] select-text scrollbar-hide  prose prose-sm max-w-none
-    ${lang === "ar" ? "text-right prose-ul:pr-6 prose-ol:pr-6 prose-ul:pl-0 prose-ol:pl-0  " : "text-left force-ltr"}
-    leading-8
-    prose-p:my-2
-    prose-p:leading-8
-    prose-li:my-2
-    prose-li:leading-8`}
-
+          dir="auto"
+          className={`
+          text-gray-700
+          wrap-break-word
+          min-h-[200px]
+          select-text
+          scrollbar-hide
+          max-w-none
+        `}
           data-gramm="false"
-          data-value="left"
-          style={{ padding: 0, border: "none" }}
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          style={{
+            padding: 2,
+            border: "none",
+            wordBreak: "normal",
+          }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.content, {
+              ADD_ATTR: ["target", "rel"],
+            }),
+          }}
         />
       </div>
 

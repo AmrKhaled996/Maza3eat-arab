@@ -246,15 +246,6 @@ export default function ReplyItem({
     return () => observer.disconnect();
   }, [rootRef, replying]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     const replies = data.pages.flatMap((page: any) => page.replies);
-  //     setReplies(replies);
-  //     console.log("loading");
-  //     if (isFetching) {
-  //     }
-  //   }
-  // }, [data]);
   useEffect(() => {
     if (data) {
       setReplies((prev) =>

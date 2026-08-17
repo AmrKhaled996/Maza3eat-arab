@@ -4,6 +4,9 @@ import { Mail, Check, Loader2 } from "lucide-react";
 import { createContactRequest } from "../../Apis/ContactRequestApi";
 import { useAuth } from "../../Hooks/Auth";
 import ContactGuidelinesModal from "./ContactGuidelinesModal";
+import type { AxiosError } from "axios";
+import { useToast } from "../../Context/Toast";
+import { useLocale } from "../../i18n/useLocale";
 
 interface Props {
   /** The ID of the user to send the contact request to */
@@ -17,11 +20,12 @@ type Status = "idle" | "loading" | "sent" | "error";
 export function ContactButton({ receiverId, defaultReason = "" }: Props) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation("common");
+  const { lang } = useLocale();
   const [status, setStatus] = useState<Status>("idle");
   const [showModal, setShowModal] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
   const [reason, setReason] = useState(defaultReason);
-
+  const {toast}=useToast();
   const handleOpen = () => {
     if (!isAuthenticated) return; // ProtectedRoute handles redirect
     setShowModal(true);
@@ -39,8 +43,13 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
         setStatus("idle");
         setReason(defaultReason);
       }, 1500);
-    } catch (err: unknown) {
-      console.error("Failed to send contact request:", err);
+    } catch (err: any) {
+
+      console.error("Failed to send contact request:", err?.response?.status);
+      if(err?.response?.status === 429) {
+        toast.error(lang==="ar"?"لقد ارسلت طلبا بالفعل  حاول مرة اخرى بعد اسبوع":"You have already sent a request, try again after a week");
+
+      }
       setStatus("error");
     }
   };

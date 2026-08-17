@@ -31,7 +31,7 @@ export default function AnswersSection() {
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !isFetchingNextPage) {
-        console.log("is fetching answers");
+
         fetchNextPage();
       }
     });
@@ -48,7 +48,7 @@ export default function AnswersSection() {
       const allAnswers = data.pages.flatMap((page: any) => page?.answers);
       setAnswers(allAnswers);
       setNextCursor(data?.pages[data?.pages.length - 1]?.nextCursor);
-      console.log("loading");
+
     }
   }, [data]);
 

@@ -23,7 +23,6 @@ export default function PostPage() {
   const {data:postAdvertisement} = useContentAds()  as { data?: PostAdvertisement };
   const [adData,setAdData] = useState<PostAdvertisement>();
   useEffect(() => {
-    console.log("postData",postAdvertisement)
     setAdData(postAdvertisement);
   }, [postAdvertisement]);
 
