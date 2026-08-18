@@ -26,15 +26,16 @@ export default function Login() {
     <div className="min-h-screen bg-gray-200 flex flex-col">
 
       {/* Main content */}
-      <div className="flex-1 flex items-center justify-center px-4 pb-8">
-        <div className="w-full max-w-5xl flex rounded-3xl overflow-hidden shadow-2xl bg-white min-h-[600px]">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full  flex shadow-2xl bg-white min-h-screen">
           {/* Left side — Image */}
-          <div className="hidden md:block md:w-1/2 relative">
-            <div className="absolute inset-2 rounded-2xl overflow-hidden border-4 border-sky-400/60 shadow-lg">
+          <div className="hidden md:block md:w-1/2 relative h-screen">
+            <div className="w-full h-full inset-2  shadow-lg object-fill">
               <img
                 src="/LoginImage.png"
                 alt={t("login.imageAlt")}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill shadow-lg"
+                
               />
             </div>
           </div>
@@ -56,12 +57,12 @@ export default function Login() {
               {/* Logo */}
               <div
                         onClick={()=>navigate(localizedPath(lang, ""))}
-                        className={`flex items-center gap-2 transition-colors  duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer`}
+                        className={`flex items-center gap-2 transition-colors duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer mt-8`}
                       >
                         <img
                           src="/logo-v3.gif"
                           alt="logo"
-                          className="w-16 h-16"
+                          className="w-25 h-25"
                           loading="lazy"
                           decoding="async"
                         />
@@ -69,7 +70,7 @@ export default function Login() {
                           <img
                           src="/logo-new.png"
                           alt="logo"
-                          className="w-16 h-16 "
+                          className="w-25 h-25 "
                           loading="lazy"
                           decoding="async"
                         />

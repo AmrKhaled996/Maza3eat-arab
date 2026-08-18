@@ -289,7 +289,7 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            to={localizedPath(lang, `admin/users/${user.id}`)}
+                            to={localizedPath(lang, `profile/${user.id}`)}
                             className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
                           >
                             <Search className="w-4 h-4" /> {t("admin.view")}

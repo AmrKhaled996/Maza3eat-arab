@@ -19,7 +19,7 @@ function HomeCommunitySectionAdd({ className ,ad }: { className?: string ,ad?:Ad
       <h4 className="font-bold text-lg leading-tight my-2 line-clamp-2">
         {ad?.title||t("home.adTravelGear")}
       </h4>
-      <p className="text-sm opacity-80 mb-4 line-clamp-4">
+      <p className="text-sm opacity-80 mb-4 line-clamp-3">
         {ad?.text||t("home.adTravelGearDesc")}
       </p>
       <button

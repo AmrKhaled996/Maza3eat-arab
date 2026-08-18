@@ -17,7 +17,7 @@ function HomeCommunityPostsAdvertisement({ad}:{ad?:Advertisement}) {
       <h4 className="font-bold text-lg leading-tight my-2">
         {ad?.title||t("home.adTravelGear")}
       </h4>
-      <p className="text-sm opacity-80 mb-4">
+      <p className="text-sm opacity-80 mb-4 line-clamp-2">
         {ad?.text||t("home.adTravelGearDesc")}
       </p>
       <button 

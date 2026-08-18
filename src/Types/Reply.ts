@@ -2,6 +2,7 @@ export interface Tier {
   id: string|number;
   name: string;
   badgeColor: string;
+  description?: string;
 }
 
 export interface Author {

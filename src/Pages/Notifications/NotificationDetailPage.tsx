@@ -4,23 +4,38 @@ import { useNotifications } from "../../Hooks/useNotifications";
 import { fetchNotificationById } from "../../Apis/NotificationApi";
 import { useTranslation } from "react-i18next";
 import NavigationBar from "../../Components/shared/NavigationBar";
-import { ArrowLeft, ArrowRight, Calendar, Shield, CheckCircle2, ExternalLink, Award, Megaphone } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  Shield,
+  CheckCircle2,
+  ExternalLink,
+  Award,
+  Megaphone,
+  LucideArrowBigRightDash,
+  LucideArrowBigLeftDash,
+} from "lucide-react";
 import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import type { Notification } from "../../Types/Notification";
+import { Badge } from "../../Components/shared/Tag";
 
 // Simple custom markdown parser to convert basic md syntax to JSX
 function parseMarkdown(text: string) {
   if (!text) return "";
-  
+
   const lines = text.split("\n");
   return lines.map((line, idx) => {
     const trimmed = line.trim();
-    
+
     // Header 1
     if (trimmed.startsWith("# ")) {
       return (
-        <h1 key={idx} className="text-3xl font-extrabold text-gray-900 mt-6 mb-4 leading-tight">
+        <h1
+          key={idx}
+          className="text-3xl font-extrabold text-gray-900 mt-6 mb-4 leading-tight"
+        >
           {parseInlineMarkdown(trimmed.slice(2))}
         </h1>
       );
@@ -39,14 +54,24 @@ function parseMarkdown(text: string) {
       const quoteText = trimmed.slice(2);
       if (quoteText.startsWith("[!IMPORTANT]")) {
         return (
-          <div key={idx} className="my-5 p-4 bg-red-50 border-s-4 border-red-500 rounded-e-xl text-red-900">
-            <div className="font-bold mb-1">تنبيه هام / Important Notification</div>
-            <p className="text-sm">{parseInlineMarkdown(quoteText.slice(12).trim())}</p>
+          <div
+            key={idx}
+            className="my-5 p-4 bg-red-50 border-s-4 border-red-500 rounded-e-xl text-red-900"
+          >
+            <div className="font-bold mb-1">
+              تنبيه هام / Important Notification
+            </div>
+            <p className="text-sm">
+              {parseInlineMarkdown(quoteText.slice(12).trim())}
+            </p>
           </div>
         );
       }
       return (
-        <blockquote key={idx} className="my-4 ps-4 border-s-4 border-gray-300 italic text-gray-600">
+        <blockquote
+          key={idx}
+          className="my-4 ps-4 border-s-4 border-gray-300 italic text-gray-600"
+        >
           {parseInlineMarkdown(quoteText)}
         </blockquote>
       );
@@ -54,7 +79,11 @@ function parseMarkdown(text: string) {
     // Bullet list
     if (trimmed.startsWith("- ")) {
       return (
-        <li key={idx} className="ms-6 list-disc text-gray-700 my-1" style={{listStyleType: "none",paddingInline:0}}>
+        <li
+          key={idx}
+          className="ms-6 list-disc text-gray-700 my-1"
+          style={{ listStyleType: "none", paddingInline: 0 }}
+        >
           {parseInlineMarkdown(trimmed.slice(2))}
         </li>
       );
@@ -87,7 +116,11 @@ function parseInlineMarkdown(text: string) {
     if (match.index > lastIndex) {
       parts.push(text.substring(lastIndex, match.index));
     }
-    parts.push(<strong key={match.index} className="font-bold text-gray-900">{match[1]}</strong>);
+    parts.push(
+      <strong key={match.index} className="font-bold text-gray-900">
+        {match[1]}
+      </strong>,
+    );
     lastIndex = boldRegex.lastIndex;
   }
 
@@ -108,23 +141,47 @@ function extractBodyFromRaw(raw: any): string | undefined {
 
   // Nested announcement object
   if (raw.announcement) {
-    if (typeof raw.announcement === "string" && raw.announcement.trim()) return raw.announcement;
-    if (typeof raw.announcement.message === "string" && raw.announcement.message.trim()) return raw.announcement.message;
-    if (typeof raw.announcement.content === "string" && raw.announcement.content.trim()) return raw.announcement.content;
-    if (typeof raw.announcement.text === "string" && raw.announcement.text.trim()) return raw.announcement.text;
+    if (typeof raw.announcement === "string" && raw.announcement.trim())
+      return raw.announcement;
+    if (
+      typeof raw.announcement.message === "string" &&
+      raw.announcement.message.trim()
+    )
+      return raw.announcement.message;
+    if (
+      typeof raw.announcement.content === "string" &&
+      raw.announcement.content.trim()
+    )
+      return raw.announcement.content;
+    if (
+      typeof raw.announcement.text === "string" &&
+      raw.announcement.text.trim()
+    )
+      return raw.announcement.text;
   }
 
   // Nested data or notification object
   if (raw.data) {
     if (typeof raw.data === "string" && raw.data.trim()) return raw.data;
-    if (typeof raw.data.message === "string" && raw.data.message.trim()) return raw.data.message;
-    if (typeof raw.data.content === "string" && raw.data.content.trim()) return raw.data.content;
-    if (typeof raw.data.text === "string" && raw.data.text.trim()) return raw.data.text;
+    if (typeof raw.data.message === "string" && raw.data.message.trim())
+      return raw.data.message;
+    if (typeof raw.data.content === "string" && raw.data.content.trim())
+      return raw.data.content;
+    if (typeof raw.data.text === "string" && raw.data.text.trim())
+      return raw.data.text;
   }
 
   if (raw.notification) {
-    if (typeof raw.notification.message === "string" && raw.notification.message.trim()) return raw.notification.message;
-    if (typeof raw.notification.content === "string" && raw.notification.content.trim()) return raw.notification.content;
+    if (
+      typeof raw.notification.message === "string" &&
+      raw.notification.message.trim()
+    )
+      return raw.notification.message;
+    if (
+      typeof raw.notification.content === "string" &&
+      raw.notification.content.trim()
+    )
+      return raw.notification.content;
   }
 
   return undefined;
@@ -135,12 +192,12 @@ export default function NotificationDetailPage() {
   const navigate = useNavigate();
   const { lang } = useLocale();
   const { t } = useTranslation("common");
-  const { notifications, markAsRead } = useNotifications();
+  const { notifications, markAsRead, isLoading } = useNotifications();
 
   // First try the cached list, then fetch full detail from API
   const cachedNotification = notifications.find((n) => n.id === id);
   const [notification, setNotification] = useState<Notification | null>(
-    cachedNotification ?? null
+    cachedNotification ?? null,
   );
   const [isLoadingDetail, setIsLoadingDetail] = useState(!cachedNotification);
 
@@ -148,32 +205,43 @@ export default function NotificationDetailPage() {
   useEffect(() => {
     if (!id) return;
 
-    if (cachedNotification) {
+    if (cachedNotification && isLoading) {
       setNotification(cachedNotification);
       setIsLoadingDetail(false);
     } else {
       setIsLoadingDetail(true);
     }
 
-    fetchNotificationById(id).then((raw) => {
-      if (!raw) {
+    fetchNotificationById(id).then((res) => {
+      if (!res) {
         setIsLoadingDetail(false);
         return;
       }
+      const raw: any = res?.notification;
+      console.log(raw);
 
-      const bodyText = extractBodyFromRaw(raw) || cachedNotification?.body;
+      const bodyText =
+        extractBodyFromRaw(raw) ||
+        cachedNotification?.body ||
+        raw?.rejectionReason;
       const titleText =
-        (raw.title as string) ||
-        (raw.announcement as any)?.title ||
-        (raw.data as any)?.title ||
-        cachedNotification?.title;
+        (raw?.title as string) ||
+        (raw?.postTitle as string) ||
+        (raw?.questionTitle as string) ||
+        (raw?.announcement as any)?.title ||
+        (raw?.data as any)?.title ||
+        cachedNotification?.title ||
+        (cachedNotification as any)?.postTitle ||
+        (cachedNotification as any)?.questionTitle;
 
       // The backend wraps the payload as { notification: { …, postId | questionId } }
       const nested = raw.notification as Record<string, unknown> | undefined;
 
       const mapped: Notification = {
         id: id,
-        type: ((raw.type || cachedNotification?.type) as Notification["type"]) ?? "ADMIN_ANNOUNCEMENT",
+        type:
+          ((raw.type || cachedNotification?.type) as Notification["type"]) ??
+          "ADMIN_ANNOUNCEMENT",
         isRead: true,
         createdAt:
           (raw.createdAt as string) ??
@@ -191,12 +259,17 @@ export default function NotificationDetailPage() {
             raw.questionId) as string | undefined) ??
           cachedNotification?.resourceId,
         sender: (raw.sender as any) ?? cachedNotification?.sender,
+        rejectionReason:
+          (raw.rejectionReason as string) ??
+          cachedNotification?.rejectionReason,
+        newTier: raw.newTier,
+        oldTier: raw.oldTier,
       };
 
       setNotification(mapped);
       setIsLoadingDetail(false);
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   // If notification was in cache and unread, mark it read optimistically
@@ -204,10 +277,10 @@ export default function NotificationDetailPage() {
     if (cachedNotification && !cachedNotification.isRead) {
       markAsRead(cachedNotification.id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cachedNotification?.id]);
 
-  if (isLoadingDetail) {
+  if (isLoadingDetail || isLoading) {
     return (
       <div className="min-h-screen pb-16 bg-gray-50/50">
         <NavigationBar page="notifications" solidNav />
@@ -227,14 +300,20 @@ export default function NotificationDetailPage() {
             onClick={() => navigate(-1)}
             className="mb-6 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
           >
-            {lang === "ar" ? <ArrowRight className="h-5 w-5" /> : <ArrowLeft className="h-5 w-5" />}
+            {lang === "ar" ? (
+              <ArrowRight className="h-5 w-5" />
+            ) : (
+              <ArrowLeft className="h-5 w-5" />
+            )}
           </button>
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {lang === "ar" ? "الإشعار غير موجود" : "Notification Not Found"}
             </h1>
             <p className="text-gray-500">
-              {lang === "ar" ? "ربما تم حذف هذا الإشعار أو أنه غير متوفر حالياً." : "This notification might have been deleted or is unavailable."}
+              {lang === "ar"
+                ? "ربما تم حذف هذا الإشعار أو أنه غير متوفر حالياً."
+                : "This notification might have been deleted or is unavailable."}
             </p>
           </div>
         </div>
@@ -268,7 +347,8 @@ export default function NotificationDetailPage() {
       case "TIER_UPGRADE":
         return {
           icon: <Award className="h-6 w-6 text-white" />,
-          bgColor: "bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 animate-pulse",
+          bgColor:
+            "bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 animate-pulse",
           lightBg: "bg-gradient-to-r from-amber-50 via-pink-50 to-indigo-50",
           textColor: "text-purple-700 font-bold",
           badgeKey: "notifications.tierUpgrade",
@@ -315,8 +395,10 @@ export default function NotificationDetailPage() {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffMins < 1) return t("notifications.justNow");
-    if (diffMins < 60) return t("notifications.minutesAgo", { count: diffMins });
-    if (diffHours < 24) return t("notifications.hoursAgo", { count: diffHours });
+    if (diffMins < 60)
+      return t("notifications.minutesAgo", { count: diffMins });
+    if (diffHours < 24)
+      return t("notifications.hoursAgo", { count: diffHours });
     if (diffDays === 1) return t("notifications.yesterday");
     return t("notifications.daysAgo", { count: diffDays });
   };
@@ -332,20 +414,27 @@ export default function NotificationDetailPage() {
           className="mb-6 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 hover:cursor-pointer transition-transform hover:scale-105"
           aria-label={t("createPost.back")}
         >
-          {lang === "ar" ? <ArrowRight className="h-5 w-5" /> : <ArrowLeft className="h-5 w-5" />}
+          {lang === "ar" ? (
+            <ArrowRight className="h-5 w-5" />
+          ) : (
+            <ArrowLeft className="h-5 w-5" />
+          )}
         </button>
 
         {/* Detailed Notification Card */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] overflow-hidden">
           {/* Header Colored Band */}
           <div className={`h-2 ${config.bgColor}`} />
-          
+
           <div className="p-8 sm:p-10">
             {/* Meta Info Row */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-2xl ${config.lightBg} flex items-center justify-center`}>
-                  {(notification.type === "POST_REJECTION" || notification.type === "QUESTION_REJECTION") ? (
+                <div
+                  className={`p-2.5 rounded-2xl ${config.lightBg} flex items-center justify-center`}
+                >
+                  {notification.type === "POST_REJECTION" ||
+                  notification.type === "QUESTION_REJECTION" ? (
                     <Shield className="h-5 w-5 text-red-500" />
                   ) : notification.type.includes("APPROVAL") ? (
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -356,9 +445,12 @@ export default function NotificationDetailPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-gray-900">
-                      {notification.sender?.name || (lang === "ar" ? "الإدارة" : "Admin")}
+                      {notification.sender?.name ||
+                        (lang === "ar" ? "الإدارة" : "Admin")}
                     </span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${config.lightBg} ${config.textColor}`}>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${config.lightBg} ${config.textColor}`}
+                    >
                       {t(config.badgeKey)}
                     </span>
                   </div>
@@ -371,55 +463,208 @@ export default function NotificationDetailPage() {
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-6 leading-snug">
-              {notification.title || (lang === "ar" ? "تفاصيل الإشعار" : "Notification Details")}
+            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-6 leading-snug">
+              {lang === "ar" ? "تفاصيل الإشعار" : "Notification Details"}
             </h1>
 
             <hr className="border-gray-100 mb-6" />
 
             {/* Body Content */}
             <div className="prose max-w-none text-gray-700">
-              {notification.body ? (
+              {notification.body &&
+              notification.type !== "POST_REJECTION" &&
+              notification.type !== "QUESTION_REJECTION" ? (
                 parseMarkdown(notification.body)
               ) : (
                 <p className="text-lg leading-relaxed text-gray-600">
-                  {lang === "ar"
-                    ?
-                     notification.type === "POST_APPROVAL"
-                      ? "تمت الموافقة على منشورك بنجاح من قبل فريق الإدارة. يمكنك الآن الاطلاع عليه والتفاعل مع الأعضاء."
-                      : notification.type === "QUESTION_APPROVAL"
-                      ? "تمت الموافقة على سؤالك بنجاح من قبل فريق الإدارة."
-                      : notification.type === "POST_LIKE"
-                      ? "تم وضع أعجاب على منشورك من قبل زائر او اكثر."
-                      : notification.type === "QUESTION_LIKE"
-                      ? "تم وضع أعجاب على سؤالك من قبل زائر او اكثر."
-                      : notification.type === "POST_REJECTION"
-                      ? "تم رفض منشورك من قبل فريق الإدارة."
-                      : notification.type === "QUESTION_REJECTION"
-                      ? "تم رفض سؤالك من قبل فريق الإدارة."
-                      : notification.type === "TIER_UPGRADE"
-                      ? "تهانينا! لقد تم ترقية مستوى حسابك بنجاح للاستمتاع بالمزيد من المميزات والصلاحيات."
-                      : notification.type === "ADMIN_ANNOUNCEMENT"
-                      ? "إعلان هام من إدارة المنصة."
-                      : "لديك إشعار جديد."
-                    : notification.type === "POST_APPROVAL"
-                    ? "Your post has been successfully approved by the administration team. You can view it now and interact with other members."
-                    : notification.type === "QUESTION_APPROVAL"
-                    ? "Your question has been successfully approved by the administration team."
-                    : notification.type === "POST_LIKE"
-                    ? "You have received a like from a visitor or more."
-                    : notification.type === "QUESTION_LIKE"
-                    ? "You have received a like from a visitor or more."
-                    : notification.type === "POST_REJECTION"
-                    ? "Your post was rejected by the administration team."
-                    : notification.type === "QUESTION_REJECTION"
-                    ? "Your question was rejected by the administration team."
-                    : notification.type === "TIER_UPGRADE"
-                    ? "Congratulations! Your tier has been upgraded successfully to unlock more privileges and features."
-                    : notification.type === "ADMIN_ANNOUNCEMENT"
-                    ? "Important announcement from platform administration."
-                    : "You have a new notification."
-                  }
+                  {notification.type === "POST_APPROVAL" ? (
+                    <p className=" leading-7">
+                      {lang === "ar"
+                        ? "تمت الموافقة على منشورك بنجاح من قبل فريق الإدارة. يمكنك الآن الاطلاع عليه والتفاعل مع الأعضاء."
+                        : "Your post has been successfully approved by the administration team. You can view it now and interact with other members."}
+                    </p>
+                  ) : notification.type === "QUESTION_APPROVAL" ? (
+                    <p className=" leading-7">
+                      {lang === "ar"
+                        ? "تمت الموافقة على سؤالك بنجاح من قبل فريق الإدارة."
+                        : "Your question has been successfully approved by the administration team."}
+                    </p>
+                  ) : notification.type === "POST_LIKE" ? (
+                    <p className=" leading-7">
+                      {lang === "ar"
+                        ? "تم وضع إعجاب على منشورك من قبل زائر أو أكثر."
+                        : "You have received a like from a visitor or more."}
+                    </p>
+                  ) : notification.type === "QUESTION_LIKE" ? (
+                    <p className=" leading-7">
+                      {lang === "ar"
+                        ? "تم وضع إعجاب على سؤالك من قبل زائر أو أكثر."
+                        : "You have received a like on your question from a visitor or more."}
+                    </p>
+                  ) : notification.type === "POST_REJECTION" ? (
+                    <p className=" leading-7">
+                      {lang === "ar" ? (
+                        <>
+                          تم رفض منشورك من قبل فريق الإدارة، المنشور بعنوان:{" "}
+                          <p className="font-bold text-gray-800 px-2">
+                            "{notification.title}"
+                          </p>
+                          السبب:{" "}
+                          <p className="font-medium">
+                            {notification.rejectionReason}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          Your post was rejected by the administration team.
+                          Post title:{" "}
+                          <p className="font-bold text-gray-800 px-4">
+                            "{notification.title}"
+                          </p>
+                          Reason:{" "}
+                          <p className="font-medium px-2">
+                            {notification.rejectionReason}
+                          </p>
+                        </>
+                      )}
+                    </p>
+                  ) : notification.type === "QUESTION_REJECTION" ? (
+                    <p className=" leading-7">
+                      {lang === "ar" ? (
+                        <>
+                          تم رفض سؤالك من قبل فريق الإدارة، السؤال بعنوان:
+                          <p className="font-bold text-gray-800 px-4">
+                            "{notification.title}"
+                          </p>
+                          السبب:{" "}
+                          <p className="font-medium px-4">
+                            {notification.rejectionReason}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          Your question was rejected by the administration team.
+                          Question title:{" "}
+                          <p className="font-bold text-gray-800 px-4">
+                            "{notification.title}"
+                          </p>
+                          Reason:{" "}
+                          <p className="font-medium px-4">
+                            {notification.rejectionReason}
+                          </p>
+                        </>
+                      )}
+                    </p>
+                  ) : notification.type === "TIER_UPGRADE" ? (
+                    <p className=" leading-7 font-medium">
+                      {lang === "ar" ? (
+                        <>
+                          <p>
+                            :تهانينا! لقد تم ترقية مستوى حسابك بسبب مساهمتك
+                            الاخيرة.
+                            <div className="mt-10 pt-6  flex justify-center flex-wrap gap-8 ">
+                              <div className="relative group inline-block z-50">
+                              <Badge
+                                tier={notification?.oldTier?.name}
+                                color={notification?.oldTier?.badgeColor}
+                              />
+
+                              {notification?.oldTier?.description && (
+                                <div className="absolute bottom-10 mt-2 start-0 z-50 w-64 bg-gray-900 text-white text-xs rounded-xl px-4 py-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                  <p className="leading-relaxed">
+                                    {notification?.oldTier?.description}
+                                  </p>
+                                  <div className="absolute -bottom-1 start-4 z-50 w-2 h-2 bg-gray-900 rotate-45" />
+                                </div>
+                              )}
+                            </div>
+                              {lang === "ar" ? (
+                                <LucideArrowBigLeftDash  className="" size={30}/>
+                              ) : (
+                                <LucideArrowBigRightDash  className="" size={30}/>
+                              )}
+                              <div className="relative group inline-block">
+
+                              <Badge
+                                tier={(notification as any)?.newTier?.name}
+                                color={
+                                  (notification as any)?.newTier?.badgeColor
+                                }
+                              />
+                              {notification?.newTier?.description && (
+                                <div className="absolute bottom-10 mt-2 start-0 z-50 w-64 bg-gray-900 text-white text-xs rounded-xl px-4 py-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                  <p className="leading-relaxed">
+                                    {notification?.newTier?.description}
+                                  </p>
+                                  <div className="absolute -bottom-1 start-4 w-2 h-2 bg-gray-900 rotate-45" />
+                                </div>
+                              )}
+                            </div>
+                              </div>
+
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p>
+                            Congratulations! Your tier has been upgraded successfully as a result of your last contribution.
+                            <div className="mt-10 pt-6  flex justify-center flex-wrap gap-8 ">
+                              <div className="relative group inline-block z-50">
+                              <Badge
+                                tier={notification?.oldTier?.name}
+                                color={notification?.oldTier?.badgeColor}
+                              />
+
+                              {notification?.oldTier?.description && (
+                                <div className="absolute bottom-10 mt-2 start-0 z-50 w-64 bg-gray-900 text-white text-xs rounded-xl px-4 py-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                  <p className="leading-relaxed">
+                                    {notification?.oldTier?.description}
+                                  </p>
+                                  <div className="absolute -bottom-1 start-4 z-50 w-2 h-2 bg-gray-900 rotate-45" />
+                                </div>
+                              )}
+                            </div>
+                              {lang === "en" ? (
+                                <LucideArrowBigRightDash  className="" size={30}/>
+                              ) : (
+                                <LucideArrowBigLeftDash  className="" size={30}/>
+                              )}
+                              <div className="relative group inline-block">
+
+                              <Badge
+                                tier={(notification as any)?.newTier?.name}
+                                color={
+                                  (notification as any)?.newTier?.badgeColor
+                                }
+                              />
+                              {notification?.newTier?.description && (
+                                <div className="absolute bottom-10 mt-2 start-0 z-50 w-64 bg-gray-900 text-white text-xs rounded-xl px-4 py-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                  <p className="leading-relaxed">
+                                    {notification?.newTier?.description}
+                                  </p>
+                                  <div className="absolute -bottom-1 start-4 w-2 h-2 bg-gray-900 rotate-45" />
+                                </div>
+                              )}
+                            </div>
+                              </div>
+
+                          </p>
+                        </>
+                      )}
+                    </p>
+                  ) : notification.type === "ADMIN_ANNOUNCEMENT" ? (
+                    <p className=" leading-7 font-medium">
+                      {lang === "ar"
+                        ? "إعلان هام من إدارة المنصة."
+                        : "Important announcement from platform administration."}
+                    </p>
+                  ) : (
+                    <p className="text-gray-600 leading-7">
+                      {lang === "ar"
+                        ? "لديك إشعار جديد."
+                        : "You have a new notification."}
+                    </p>
+                  )}
                 </p>
               )}
             </div>
@@ -436,13 +681,13 @@ export default function NotificationDetailPage() {
                     <ExternalLink className="h-4 w-4" />
                   </button>
                 )}
-                
-                <button
+
+                {/* <button
                   onClick={() => navigate(localizedPath(lang, "notifications"))}
                   className="px-6 py-3 border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition-all hover:cursor-pointer"
                 >
                   {t("notifications.backToNotifications")}
-                </button>
+                </button> */}
               </div>
             )}
           </div>

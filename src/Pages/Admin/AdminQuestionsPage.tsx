@@ -94,7 +94,7 @@ export default function AdminQuestionsPage() {
                   <th className="px-6 py-4 text-start">{t("admin.questionDetails")}</th>
                   <th className="px-6 py-4 text-start">{t("admin.author")}</th>
                   <th className="px-6 py-4 text-start">{t("admin.date")}</th>
-                  <th className="px-6 py-4 text-end">{t("admin.actions")}</th>
+                  {statusTab === "APPROVED" && <th className="px-6 py-4 text-end">{t("admin.actions")}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -118,19 +118,11 @@ export default function AdminQuestionsPage() {
                         </Link>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {safeFormatDate(question.createdAt)}
+                        {safeFormatDate(question.publishDate)}
                       </td>
+                          {statusTab === "APPROVED" && (
                       <td className="px-6 py-4 text-end">
                         <div className="flex items-center justify-end gap-2">
-                          {statusTab !== "APPROVED" && (
-                            <button
-                              onClick={() => handleApprove(question.id)}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                              title="Approve"
-                            >
-                              <CheckCircle className="w-5 h-5" />
-                            </button>
-                          )}
                           <button
                             onClick={() => handleDelete(question.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -138,8 +130,10 @@ export default function AdminQuestionsPage() {
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
+                            
                         </div>
                       </td>
+                          )}
                     </tr>
                   ))
                 )}
