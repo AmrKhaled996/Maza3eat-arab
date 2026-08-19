@@ -37,7 +37,7 @@ const videos = [
   },
   {
     vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360850/9.mp4",
-    name: "Egypt, Ras El Hekma",
+    name: "Egypt, El sahel Al shamaly",
   },
 ];
 
@@ -76,7 +76,7 @@ const ArVideos = [
   },
   {
     vid: "https://res.cloudinary.com/vxybxqkq/video/upload/v1786360850/9.mp4",
-    name: "مصر، رأس الحكمة",
+    name: "مصر، الساحل الشمالي",
   },
 ];
 export default function InfiniteSlider() {

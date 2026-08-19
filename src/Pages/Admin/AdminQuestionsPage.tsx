@@ -8,6 +8,7 @@ import { useLocale } from "../../i18n/useLocale";
 import { localizedPath } from "../../i18n/paths";
 import ConfirmModal from "../../Components/shared/ConfirmModal";
 import { safeFormatDate } from "../../utils/DateFormater";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function AdminQuestionsPage() {
   const { t } = useTranslation();
@@ -113,7 +114,7 @@ export default function AdminQuestionsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <Link to={localizedPath(lang, `profile/${question.author.id}`)} className="flex items-center gap-2 group hover:text-primary">
-                          <img src={question.author.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-gray-100" />
+                          <Avatar src={question.author.avatar} name={question.author.name} className="w-8 h-8 rounded-full object-cover border border-gray-100" />
                           <span className="text-sm font-medium text-gray-700 group-hover:text-primary">{question.author.name}</span>
                         </Link>
                       </td>

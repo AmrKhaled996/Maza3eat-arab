@@ -13,7 +13,7 @@ import { Title } from "react-head";
 
 function RepliesThreadPage() {
   const { lang } = useLocale();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
@@ -30,11 +30,11 @@ function RepliesThreadPage() {
   }, [reply, id, lang, navigate]);
 
   return (
-    <div className="min-h-screen  max-w-7xl mx-auto">
+    <div className="min-h-screen  max-w-7xl mx-auto" key={reply?.id}>
       <NavigationBar page="" solidNav={true} />
-      <Title> {lang === "ar" ? "الردود":"Replies"}  </Title>
+      <Title key={i18n.language}> {t("replies.title")} </Title>
       {/* ================= Page ================= */}
-      <main className="mx-auto max-w-362.5 px-6 py-6 mt-12">
+      <main className="mx-auto max-w-362.5 px-6 py-6 mt-20">
         <div className="grid grid-cols-12 gap-4">
           {/* ================= Left Side ================= */}
           <section className="col-span-12 xl:col-span-7">

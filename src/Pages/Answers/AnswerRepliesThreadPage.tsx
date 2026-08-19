@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import ReplyItem from "../../Components/Answers/ReplyItem";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { Reply } from "../../Types/Reply";
@@ -8,29 +8,33 @@ import NavigationBar from "../../Components/shared/NavigationBar";
 import { localizedPath } from "../../i18n/paths";
 import { useLocale } from "../../i18n/useLocale";
 import { useTranslation } from "react-i18next";
+import { Title } from "react-head";
 
 function AnswerRepliesThreadPage() {
   const { lang } = useLocale();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
 
-  const state = location.state as { reply: Reply; postId: string } | undefined;
+  const state = location.state as
+    | { reply: Reply; questionId: string }
+    | undefined;
 
   if (!state) {
     navigate(-1);
     return null;
   }
 
-  const { reply, postId } = state;
+  const { reply, questionId } = state;
 
   if (!state.reply) navigate(-1);
 
   return (
-    <div className="min-h-screen  max-w-7xl mx-auto">
+    <div className="min-h-screen  max-w-7xl mx-auto" key={reply.id}>
       <NavigationBar page="" solidNav={true} />
+      <Title key={i18n.language}>{t("replies.title")}</Title>
       {/* ================= Page ================= */}
-      <main className="mx-auto max-w-362.5 px-6 py-6 mt-12">
+      <main className="mx-auto max-w-362.5 px-6 py-6 mt-20">
         <div className="grid grid-cols-12 gap-4">
           {/* ================= Left Side ================= */}
           <section className="col-span-12 xl:col-span-7">
@@ -43,16 +47,20 @@ function AnswerRepliesThreadPage() {
                 }}
                 className="flex h-10 w-10 items-center justify-center rounded-full  bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer"
               >
-                <ArrowLeft className="h-5 w-5" />
+                {lang === "ar" ? (
+                  <ArrowRight className="h-5 w-5" />
+                ) : (
+                  <ArrowLeft className="h-5 w-5" />
+                )}
               </button>
               {/* Show Discussion */}
               <button
                 onClick={() => {
-                  navigate(localizedPath(lang, `post/${postId}`));
+                  navigate(localizedPath(lang, `q&a/${questionId}`));
                 }}
                 className="rounded-full bg-stone-100 shadow-sm hover:bg-stone-200 transition-colors duration-300 hover:cursor-pointer  px-4 py-1 text-sm font-medium \ m-auto flex gap-2"
               >
-                {t("comments.showDiscussion")}{" "}
+                {t("answers.showDiscussion")}{" "}
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </button>
             </div>

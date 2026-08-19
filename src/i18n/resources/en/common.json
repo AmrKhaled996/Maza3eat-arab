@@ -371,6 +371,9 @@
     },
     "showDiscussion": "Show Full Discussion"
   },
+  "replies": {
+    "title": "Replies"
+  },
   "profileNav": {
     "menuProfile": "Profile",
     "menuPosts": "Posts",
@@ -614,7 +617,22 @@
     "questionsTab": "Questions",
     "noPosts": "No posts yet.",
     "noQuestions": "No questions yet.",
-    "joined": "Joined {{date}}"
+    "joined": "Joined {{date}}",
+    "menuProfile": "Profile",
+    "menuPosts": "Posts",
+    "menuQuestions": "Q&A",
+    "menuDelete": "Delete",
+    "menucontact": "Contact",
+    "deletePostDialog": {
+      "title": "Delete Post",
+      "message": "Are you sure you want to delete your post? This action cannot be undone.",
+      "deleteButton": "Delete"
+    },
+    "deleteQuestionDialog": {
+      "title": "Delete Question",
+      "message": "Are you sure you want to delete your question? This action cannot be undone.",
+      "deleteButton": "Delete"
+    }
   },
   "community": {
     "trendingTags": "Trending Tags",

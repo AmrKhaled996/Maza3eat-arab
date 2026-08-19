@@ -12,7 +12,7 @@ import { ToastProvider } from "./Context/Toast.tsx";
 
 const client = new QueryClient();
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <QueryClientProvider client={client}>
       <HeadProvider>
         <AuthProvider>
@@ -25,5 +25,5 @@ createRoot(document.getElementById("root")!).render(
         </AuthProvider>
       </HeadProvider>
     </QueryClientProvider>
-  </StrictMode>,
+  // </StrictMode>,
 );

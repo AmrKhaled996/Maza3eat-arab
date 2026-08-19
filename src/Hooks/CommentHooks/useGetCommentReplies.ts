@@ -3,7 +3,7 @@ import { getCommentReplies, getCommentRepliesWithCursor } from "../../Apis/Comme
 
 
 
-function useGetCommentsReplies( commentId: string ,cursor:string ="" ,excludeCommentId?: string) {
+function useGetCommentsReplies( commentId: string ,cursor:string ="" ,excludeCommentId?: string , enabled?: boolean) {
     return  useQuery({
         queryKey: ["get-comment-replies", commentId, excludeCommentId ?? null],
         queryFn: () =>{
@@ -14,7 +14,10 @@ function useGetCommentsReplies( commentId: string ,cursor:string ="" ,excludeCom
       return  getCommentReplies(commentId, excludeCommentId)} ,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
-      refetchOnReconnect: false
+      refetchOnReconnect: false,
+      refetchIntervalInBackground: false,
+      refetchInterval: false,
+      enabled: !!commentId && enabled
 
   });
 

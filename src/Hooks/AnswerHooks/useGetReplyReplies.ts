@@ -3,19 +3,20 @@ import { getReplyReplies, getReplyRepliesWithCursor } from "../../Apis/AnswersAp
 
 
 
-function useGetReplysReplys(replyId: string, cursor: string = "") {
+function useGetReplysReplys(replyId: string, cursor: string = "",excludeReplyId:string="",enabled?:boolean) {
   return useQuery({
-    queryKey: ["get-answer-reply-replies", replyId, cursor],
+    queryKey: ["get-answer-reply-replies", replyId, cursor,excludeReplyId],
     queryFn: () => {
       if (cursor) {
-        return getReplyRepliesWithCursor(replyId, cursor);
+        return getReplyRepliesWithCursor(replyId, cursor,excludeReplyId);
       }
-      return getReplyReplies(replyId);
+      return getReplyReplies(replyId,excludeReplyId);
     },
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
-      refetchInterval: false
+      refetchInterval: false,
+      enabled: !!replyId && enabled
   });
 }
 export default useGetReplysReplys;

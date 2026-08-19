@@ -338,13 +338,14 @@
     }
   },
   "comments": {
+    
     "placeholder": "اكتب تعليقاً...",
     "writeReplyPlaceholder": "اكتب...",
     "publish": "نشر",
     "reply": "رد",
     "report": "إبلاغ",
     "delete": "حذف",
-    "viewMoreReplies": "عرض الردود ({{count}})",
+    "viewMoreReplies": "عرض الردود {{count}}",
     "repliesCount": "{{count}} ردود",
     "showMore": "عرض المزيد",
     "errors": {
@@ -361,7 +362,7 @@
     "reply": "رد",
     "report": "إبلاغ",
     "delete": "حذف",
-    "viewMoreReplies": "عرض الردود ({{count}})",
+    "viewMoreReplies": "عرض الردود {{count}}",
     "repliesCount": "{{count}} ردود",
     "showMore": "عرض المزيد",
     "errors": {
@@ -369,7 +370,10 @@
       "maxChars": "الحد الأقصى {{count}} حرفًا.",
       "failedReport": "فشل في إرسال البلاغ."
     },
-    "showDiscussion": "عرض المنشور كاملا"
+    "showDiscussion": "عرض السؤال كاملا"
+  },
+  "replies": {
+    "title": "الردود"
   },
   "profileNav":{
     "menuProfile": "الملف الشخصي",
@@ -612,7 +616,29 @@
     "questionsTab": "الأسئلة",
     "noPosts": "لا توجد منشورات بعد.",
     "noQuestions": "لا توجد أسئلة بعد.",
-    "joined": "انضم في {{date}}"
+    "joined": "انضم في {{date}}",
+     "menuProfile": "الملف الشخصي",
+    "menuPosts": "المنشورات",
+    "menuQuestions": "الأسئلة",
+    "menuDelete": "حذف ",
+    "menucontact": "تواصل",
+    "deletePostDialog": {
+      "title": "حذف المنشور",
+      "message": "هل انت متاكد من حذف المنشور؟",
+      "deleteButton": "حذف"
+    },
+    "deleteQuestionDialog": {
+      "title": "حذف السؤال",
+      "message": "هل انت متاكد من حذف السؤال؟",
+      "deleteButton": "حذف"
+    },
+    "contactDialog": {
+      "title": "طلب تواصل",
+      "description": "أرسل طلب تواصل إلى هذا المستخدم، وسيتواصل معك بعد ذلك.",
+      "messageSent" :"رسالة",
+      "contactButton": "ارسال",
+      "inputPlaceholder": "اكتب رسالة..."
+    }
   },
   "community": {
     "trendingTags": "الوسوم الشائعة",

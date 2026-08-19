@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
@@ -13,23 +13,60 @@ import { ContactButton } from "../../Components/shared/ContactButton";
 import PostCard from "../../Components/Community/PostCard";
 import { QuestionCard } from "../../Components/Q&A/QuestionCard";
 import BounceLoading from "../../Components/shared/BounceLoading";
-import { FileText, HelpCircle, Calendar, ArrowLeft } from "lucide-react";
+import {
+  FileText,
+  HelpCircle,
+  Calendar,
+  ArrowLeft,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import { FormatPublishDate } from "../../utils/DateFormater";
 import Avatar from "../../Components/shared/Avatar";
+import { useAuth } from "../../Context/Auth";
+import cn from "../../utils/Cn";
+import { useLocale } from "../../i18n/useLocale";
+import {
+  deleteUserPost,
+  deleteUserQuestion,
+} from "../../Apis/ProfileApi/profile-api";
+import DeleteQuestionDialog from "../../Components/Profile/DeleteQuestionDialog";
+import DeletePostDialog from "../../Components/Profile/DeletePostDialog";
+import { useToast } from "../../Context/Toast";
+
 
 export default function ProfilePostPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation("common");
+  const { lang } = useLocale();
+  const { user } = useAuth();
+  const {toast} = useToast();
   const navigate = useNavigate();
+
+  const [profileQuestionsData, setProfileQuestionsData] = useState<any>([]);
+  const [deleteQuestionId, setDeleteQuestionId] = useState<string>("");
+  const [deleteQuestionOpen, setDeleteQuestionOpen] = useState(false);
+  const [deleteQuestionLoading, setDeleteQuestionLoading] = useState(false);
+  const [questionSettingsOpen, setQuestionSettingsOpen] = useState(false);
+
+  const [profilePostsData, setProfilePostsData] = useState<any>([]);
+  const [deletePostId, setDeletePostId] = useState<string>("");
+  const [deletePostOpen, setDeletePostOpen] = useState(false);
+  const [deletePostLoading, setDeletePostLoading] = useState(false);
+  const [postSettingsOpen, setPostSettingsOpen] = useState(false);
+
+  
   const [activeTab, setActiveTab] = useState<"posts" | "questions">("posts");
-
+  
   const userId = id || "";
-
+  
   const { data: userProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["userProfile", userId],
     queryFn: () => fetchUserProfile(userId),
     enabled: !!userId,
   });
+  const [profilePostCount, setProfilePostCount] = useState<any>(userProfile?.counts?.posts || 0);
+  const [profileQuestionCount, setProfileQuestionCount] = useState<any>(userProfile?.counts?.questions || 0);
 
   const {
     data: postsData,
@@ -63,9 +100,64 @@ export default function ProfilePostPage() {
     enabled: !!userId && activeTab === "questions",
   });
 
-  const posts = postsData?.pages.flatMap((p: any) => p.posts || []) || [];
-  const questions =
-    questionsData?.pages.flatMap((p: any) => p.questions || []) || [];
+  const handleQuestionDelete = async (id: string) => {
+    try {
+      if (!id) return;
+      setDeleteQuestionLoading(true);
+      await deleteUserQuestion({ questionId: id });
+      const newQuestions = profileQuestionsData.filter((q: any) => q.id !== id);
+      setProfileQuestionsData(newQuestions);
+      setProfileQuestionCount(profileQuestionCount - 1);
+      toast.success(lang === "ar" ? "تم حذف السؤال بنجاح" : "Question deleted successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error(lang === "ar" ? "حدث خطأ ما ، لم يتم حذف السؤال" : "Something went wrong , question not deleted");
+    } finally {
+      setDeleteQuestionLoading(false);
+      setDeleteQuestionOpen(false);
+    }
+  };
+
+  const handlePostDelete = async (id: string) => {
+    try {
+      if (!id) return;
+      setDeletePostLoading(true);
+      await deleteUserPost({ postId: id });
+      const newPosts = profilePostsData.filter((q: any) => q.id !== id);
+      setProfilePostsData(newPosts);
+      setProfilePostCount(profilePostCount - 1);
+      toast.success(lang === "ar" ? "تم حذف المنشور بنجاح" : "Post deleted successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error(lang === "ar" ? "حدث خطأ ما ، لم يتم حذف المنشور" : "Something went wrong , post not deleted");
+    } finally {
+      setDeletePostLoading(false);
+      setDeletePostOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const questions =
+      questionsData?.pages.flatMap((p: any) => p.questions || []) || [];
+
+    setProfileQuestionsData(questions);
+  }, [questionsData]);
+
+  useEffect(() => {
+    const posts = postsData?.pages.flatMap((p: any) => p.posts || []) || [];
+
+    setProfilePostsData(posts);
+  }, [postsData]);
+
+  useEffect(() => {
+    if(userProfile){
+      setProfilePostCount(userProfile?.counts?.posts);
+      setProfileQuestionCount(userProfile?.counts?.questions);
+    }
+  },[userProfile])
+
+
+
 
   if (isProfileLoading) {
     return (
@@ -122,9 +214,13 @@ export default function ProfilePostPage() {
             <div className="flex-1 space-y-3">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-extrabold text-gray-900">
+                  <h1 className="text-2xl font-extrabold text-gray-900 flex gap-5 ">
                     {userProfile.name}
+                    {user?.id !== userId && (
+                      <ContactButton receiverId={userProfile.id} />
+                    )}
                   </h1>
+
                   {userProfile.createdAt && (
                     <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1 justify-center sm:justify-start">
                       <Calendar className="w-3.5 h-3.5" />
@@ -137,25 +233,23 @@ export default function ProfilePostPage() {
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mt-1.5 justify-center sm:justify-start">
+                  <div className="flex items-center gap-4  text-gray-500 justify-center sm:justify-start my-4">
                     <span className="flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5" />
                       <span className="font-bold text-gray-800">
-                        {userProfile.counts?.posts ?? 0}
+                        {profilePostCount}
                       </span>
                       {t("profile.postsTab", "Posts")}
                     </span>
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 ">
                       <HelpCircle className="w-3.5 h-3.5" />
-                      <span className="font-bold text-gray-800">
-                        {userProfile.counts?.questions ?? 0}
+                      <span className="font-bold text-gray-800 ">
+                        {profileQuestionCount}
                       </span>
                       {t("profile.questionsTab", "Questions")}
                     </span>
                   </div>
                 </div>
-
-                <ContactButton receiverId={userProfile.id} />
               </div>
 
               {/* Tier Badge with hover tooltip */}
@@ -210,15 +304,50 @@ export default function ProfilePostPage() {
           <div className="space-y-4">
             {isPostsLoading ? (
               <BounceLoading />
-            ) : posts.length === 0 ? (
+            ) : profilePostsData.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
                 {t("profile.noPosts", "No posts yet.")}
               </div>
             ) : (
-              posts.map((post: any) => (
-
-                  <PostCard key={post.id} post={post} />
-
+              profilePostsData.map((post: any) => (
+                <div key={post.id} className="flex gap-1">
+                  <div className="w-full">
+                    <PostCard key={post.id} post={post} />
+                  </div>
+                  {userId === user?.id && (
+                    <div
+                      key={post.id}
+                      onClick={() =>
+                        setPostSettingsOpen((prev) =>
+                          prev === post.id ? null : post.id,
+                        )
+                      }
+                      className="p-2 bg-white rounded-full h-fit hover:cursor-pointer drop-shadow-md hover:shadow-sm hover:opacity-80 transition-all duration-300 relative"
+                    >
+                      <MoreHorizontal />
+                      {postSettingsOpen === post.id && (
+                        <div
+                          className={cn(
+                            `absolute top-11 z-20 `,
+                            lang === "en" ? "right-0" : "left-0",
+                          )}
+                        >
+                          <div className="bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-20">
+                            <button
+                              onClick={() => {
+                                setDeletePostOpen(true);
+                                setDeletePostId(post.id);
+                              }}
+                              className="text-red-500 hover:text-red-600 hover:cursor-pointer  hover:opacity-80 transition-all duration-300 flex items-center gap-2 z-20"
+                            >
+                              <Trash2 /> {t("profile.menuDelete")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))
             )}
             {hasNextPosts && (
@@ -241,13 +370,50 @@ export default function ProfilePostPage() {
           <div className="space-y-4">
             {isQuestionsLoading ? (
               <BounceLoading />
-            ) : questions.length === 0 ? (
+            ) : profileQuestionsData.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
                 {t("profile.noQuestions", "No questions yet.")}
               </div>
             ) : (
-              questions.map((question: any) => (
-                <QuestionCard key={question.id} question={question} />
+              profileQuestionsData.map((question: any) => (
+                <div key={question.id} className="flex gap-1">
+                  <div className="w-full">
+                    <QuestionCard key={question.id} question={question} />
+                  </div>
+                  {userId === user?.id && (
+                    <div
+                      key={question.id}
+                      onClick={() =>
+                        setQuestionSettingsOpen((prev) =>
+                          prev === question.id ? null : question.id,
+                        )
+                      }
+                      className="p-2 bg-white rounded-full h-fit hover:cursor-pointer shadow-sm hover:shadow-sm hover:opacity-80 transition-all duration-300 relative"
+                    >
+                      <MoreHorizontal />
+                      {questionSettingsOpen === question.id && (
+                        <div
+                          className={cn(
+                            `absolute top-11 z-20 `,
+                            lang === "en" ? "right-0" : "left-0",
+                          )}
+                        >
+                          <div className="bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-20">
+                            <button
+                              onClick={() => {
+                                setDeleteQuestionOpen(true);
+                                setDeleteQuestionId(question.id);
+                              }}
+                              className="text-red-500 hover:text-red-600 hover:cursor-pointer  hover:opacity-80 transition-all duration-300 flex items-center gap-2 z-20"
+                            >
+                              <Trash2 /> {t("profile.menuDelete")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ))
             )}
             {hasNextQuestions && (
@@ -266,6 +432,22 @@ export default function ProfilePostPage() {
           </div>
         )}
       </div>
+      {deleteQuestionOpen && (
+        <DeleteQuestionDialog
+          open={deleteQuestionOpen}
+          onClose={() => setDeleteQuestionOpen(false)}
+          onConfirm={() => handleQuestionDelete(deleteQuestionId)}
+          loading={deleteQuestionLoading}
+        />
+      )}
+      {deletePostOpen && (
+        <DeletePostDialog
+          open={deletePostOpen}
+          onClose={() => setDeletePostOpen(false)}
+          onConfirm={() => handlePostDelete(deletePostId)}
+          loading={deletePostLoading}
+        />
+      )}
     </div>
   );
 }

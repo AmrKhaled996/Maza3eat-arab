@@ -137,7 +137,7 @@ html[dir="rtl"] .footer-tagline {
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(156, 163, 175, 0.4);
-  border-radius: 9999px;
+
   transition: background 0.2s ease;
 }
 ::-webkit-scrollbar-thumb:hover {

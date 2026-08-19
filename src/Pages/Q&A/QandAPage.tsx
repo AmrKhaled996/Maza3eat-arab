@@ -21,6 +21,7 @@ import AnswersSection from "../../Components/Answers/MainContainer";
 import { Title } from "react-head";
 import { playLikeSound } from "../../utils/sounds";
 import { Tag } from "../../Components/shared/Tag";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function QandAPage() {
   const { id } = useParams<{ id: string }>();
@@ -129,10 +130,11 @@ export default function QandAPage() {
               {/* Question Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={question.author.avatar || "/default-avatar.png"}
-                    alt={question.author.name}
-                    className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                  <Avatar
+                    src={question.author.avatar}
+                    name={question.author.name}
+                    style={{ outlineColor: question?.author?.badgeColor}}
+                    className="w-12 h-12 rounded-full object-cover  outline-3  "
                   />
                   <div>
                     <div className="flex items-center gap-2">

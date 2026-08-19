@@ -123,12 +123,12 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
                 ) : status === "sent" ? (
                   <>
                     <Check size={16} />
-                    <span>{t("contactRequest.sentSuccess")}</span>
+                    <span className="text-sm">{t("contactRequest.sentSuccess")}</span>
                   </>
                 ) : (
                   <>
                     <Mail size={14} />
-                    <span>{t("contactRequest.sendButton")}</span>
+                    <span className="text-sm">{t("contactRequest.sendButton")}</span>
                   </>
                 )}
               </button>

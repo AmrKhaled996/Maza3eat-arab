@@ -6,6 +6,7 @@ import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import useGetAnswersByPostId from "../../Hooks/AnswerHooks/useGetAnswersByPostId";
 import { useAuth } from "../../Context/Auth";
 
+
 export default function AnswersSection() {
   const [answers, setAnswers] = useState<AnswerType[]>([]);
   // const [newAnswer, setNewAnswer] = useState<Answer>();
@@ -26,7 +27,7 @@ export default function AnswersSection() {
 
 
   const handleAddAnswer = (answer: AnswerType) => {
-    setAnswers((prev) => [answer, ...prev]);
+    setAnswers((prev) => [prev[0], answer, ...prev.slice(1)]);
   };
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -54,8 +55,10 @@ export default function AnswersSection() {
 
   if (!questionIdparam) return null;
 
+  
+
   return (
-    <div className="max-w-2xl mx-auto mt-6" dir="rtl">
+    <div className="max-w-2xl mx-auto mt-6" dir="rtl" >
       {user && (
         <div className="w-full">
           <AnswerInput onAddAnswer={handleAddAnswer} />
@@ -71,7 +74,7 @@ export default function AnswersSection() {
           <div>
             {HighlightedAnswer && <AnswerItem key={HighlightedAnswer?.id} answer={HighlightedAnswer} />}
             {answers?.map((c, idx) => (
-              <AnswerItem key={c.id} answer={c} isFirst={idx === 0} />
+              <AnswerItem key={c.id} answer={c} isFirst={idx===0} />
             ))}
           </div>
         )}

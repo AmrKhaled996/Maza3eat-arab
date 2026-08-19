@@ -63,10 +63,13 @@ export async function getAnswersByQuestionId(
 export async function getAnswerRepliesWithCursor(
   answersId: string,
   cursor: string,
+  excludeReplyId?: string,
 ) {
   try {
     const response = await axiosInstance.get(`/answers/${answersId}/replies`, {
-      params: { cursor: cursor },
+      params:excludeReplyId
+       ? { cursor: cursor, excludeReplyId: excludeReplyId }:
+       { cursor: cursor },
     });
 
     return response.data.data;
@@ -80,9 +83,13 @@ export async function getAnswerRepliesWithCursor(
     throw error;
   }
 }
-export async function getAnswerReplies(answersId: string) {
+export async function getAnswerReplies(answersId: string,excludeReplyId:string) {
   try {
-    const response = await axiosInstance.get(`/answers/${answersId}/replies`);
+    const response = await axiosInstance.get(`/answers/${answersId}/replies`,{
+      params: excludeReplyId
+        ? { excludeReplyId: excludeReplyId }
+        : {},
+    });
 
     return response.data.data;
   } catch (error) {

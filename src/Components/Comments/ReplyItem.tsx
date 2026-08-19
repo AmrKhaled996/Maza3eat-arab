@@ -79,7 +79,8 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching, isLoading } = useGetReplyReplies(reply?.id, pageCursor);
+  const { data, isFetching, isLoading } = useGetReplyReplies(reply?.id, pageCursor ,   HighlightedReplyID??"",
+    showReplies);
 
   const Highlight = () => {
     if (reply?.id === HighlightedReplyID) {
@@ -139,7 +140,7 @@ export default function ReplyItem({
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
       setShowReplies(true);
-      toast.success("Reply created successfully");
+      toast.success(lang === "en" ? "Reply created successfully" : "تم إرسال الرد بنجاح");
     } catch (error) {
       console.error(error);
       toast.error(t("error.tryAgain"));
@@ -284,7 +285,7 @@ export default function ReplyItem({
     }
   }, [data,isLoading])
   return (
-    <div className={`flex max-w-2xl scroll-mt-40 `} dir="rtl" ref={rootRef} id={reply?.id}>
+    <div className={`flex max-w-2xl scroll-mt-40 `} dir="rtl" ref={rootRef} id={reply?.id} key={reply?.id}>
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
         <Avatar
           src={reply?.author?.avatar}
@@ -468,7 +469,7 @@ export default function ReplyItem({
         )}
 
         {/* replies */}
-        {replies && replies.length > 0 && (
+        {reply?.hasReplies && (
           <>
             {!showReplies && (
               <button

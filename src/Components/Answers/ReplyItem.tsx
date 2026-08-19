@@ -22,6 +22,7 @@ import ReportDialog from "./ReportDialog";
 import cn from "../../utils/Cn";
 import { useAuth } from "../../Context/Auth";
 import Avatar from "../shared/Avatar";
+import { useToast } from "../../Context/Toast";
 
 export default function ReplyItem({
   reply,
@@ -35,7 +36,8 @@ export default function ReplyItem({
   const { lang } = useLocale();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const [liked, setLiked] = useState(Boolean(reply?.likedByMe));
   const [likes, setLikes] = useState(reply?.likesCount);
@@ -56,11 +58,13 @@ export default function ReplyItem({
   const [nextCursor, setNextCursor] = useState("");
   // cursor actually sent to the server; only advances on an explicit "show more"
   const [pageCursor, setPageCursor] = useState("");
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   const [IsHighligthed, setIsHighligthed] = useState(false);
   const [searchParams] = useSearchParams();
 
-  const HighlightedCommentID = searchParams.get("highlighted");
+  const HighlightedReplyID = searchParams.get("highlighted");
+  const [hasScrolledToHash, setHasScrolledToHash] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,14 +79,18 @@ export default function ReplyItem({
   const [isReporting, setIsReporting] = useState(false);
   const [reportingError, setReportingError] = useState("");
 
-  const { data, isFetching } = useGetReplysReplys(reply?.id, nextCursor);
+  const { data, isFetching, isLoading } = useGetReplysReplys(
+    reply?.id,
+    nextCursor,
+    HighlightedReplyID??"",
+    showReplies
+    
+  );
 
   const Highlight = () => {
-    if (reply?.id === HighlightedCommentID) {
-      // setIsHighligthed(true);
+    if (reply?.id === HighlightedReplyID) {
       return "border-blue-300 bg-sky-100";
     } else {
-      // setIsHighligthed(false);
       return "border-[#E5E7EB] bg-[#f7f7f7]";
     }
   };
@@ -139,9 +147,13 @@ export default function ReplyItem({
       setreplyInputValue("");
       setReplies((prev) => [...prev, response?.data?.data]);
       setShowReplies(true);
+      toast.success(
+        lang === "en" ? "Reply created successfully" : "تم إرسال الرد بنجاح",
+      );
     } catch (error) {
       console.error(error);
       console.error("Failed to create reply");
+      toast.error(t("error.tryAgain"));
     } finally {
       setIsSubmitting(false);
       setReplying(false);
@@ -205,12 +217,11 @@ export default function ReplyItem({
   const handleShowReplies = () => {
     if (replies[0]?.depth % 3 === 0)
       navigate(localizedPath(lang, `answer-replies`), {
-        state: { reply: reply, postId: data.postId },
+        state: { reply: reply, questionId: data.questionId },
       });
     if (showReplies) return;
     setShowReplies(true);
   };
-
 
   const recomputeHeights = () => {
     if (!rootRef.current) return;
@@ -249,20 +260,58 @@ export default function ReplyItem({
   useEffect(() => {
     if (data) {
       setReplies((prev) =>
-        pageCursor ? [...prev, ...(data?.replies ?? [])] : (data?.replies ?? []),
+        pageCursor
+          ? [...prev, ...(data?.replies ?? [])]
+          : (data?.replies ?? []),
       );
       setNextCursor(data?.nextCursor ?? "");
       setHasMoreReplies(!!data?.hasMore);
     }
   }, [data]);
 
+useEffect(() => {
+  if (
+    HighlightedReplyID === reply?.id&&
+    !showReplies
+  ) {
+    setShowReplies(true);
+    setIsHighligthed(true);
+  }
+}, [
+  HighlightedReplyID,
+  reply?.id,
+  showReplies,
+]);
+
   useEffect(() => {
-    if (HighlightedCommentID === reply?.id) {
-      setIsHighligthed(true);
+    if (hasScrolledToHash) return;
+    if (isLoading || !data) return;
+
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const element = document.getElementById(hash.substring(1));
+
+    if (!element) return;
+    setHasScrolledToHash(true);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
-  }, []);
+  }, [data, isLoading]);
+
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef}>
+    <div
+      className="flex max-w-2xl  scroll-mt-20"
+      dir="rtl"
+      ref={rootRef}
+      id={reply?.id}
+      key={reply?.id}
+    >
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
         <Avatar
           name={reply?.author?.name}
@@ -287,7 +336,7 @@ export default function ReplyItem({
                   <svg
                     key={index}
                     width={41}
-                    height={repliesRef.current[index]?.offsetHeight}
+                    height={repliesRef.current[index]?.offsetHeight + 8}
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -312,16 +361,19 @@ export default function ReplyItem({
       </div>
 
       <div className="flex-1 relative">
-        {IsHighligthed && (
-          <div className="absolute inset-x-30 inset-80 top-0 h-[calc(100%-1.5rem)]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_4_100ms_forwards] " />
-        )}
         {/* bubble */}
         <div
+          ref={highlightRef}
           className={cn(
-            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20`,
+            ` border  rounded-2xl px-4 py-3 shadow-sm  w-full  z-20 relative`,
             Highlight(),
           )}
         >
+          {IsHighligthed && (
+            <div
+              className={`absolute top-1/2 inset-x-30 inset-80  h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_8_100ms_forwards] `}
+            />
+          )}
           <div className="flex gap-2 items-center">
             <span className="font-bold">{reply?.author?.name}</span>
             <Badge
@@ -356,17 +408,19 @@ export default function ReplyItem({
             {likes}
           </button>
 
-          {user?.id &&<button
-            onClick={() => {
-              setReplying(!replying);
-            }}
-            className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
-          >
-            <Reply
-              className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
-            />
-            {t("answers.reply")}
-          </button>}
+          {user?.id && (
+            <button
+              onClick={() => {
+                setReplying(!replying);
+              }}
+              className={`flex ${lang == "ar" ? "flex-row" : "flex-row-reverse"} items-center gap-1 hover:cursor-pointer text-gray-600 hover:text-blue-500 group transition-all duration-200`}
+            >
+              <Reply
+                className={`h-5 w-5 ${lang == "ar" ? "" : "-scale-x-100"} text-gray-600 group-hover:text-blue-500 `}
+              />
+              {t("answers.reply")}
+            </button>
+          )}
           <div className="relative inline-block">
             {(reply?.permissions?.canDelete ||
               reply?.permissions?.canReport) && (
@@ -389,7 +443,7 @@ export default function ReplyItem({
             )}
 
             {openMoreMenu && (
-              <div className="absolute right-0 bottom-full mb-2 w-40 rounded-lg  bg-white shadow-lg">
+              <div className="absolute right-0 bottom-full mb-2 w-40 rounded-lg  bg-white shadow-lg z-20">
                 {reply?.permissions?.canReport && (
                   <button
                     onClick={() => setOpenReportDialog(true)}
@@ -441,7 +495,7 @@ export default function ReplyItem({
         )}
 
         {/* replies */}
-        {replies && replies.length > 0 && (
+        {reply.hasReplies && (
           <>
             {!showReplies && (
               <button

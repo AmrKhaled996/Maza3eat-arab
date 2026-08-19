@@ -30,6 +30,7 @@ import {
 import { fetchNotificationById } from "../../Apis/NotificationApi";
 import { useToast } from "../../Context/Toast";
 import { Title } from "react-head";
+import Avatar from "../../Components/shared/Avatar";
 
 export default function NotificationsPage() {
   const { lang } = useLocale();
@@ -348,11 +349,11 @@ export default function NotificationsPage() {
             );
             case "COMMENT_REPLY_REPLY":
               return (
-                navigate(localizedPath(lang, `replies`),{state:{reply: res?.notification?.parentReply}})
+                navigate(localizedPath(lang, `replies`),{state:{reply: res?.notification?.parentReply,postId: res?.notification?.postId,commentId: res?.notification?.comment?.id}})
               );
           case "ANSWER_REPLY_REPLY":
             return (
-              navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.notification?.parentReply}})
+              navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.notification?.parentReply,questionId: res?.notification?.questionId,answerId: res?.notification?.answer?.id}})
             );
           case "POST_LIKE":
             return (
@@ -466,10 +467,11 @@ export default function NotificationsPage() {
                       {/* Left side: Avatar + type badge */}
                       <div className="relative shrink-0">
                         {n.sender ? (
-                          <img
+                          <Avatar
                             src={n.sender.avatar}
-                            alt={n.sender.name}
-                            className="h-11 w-11 rounded-full object-cover border border-gray-100 shadow-sm"
+                            name={n.sender.name}
+                            style={{ outlineColor: n.sender?.tier?.badgeColor }}
+                            className="h-11 w-11 rounded-full object-cover outline-3  shadow-sm"
                           />
                         ) : (
                           // System Admin Notification placeholder avatar
@@ -489,7 +491,7 @@ export default function NotificationsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {n.sender?.tier && (
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${getTierBadgeStyles(n.sender.tier.name)}`}>
+                            <span className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize`} style={{ background: n?.sender?.tier?.badgeColor }}>
                               {n.sender.tier.name}
                             </span>
                           )}
@@ -572,10 +574,11 @@ export default function NotificationsPage() {
                     className="p-5 flex gap-4 items-start transition-all hover:bg-gray-50/20"
                   >
                     {/* User Avatar */}
-                    <img
+                    <Avatar
                       src={req.user.avatar}
-                      alt={req.user.name}
-                      className="h-11 w-11 rounded-full object-cover border border-gray-100 shadow-sm shrink-0"
+                      name={req.user.name}
+                      style={{ outlineColor: req.user?.tier?.badgeColor }}
+                      className="h-11 w-11 rounded-full object-cover outline-3 shadow-sm shrink-0"
                     />
 
                     {/* Request Details */}
@@ -590,7 +593,9 @@ export default function NotificationsPage() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${getTierBadgeStyles(req.user.tier.name)}`}>
+                        <span className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize `}
+                        style={{ background: req.user.tier?.badgeColor }}
+                        >
                           {req.user.tier.name}
                         </span>
 
@@ -733,13 +738,14 @@ export default function NotificationsPage() {
             </div>
 
             <div className="p-6 pt-8 text-center">
-              <img
+              <Avatar
                 src={reasonModalReq.user.avatar}
-                alt={reasonModalReq.user.name}
-                className="h-16 w-16 rounded-full object-cover mx-auto border-2 border-primary/10 shadow-md mb-3"
+                name={reasonModalReq.user.name}
+                style={{ outlineColor: reasonModalReq.user?.tier?.badgeColor }}
+                className="h-16 w-16 rounded-full object-cover  mx-auto outline-3 shadow-md mb-3"
               />
               <h3 className="text-lg font-extrabold text-gray-900">{reasonModalReq.user.name}</h3>
-              <span className={`inline-block text-[10px] font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize ${getTierBadgeStyles(reasonModalReq.user.tier.name)}`}>
+              <span className={`inline-block text-white text-[10px] font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize `} style={{ backgroundColor: reasonModalReq.user?.tier?.badgeColor }}>
                 {reasonModalReq.user.tier.name}
               </span>
 
@@ -792,13 +798,14 @@ export default function NotificationsPage() {
 
             <div className="p-6 pt-8">
               <div className="text-center mb-6">
-                <img
+                <Avatar
                   src={contactInfoModalReq.user.avatar}
-                  alt={contactInfoModalReq.user.name}
-                  className="h-16 w-16 rounded-full object-cover mx-auto border-2 border-primary/10 shadow-md mb-3"
+                  name={contactInfoModalReq.user.name}
+                  style={{ outlineColor: contactInfoModalReq.user?.tier?.badgeColor }}
+                  className="h-16 w-16 rounded-full object-cover mx-auto outline-3 shadow-md mb-3"
                 />
                 <h3 className="text-lg font-extrabold text-gray-900">{contactInfoModalReq.user.name}</h3>
-                <span className={`inline-block text-[10px] font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize ${getTierBadgeStyles(contactInfoModalReq.user.tier.name)}`}>
+                <span className={`inline-block text-[10px] text-white font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize` } style={{ background: contactInfoModalReq.user.tier?.badgeColor }} >
                   {contactInfoModalReq.user.tier.name}
                 </span>
               </div>

@@ -19,17 +19,22 @@ import {
 } from "../../Apis/AnswersApi/Answers";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
 import { CheckCircle2 } from "lucide-react";
 import { localizedPath } from "../../i18n/paths";
 import { useAuth } from "../../Context/Auth";
 import Avatar from "../shared/Avatar";
 
+
 export default function AnswerItem({ answer, isFirst = false }: { answer: Answer; isFirst?: boolean }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
   const {user} = useAuth();
+  const location = useLocation();
+  
+  const HighlightedReply = location.state?.reply;
+  const HighlightedReplyParentId = location.state?.answerId;
 
   const [voted, setVoted] = useState(answer?.myVote);
   const [votes, setVotes] = useState(answer?.totalVoteValue);
@@ -69,9 +74,11 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
 
   const { id: questionIdparam } = useParams<{ id: string }>();
 
-  const { data,isLoading, isFetching, refetch } = useGetAnswersReplies(
+  const { data,isLoading, isFetching, refetch,  } = useGetAnswersReplies(
     answer?.id,
     nextCursor,
+    HighlightedAnswerID ??"",
+    showReplies
   );
 
   const Highlight = () => {
@@ -291,12 +298,19 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
       setHasMoreReplies(data?.hasMore);
     }
   }, [data]);
-  useEffect(() => {
-    if (HighlightedAnswerID === answer?.id) {
-      setShowReplies(true);
-      setIsHighligthed(true);
-    }
-  }, [HighlightedAnswerID]);
+useEffect(() => {
+  if (
+    HighlightedReplyParentId === answer?.id &&
+    !showReplies
+  ) {
+    setShowReplies(true);
+    setIsHighligthed(true);
+  }
+}, [
+  HighlightedReplyParentId,
+  answer?.id,
+  showReplies,
+]);
 
   
     useEffect(() => {
@@ -320,7 +334,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
     }
   }, [data,isLoading]);
   return (
-    <div className="flex max-w-2xl  " dir="rtl" ref={rootRef} id={answer?.id}>
+    <div className="flex max-w-2xl scroll-mt-20 " dir="rtl" ref={rootRef} id={answer?.id} key={answer?.id}>
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       > 
@@ -349,7 +363,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
                   <svg
                     key={index}
                     width={41}
-                    height={repliesRef.current[index]?.offsetHeight}
+                    height={repliesRef.current[index]?.offsetHeight+8}
                     // viewBox="0 0 41 114"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -419,21 +433,6 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
 
         {/* actions */}
         <div className="flex gap-4 mt-2 mx-2 mb-2 text-xs">
-          {/* <button
-            onClick={() => {
-              handleLike();
-            }}
-            className="flex gap-1 items-center"
-          >
-            <Heart
-              className={`h-5 w-5 hover:cursor-pointer  hover:text-red-500 group transition-all duration-200   ${
-                voted
-                  ? "fill-red-500 text-red-500"
-                  : "text-gray-600 group-hover:text-red-500 hover:cursor-pointer"
-              }`}
-            />{" "}
-            {votes}
-          </button> */}
 
           {user?.id &&<button
             onClick={() => {
@@ -519,7 +518,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
         )}
 
         {/* replies */}
-        {replies && replies.length > 0 && (
+        {answer.repliesCount > 0 && (
           <>
             {!showReplies && answer.repliesCount > 0 && (
               <button
@@ -534,6 +533,7 @@ export default function AnswerItem({ answer, isFirst = false }: { answer: Answer
 
             {showReplies && (
               <div className="mt-3  ">
+              { HighlightedReply && HighlightedReplyParentId === answer?.id && <ReplyItem key={HighlightedReply.id} reply={HighlightedReply} />}
                 {replies?.map((r, index) => {
                   return (
                     <div

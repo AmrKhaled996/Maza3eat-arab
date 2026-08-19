@@ -77,7 +77,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
     isLoading,
     isFetching,
     refetch,
-  } = useGetCommentsReplies(comment?.id, nextCursor,HighlightedCommentID ?? "");
+  } = useGetCommentsReplies(comment?.id, nextCursor,HighlightedCommentID ?? "", showReplies);
 
   const Highlight = () => {
     if (comment?.id === HighlightedCommentID) {
@@ -240,12 +240,19 @@ export default function CommentItem({ comment }: { comment: Comment }) {
       setHasMoreReplies(data?.hasMore);
     }
   }, [data]);
-  useEffect(() => {
-    if (HighlightedReplyParentId === comment?.id) {
-      setShowReplies(true);
-      setIsHighligthed(true);
-    }
-  }, [HighlightedCommentID]);
+useEffect(() => {
+  if (
+    HighlightedReplyParentId === comment?.id &&
+    !showReplies
+  ) {
+    setShowReplies(true);
+    setIsHighligthed(true);
+  }
+}, [
+  HighlightedReplyParentId,
+  comment?.id,
+  showReplies,
+]);
 
   useEffect(() => {
     if (hasScrolledToHash) return;
@@ -450,7 +457,7 @@ export default function CommentItem({ comment }: { comment: Comment }) {
         )}
 
         {/* replies */}
-        {replies && replies.length > 0 && (
+        {comment.repliesCount>0 && (
           <>
             {!showReplies && comment.repliesCount > 0 && (
               <button

@@ -37,12 +37,13 @@ export async function createReplyToReply(content: string, replyId: string) {
 export async function getReplyRepliesWithCursor(
   replyId: string,
   cursor: string,
+  excludeReplyId: string = "",
 ) {
   try {
     const response = await axiosInstance.get(
       `/answer-replies/${replyId}/replies`,
       {
-        params: { cursor: cursor },
+        params:excludeReplyId ? { cursor: cursor, excludeReplyId: excludeReplyId } : { cursor: cursor },
       },
     );
 
@@ -57,10 +58,12 @@ export async function getReplyRepliesWithCursor(
     throw error;
   }
 }
-export async function getReplyReplies(replyId: string) {
+export async function getReplyReplies(replyId: string, excludeReplyId: string = "") {
   try {
     const response = await axiosInstance.get(
-      `/answer-replies/${replyId}/replies`,
+      `/answer-replies/${replyId}/replies`,{
+        params:excludeReplyId ? { excludeReplyId: excludeReplyId } : {},
+      }
     );
 
     return response.data.data;

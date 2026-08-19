@@ -125,7 +125,7 @@ function NavigationBar({
   return (
     <>
       <nav
-        className={`z-50 top-0 left-0 right-0  flex items-center justify-between px-6 sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
+        className={`z-50 top-0 left-0 right-0  flex items-center justify-between px-6  sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
       >
         <div
           onClick={()=>navigate(localizedPath(lang, ""))}
@@ -322,6 +322,14 @@ function NavigationBar({
                     >
                       {t("profileNav.menuProfile")}
                     </Link>
+                   {(user.role==="ADMIN"|| user.role==="MODERATOR") && <Link
+                      to={localizedPath(lang, `admin`)}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-bold text-primary hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("admin.dashboard")}
+                    </Link>}
                     <Link
                       to={localizedPath(lang, "create-post")}
                       role="menuitem"
