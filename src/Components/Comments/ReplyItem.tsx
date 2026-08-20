@@ -202,11 +202,7 @@ export default function ReplyItem({
   /* handle overflow replies*/
 
   const handleShowReplies = () => {
-    if (replies[0]?.depth % 3 === 0)
-      navigate(localizedPath(lang, `replies`), {
-        state: { reply: reply, postId: data.postId },
-      });
-    if (showReplies) return;
+
     setShowReplies(true);
   };
 
@@ -254,6 +250,13 @@ export default function ReplyItem({
       );
       setNextCursor(data?.nextCursor ?? "");
       setHasMoreReplies(!!data?.hasMore);
+      
+    if (data.replies[0]?.depth % 3 === 0)
+      navigate(localizedPath(lang, `replies`), {
+        state: { reply: reply, postId: data.postId },
+      });
+    if (showReplies) return;
+    setShowReplies(true);
     }
   }, [data]);
 

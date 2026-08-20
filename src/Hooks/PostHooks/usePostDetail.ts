@@ -30,6 +30,7 @@ function usePostDetail(postId: string) {
                 author: data.author,
                 publishDate: data.publishDate,
                 likedByMe: data.likedByMe,
+                scope:data.scope
             } as Post;
         },
         enabled: !!postId,

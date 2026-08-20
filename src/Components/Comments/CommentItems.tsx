@@ -19,16 +19,18 @@ import {
 } from "../../Apis/CommentsApi/Comment";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../utils/Cn";
 import { useAuth } from "../../Context/Auth";
 import Avatar from "../shared/Avatar";
+import { localizedPath } from "../../i18n/paths";
 
 export default function CommentItem({ comment }: { comment: Comment }) {
   const { lang } = useLocale();
   const { t } = useTranslation();
   const {user} = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const HighlightedReply = location.state?.reply;
   const HighlightedReplyParentId = location.state?.commentId;
 
@@ -279,12 +281,15 @@ useEffect(() => {
       <div
         className={`relative w-9 mx-4 ${lang === "ar" ? "ml-4" : "mr-4"} group`}
       >
-        <Avatar
-          name={comment?.author?.name}
-          src={comment?.author?.avatar}
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
-          style={{ outlineColor: comment?.author?.tier.badgeColor }}
-        />
+        <Link to={localizedPath(lang, `profile/${comment?.author?.id}`)}>
+          <Avatar
+            name={comment?.author?.name}
+            src={comment?.author?.avatar}
+            className="w-9 h-9 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 mx-2 relative z-30"
+            style={{ outlineColor: comment?.author?.tier.badgeColor }}
+
+            />
+          </Link>
 
         <div className="w-fit ">
           {showReplies && (
@@ -340,7 +345,7 @@ useEffect(() => {
               className={`absolute inset-x-30 inset-80 top-0 h-[${highlightRef?.current?.offsetHeight}px]  rounded-4xl main-gradient -z-1 opacity-20 animate-[ping_1.5s_8_100ms_forwards] `} />
             )}
           <div className="flex gap-2 items-center">
-            <span className="font-bold">{comment?.author?.name}</span>
+              <Link to={localizedPath(lang, `profile/${comment?.author?.id}`)} className="font-bold text-gray-900 hover:text-primary transition-colors">{comment?.author?.name}</Link>
             <Badge
               tier={comment?.author?.tier.name}
               color={comment?.author?.tier.badgeColor}

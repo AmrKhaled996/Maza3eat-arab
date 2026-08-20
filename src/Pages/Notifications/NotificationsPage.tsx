@@ -58,6 +58,7 @@ export default function NotificationsPage() {
   const [acceptModalReq, setAcceptModalReq] = useState<ContactRequest | null>(null);
   const [contactMethodType, setContactMethodType] = useState<"FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL">("WHATSAPP");
   const [contactMethodValue, setContactMethodValue] = useState("");
+  const [contactMethodError, setContactMethodError] = useState("");
   const [isReporting, setIsReporting] = useState(false);
   const [isReportMenuOpen, setIsReportMenuOpen] = useState(false);
 
@@ -918,14 +919,15 @@ export default function NotificationsPage() {
                 onChange={(e) => setContactMethodValue(e.target.value)}
                 className="w-full mb-6 p-3 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
-
-              <div className="flex gap-3">
+                {contactMethodError && <p className="text-xs text-red-500">*{contactMethodError}</p>}
+                <div className="flex gap-3">
                 <button
                   disabled={
                     !contactMethodValue.trim() ||
-                    (contactMethodType === "EMAIL" && !/^\S+@\S+\.\S+$/.test(contactMethodValue)) ||
-                    (contactMethodType === "WHATSAPP" && !/^\+?\d{10,15}$/.test(contactMethodValue)) ||
-                    ((contactMethodType === "FACEBOOK" || contactMethodType === "INSTAGRAM") && !/^https?:\/\/.+/.test(contactMethodValue))
+                    (contactMethodType === "EMAIL" && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(contactMethodValue)) ||
+                    (contactMethodType === "WHATSAPP" && !/^\+\d{10,15}$/.test(contactMethodValue)) ||
+                    ((contactMethodType === "FACEBOOK") && !/^(https?:\/\/)?(www\.)?facebook\.com\/[A-Za-z0-9.]+\/?$/.test(contactMethodValue))||
+                    ((contactMethodType === "INSTAGRAM") && !/^[a-z0-9](?!.*\.\.)(?!.*__)[a-z0-9._]{1,29}$/.test(contactMethodValue))
                   }
                   onClick={async () => {
                     if (!contactMethodValue.trim()) return;
@@ -939,9 +941,13 @@ export default function NotificationsPage() {
                       setAcceptModalReq(null);
                       setContactMethodValue("");
                       toast.success(t("notifications.successContactRequestAccepted"));
-                    } catch (error) {
+                    } catch (error:any) {
                       console.error(error);
                       toast.error(t("error.tryAgain"))
+                      if(error.response?.status===422){
+                        setContactMethodError(lang==="ar"?"قم بإدخال معلومات تواصل صحيحة":"Please enter a valid contact information")
+                        
+                      }
                     }
                   }}
                   className="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 hover:cursor-pointer transition-transform hover:-translate-y-0.5"

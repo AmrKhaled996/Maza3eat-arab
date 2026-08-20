@@ -6,6 +6,7 @@ import {
   Heart,
   MessageCircle,
   ArrowRight,
+  Clock4Icon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
@@ -28,7 +29,7 @@ function stripHtml(html: string) {
   return text;
 }
 
-export function QuestionCard({ question }: { question: Question }) {
+export function QuestionCard({ question,status="" }: { question: Question , status?: string}) {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
   const { lang } = useLocale();
@@ -75,11 +76,13 @@ export function QuestionCard({ question }: { question: Question }) {
           </div>
         </div>
 
-        {/* Answer count pill badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-xs font-extrabold shadow-2xs">
-          <MessageCircle className="w-3.5 h-3.5" />
-          <span>{answerCount} {lang === "ar" ? "إجابة" : "Answers"}</span>
+
+        {status ==="PENDING" &&
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-linear-to-br to-[#F97316] from-[#FBBF24] text-white opacity-80 text-xs font-extrabold shadow-2xs">
+          <Clock4Icon size={16} strokeWidth={2} />
+          <span> {lang === "ar" ? "معلق" : "Pending"}</span>
         </div>
+        }
       </div>
 
       {/* Question Title & Content */}

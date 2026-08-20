@@ -88,7 +88,7 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
 }, [])
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-xs flex gap-3 justify-between">
+    <div className="bg-white max-w-xl  rounded-3xl px-4 pb-4 sm:p-5 sm:pt-0   flex gap-3 justify-between">
       {/* Like Button */}
       <button
         onClick={handleLike}
@@ -120,7 +120,7 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
       </button>
 
       {/* Save Button */}
-      <button
+      {/* <button
         onClick={handleSave}
         aria-pressed={isSaved}
         className={`group flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-full font-bold text-sm transition-all duration-300 cursor-pointer active:scale-95 ${
@@ -137,7 +137,7 @@ export default function PostInteractions({ post }: PostInteractionsProps) {
           }`}
         />
         <span>{t("post.save")}</span>
-      </button>
+      </button> */}
     </div>
   );
 }

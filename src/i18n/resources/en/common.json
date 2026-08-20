@@ -612,6 +612,7 @@
     "confirm": "Confirm & Send"
   },
   "profile": {
+    "profileTitle": "Profile",
     "userNotFound": "User Not Found",
     "postsTab": "Posts",
     "questionsTab": "Questions",

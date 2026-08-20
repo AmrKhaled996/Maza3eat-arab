@@ -33,6 +33,7 @@ import {
 import DeleteQuestionDialog from "../../Components/Profile/DeleteQuestionDialog";
 import DeletePostDialog from "../../Components/Profile/DeletePostDialog";
 import { useToast } from "../../Context/Toast";
+import { Title } from "react-head";
 
 
 export default function ProfilePostPage() {
@@ -193,6 +194,7 @@ export default function ProfilePostPage() {
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <NavigationBar page="profile" solidNav />
 
+      <Title>{t("profile.profileTitle") + " - " + userProfile.name}</Title>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 md:pt-28 space-y-6">
         {/* Back button */}
         <button
@@ -312,9 +314,9 @@ export default function ProfilePostPage() {
               profilePostsData.map((post: any) => (
                 <div key={post.id} className="flex gap-1">
                   <div className="w-full">
-                    <PostCard key={post.id} post={post} />
+                    <PostCard key={post.id} post={post} status={post.status} />
                   </div>
-                  {userId === user?.id && (
+                  {post.permissions.canDelete && (
                     <div
                       key={post.id}
                       onClick={() =>
@@ -378,9 +380,9 @@ export default function ProfilePostPage() {
               profileQuestionsData.map((question: any) => (
                 <div key={question.id} className="flex gap-1">
                   <div className="w-full">
-                    <QuestionCard key={question.id} question={question} />
+                    <QuestionCard key={question.id} question={question} status={question.status} />
                   </div>
-                  {userId === user?.id && (
+                  {question.permissions.canDelete && (
                     <div
                       key={question.id}
                       onClick={() =>

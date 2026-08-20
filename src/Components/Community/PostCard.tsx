@@ -1,7 +1,7 @@
 import { Badge, Tag } from "../../Components/shared/Tag";
 import type { Post } from "../../Types/Post";
 import PostsComments from "../../assets/images/icons/PostComments";
-import { ArrowUpRight, Heart, Plus } from "lucide-react";
+import { ArrowUpRight, Clock4Icon, Heart, Plus } from "lucide-react";
 import type { Tag as TagType } from "../../Types/Tag";
 import { useNavigate } from "react-router-dom";
 import { FormatPublishDate } from "../../utils/DateFormater";
@@ -24,7 +24,7 @@ function stripHtml(html: string) {
   return text;
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post,status="" }: { post: Post,status?:string }) {
   const navigate = useNavigate();
     const { t } = useTranslation("common");
     const {lang} = useLocale();
@@ -41,7 +41,7 @@ function PostCard({ post }: { post: Post }) {
           className="w-full sm:w-full h-52 sm:h-full object-cover min-h-52 max-h-80 rounded-xl rounded-b-none "
         />
         {post?.image?.remainingImages !== undefined &&
-          post?.image.remainingImages > 1 && (
+          post?.image.remainingImages >= 1 && (
             <span className="absolute w-8 h-8 top-3 right-3 bg-black/50 text-white text-xs font-bold px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center justify-center">
               {post?.image.remainingImages}
               <Plus size={24} strokeWidth={3} className=" font-bold" />
@@ -77,6 +77,14 @@ function PostCard({ post }: { post: Post }) {
           <span className={cn(` text-xs text-gray-400` , lang === "ar" ? "mr-auto ml-2" : "ml-auto mr-2")}>
             {post?.publishDate ? FormatPublishDate(post?.publishDate) : ""}
           </span>
+
+                  {/* Answer count pill badge */}
+                  {status ==="PENDING" &&
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-linear-to-br to-[#F97316] from-[#FBBF24] text-white opacity-80 text-xs font-extrabold shadow-2xs">
+                    <Clock4Icon size={16} strokeWidth={2} />
+                    <span> {lang === "ar" ? "معلق" : "Pending"}</span>
+                  </div>
+                  }
         </div>}
 
         {/* Title */}

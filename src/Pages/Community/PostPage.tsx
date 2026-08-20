@@ -83,7 +83,7 @@ export default function PostPage() {
           </div>
 
           {/* Main Content - Post (col-span-7) */}
-          <div className="md:col-span-7 space-y-6 order-1 md:order-2">
+          <div className="md:col-span-7 space-y-2 order-1 md:order-2">
             {/* Post Title */}
             <h1 className="text-4xl font-bold text-gray-900">{post.title}</h1>
 

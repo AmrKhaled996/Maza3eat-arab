@@ -83,7 +83,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
 
       {/* Toast container */}
-      <div className={`fixed top-5 ${lang === "en" ? "left-5" : "right-5"} z-[9999] flex w-[350px] max-w-[calc(100vw-2rem)] flex-col gap-3`}>
+      <div className={`fixed top-18 ${lang === "en" ? "left-5" : "right-5"} z-[9999] flex w-[350px] max-w-[calc(100vw-2rem)] flex-col gap-3`}>
         {toasts.map((item) => (
           <ToastItem
             key={item.id}

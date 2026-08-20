@@ -3,7 +3,7 @@ import { axiosInstance } from "./axiosInstance";
 export interface TagItem {
   id?: string;
   name: string;
-  count?: number;
+  postsCount?: number;
 }
 
 /**

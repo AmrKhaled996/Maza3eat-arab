@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
   Heart,
@@ -22,12 +22,15 @@ import { Title } from "react-head";
 import { playLikeSound } from "../../utils/sounds";
 import { Tag } from "../../Components/shared/Tag";
 import Avatar from "../../Components/shared/Avatar";
+import { localizedPath } from "../../i18n/paths";
+import { useLocale } from "../../i18n/useLocale";
 
 export default function QandAPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("common");
-    const {data:contentAdvertisement} = useContentAds()  as { data?: ContentAdvertisement };
+  const {lang}= useLocale();
+  const {data:contentAdvertisement} = useContentAds()  as { data?: ContentAdvertisement };
 
   const {
     data: question,
@@ -130,15 +133,17 @@ export default function QandAPage() {
               {/* Question Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <Avatar
-                    src={question.author.avatar}
-                    name={question.author.name}
-                    style={{ outlineColor: question?.author?.badgeColor}}
-                    className="w-12 h-12 rounded-full object-cover  outline-3  "
-                  />
+                  <Link to={localizedPath(lang, `profile/${question?.author?.id}`)}>
+                    <Avatar
+                      src={question.author.avatar}
+                      name={question.author.name}
+                      style={{ outlineColor: question?.author?.badgeColor}}
+                      className="w-12 h-12 rounded-full object-cover  outline-3  "
+                      />
+                    </Link>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-gray-900">{question.author.name}</span>
+                        <Link to={localizedPath(lang, `profile/${question?.author?.id}`)} className="font-bold text-gray-900 hover:text-primary transition-colors">{question.author.name}</Link>
                       {question.author.tierName && (
                         <span
                           className="text-[10px] font-extrabold px-2 py-0.5 rounded-full text-white uppercase"
@@ -214,18 +219,7 @@ export default function QandAPage() {
                 <h2 className="text-base font-bold text-gray-900">
                   {t("QandAPage.answersHeading", { count: answers.length })}
                 </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">{t("QandAPage.sortBy")}:</span>
-                  <select
-                    value={answersSortOrder}
-                    onChange={(e) => setAnswersSortOrder(e.target.value)}
-                    className="text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs hover:border-gray-300 transition-colors"
-                  >
-                    <option value="votes">{t("QandAPage.mostLiked")}</option>
-                    <option value="newest">{t("QandAPage.newest")}</option>
-                    <option value="oldest">{t("QandAPage.oldest")}</option>
-                  </select>
-                </div>
+                
               </div>
             )}
 

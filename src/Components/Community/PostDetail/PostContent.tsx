@@ -19,7 +19,9 @@ export default function PostContent({
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 space-y-4">
+    <div 
+    onClick={()=>{console.log((post as any).scope,"post:",post)}}
+    className="bg-white rounded-2xl p-6 space-y-4">
       {/* Title */}
       {!hideTitle && (
         <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
@@ -55,7 +57,8 @@ export default function PostContent({
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
           {post.tags.map((tag) => (
-            <Tag key={tag.name} label={`#${tag.name}`} />
+            <Tag key={tag.name} label={`#${tag.name}`} 
+            dir={(post as any).scope==="admin" ? "featured": "community"}/>
           ))}
         </div>
       )}

@@ -7,6 +7,7 @@ import ContactGuidelinesModal from "./ContactGuidelinesModal";
 import type { AxiosError } from "axios";
 import { useToast } from "../../Context/Toast";
 import { useLocale } from "../../i18n/useLocale";
+import { extractDateTime } from "../../utils/DateFormater";
 
 interface Props {
   /** The ID of the user to send the contact request to */
@@ -47,7 +48,7 @@ export function ContactButton({ receiverId, defaultReason = "" }: Props) {
 
       console.error("Failed to send contact request:", err?.response?.status);
       if(err?.response?.status === 429) {
-        toast.error(lang==="ar"?"لقد ارسلت طلبا بالفعل  حاول مرة اخرى بعد اسبوع":"You have already sent a request, try again after a week");
+        toast.error(lang==="ar"?`لقد ارسلت طلبا بالفعل  حاول مرة اخرى بعد ${extractDateTime(err?.response?.data?.nextAvailableAt).date}`:`You have already sent a request, try again after ${extractDateTime(err?.response?.data?.nextAvailableAt).date}`);
 
       }
       setStatus("error");

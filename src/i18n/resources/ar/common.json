@@ -611,6 +611,7 @@
     "confirm": "تأكيد وإرسال"
   },
   "profile": {
+    "profileTitle": "الحساب",
     "userNotFound": "المستخدم غير موجود",
     "postsTab": "المنشورات",
     "questionsTab": "الأسئلة",

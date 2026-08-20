@@ -675,7 +675,7 @@ export default function NotificationDetailPage() {
                 {actionRoute && (
                   <button
                     onClick={() => navigate(actionRoute)}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary/95 transition-all hover:-translate-y-0.5 hover:cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:bg-primary/95 transition-all hover:-translate-y-0.5 hover:cursor-pointer mx-auto"
                   >
                     <span>{t("notifications.seeItNow")}</span>
                     <ExternalLink className="h-4 w-4" />
