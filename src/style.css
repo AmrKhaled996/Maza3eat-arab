@@ -193,10 +193,12 @@ html[dir="rtl"] .footer-tagline {
 }
 .force-ltr {
   direction: ltr;
+  text-align: left;
 
 }
 .force-rtl {
   direction: rtl;
+  text-align: right;
 }
 
 .animate-marquee-left {

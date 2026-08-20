@@ -1,6 +1,7 @@
 import useHomePosts from "../../../Hooks/HomeHooks/useHomePosts";
 import type { Advertisement } from "../../../Types/Advertisement";
 import type { Post } from "../../../Types/Post";
+import TrendingTags from "../../shared/TrendingTags";
 import HomeCommunityPostsAdvertisement from "./Advertisement";
 import HomeCommunitySectionBigCard from "./BigCard";
 import HomeCommunitySectionBigCardSkeleton from "./BigCardSkeleton";
@@ -29,7 +30,7 @@ function CommunitySection({ ad }: { ad?: Advertisement }) {
         <div className="flex flex-col">
           <div className="sticky top-28 flex flex-col gap-5">
             {/* Trending Topics */}
-            <PostTrendingTopicsSection limit={3} />
+            <TrendingTags limit={3} />
 
             {/* Sponsored / Ad */}
             {ad && <HomeCommunityPostsAdvertisement ad={ad} />}

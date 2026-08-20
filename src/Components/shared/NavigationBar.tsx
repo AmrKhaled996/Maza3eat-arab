@@ -31,7 +31,6 @@ function NavigationBar({
   const profileWrapRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, logout } = useAuth();
 
-
   const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -128,7 +127,7 @@ function NavigationBar({
         className={`z-50 top-0 left-0 right-0  flex items-center justify-between px-6  sm:px-10 ${effectiveScrolled ? "fixed bg-white shadow-[0_1px_26px_-10px] navApperance" : "absolute "}   transition-all duration-700`}
       >
         <div
-          onClick={()=>navigate(localizedPath(lang, ""))}
+          onClick={() => navigate(localizedPath(lang, ""))}
           className={`flex items-center gap-2 ${effectiveScrolled ? "" : "bg-white shadow-lg"} transition-colors  duration-700 rounded-b-2xl px-4 py-2 hover:cursor-pointer`}
         >
           <img
@@ -138,14 +137,14 @@ function NavigationBar({
             loading="lazy"
             decoding="async"
           />
-          <Link to={localizedPath(lang, "")} >
+          <Link to={localizedPath(lang, "")}>
             <img
-            src="/logo-new.png"
-            alt="logo"
-            className="w-16 h-16 "
-            loading="lazy"
-            decoding="async"
-          />
+              src="/logo-new.png"
+              alt="logo"
+              className="w-16 h-16 "
+              loading="lazy"
+              decoding="async"
+            />
           </Link>
         </div>
 
@@ -155,7 +154,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "featured")}
             className={cn(
-              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"}  font-semibold nav-link-text group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
+              ` ${lang === "ar" ? "text-[14.5px] lg:text-md" : "text-md"}  font-semibold nav-link-text group-hover:opacity-60 hover:opacity-100!  hover:scale-105 transition-all  drop-shadow `,
               handlePage("featured"),
             )}
           >
@@ -164,7 +163,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "community")}
             className={cn(
-              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang === "ar" ? "text-[14.5px] lg:text-md" : "text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("community"),
             )}
           >
@@ -173,7 +172,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "q&a")}
             className={cn(
-              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang === "ar" ? "text-[14.5px] lg:text-md" : "text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("q&a"),
             )}
           >
@@ -182,7 +181,7 @@ function NavigationBar({
           <Link
             to={localizedPath(lang, "about")}
             className={cn(
-              ` ${lang ==="ar"? "text-[14.5px] lg:text-md":"text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
+              ` ${lang === "ar" ? "text-[14.5px] lg:text-md" : "text-md"} font-semibold nav-link-text group-hover:opacity-60 hover:scale-105 transition-all hover:opacity-100!  drop-shadow`,
               handlePage("about"),
             )}
           >
@@ -279,7 +278,9 @@ function NavigationBar({
               </svg>
               {unreadCount.total.count > 0 && (
                 <span className="absolute -top-1 -end-1 bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
-                  {unreadCount.total.isCapped || unreadCount.total.count > 99 ? "99+" : unreadCount.total.count}
+                  {unreadCount.total.isCapped || unreadCount.total.count > 99
+                    ? "99+"
+                    : unreadCount.total.count}
                 </span>
               )}
             </Link>
@@ -288,9 +289,7 @@ function NavigationBar({
           <div
             className="relative flex justify-center items-center"
             ref={profileWrapRef}
-            onMouseEnter={() => isAuthenticated && setProfileOpen(true)}
-            onMouseLeave={() => setProfileOpen(false)}
-          >
+            >
             {isAuthenticated && user ? (
               <>
                 <button
@@ -310,56 +309,58 @@ function NavigationBar({
                 {profileOpen && (
                   /* pt-2 (not mt-2) keeps the hover bridge between avatar and menu */
                   <div className="absolute end-0 top-full z-50 pt-2 min-w-50">
-                  <div
-                    className="rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
-                    role="menu"
-                  >
-                    <Link
-                      to={localizedPath(lang, `profile/${user.id}`)}
-                      role="menuitem"
-                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                      onClick={() => setProfileOpen(false)}
+                    <div
+                      className="rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                      role="menu"
                     >
-                      {t("profileNav.menuProfile")}
-                    </Link>
-                   {(user.role==="ADMIN"|| user.role==="MODERATOR") && <Link
-                      to={localizedPath(lang, `admin`)}
-                      role="menuitem"
-                      className="block px-4 py-2.5 text-sm font-bold text-primary hover:bg-gray-50"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      {t("admin.dashboard")}
-                    </Link>}
-                    <Link
-                      to={localizedPath(lang, "create-post")}
-                      role="menuitem"
-                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      {t("createPost.menuCreatePost")}
-                    </Link>
-                    <Link
-                      to={localizedPath(lang, "create-q&a")}
-                      role="menuitem"
-                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      {t("home.qnaAsk")}
-                    </Link>
-                    <div className="border-t border-gray-100 my-1" />
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50 hover:cursor-pointer transition-all duration-300"
-                      onClick={async () => {
-                        setProfileOpen(false);
-                        await logout();
-                        navigate(localizedPath(lang, "login"));
-                      }}
-                    >
-                      {t("login.logout")}
-                    </button>
-                  </div>
+                      <Link
+                        to={localizedPath(lang, `profile/${user.id}`)}
+                        role="menuitem"
+                        className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {t("profileNav.menuProfile")}
+                      </Link>
+                      {(user.role === "ADMIN" || user.role === "MODERATOR") && (
+                        <Link
+                          to={localizedPath(lang, `admin`)}
+                          role="menuitem"
+                          className="block px-4 py-2.5 text-sm font-bold text-primary hover:bg-gray-50"
+                          onClick={() => setProfileOpen(false)}
+                        >
+                          {t("admin.dashboard")}
+                        </Link>
+                      )}
+                      <Link
+                        to={localizedPath(lang, "create-post")}
+                        role="menuitem"
+                        className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {t("createPost.menuCreatePost")}
+                      </Link>
+                      <Link
+                        to={localizedPath(lang, "create-q&a")}
+                        role="menuitem"
+                        className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {t("home.qnaAsk")}
+                      </Link>
+                      <div className="border-t border-gray-100 my-1" />
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50 hover:cursor-pointer transition-all duration-300"
+                        onClick={async () => {
+                          setProfileOpen(false);
+                          await logout();
+                          navigate(localizedPath(lang, "login"));
+                        }}
+                      >
+                        {t("login.logout")}
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
@@ -507,7 +508,9 @@ function NavigationBar({
               </span>
               {unreadCount.total.count > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {unreadCount.total.isCapped || unreadCount.total.count > 99 ? "99+" : unreadCount.total.count}
+                  {unreadCount.total.isCapped || unreadCount.total.count > 99
+                    ? "99+"
+                    : unreadCount.total.count}
                 </span>
               )}
             </Link>
@@ -527,71 +530,89 @@ function NavigationBar({
                 />
               </div>
             )}
-
+          <div
+            className="relative flex  items-center"
+            ref={profileWrapRef}
+          >
           {isAuthenticated && user ? (
             <>
               <button
                 type="button"
                 onClick={() => setProfileOpen((o) => !o)}
                 className="flex items-center justify-between transition-opacity hover:opacity-90 hover:cursor-pointer"
-                
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <img
+                <Avatar
                   src={user.avatar || "https://i.pravatar.cc/40?img=12"}
-                  alt={user.name}
+                  name={user.name}
                   className="h-12 w-12 rounded-full object-cover  mx-6 my-2  shadow outline-2 outline-offset-0"
                   style={{ outlineColor: user.tier.badgeColor }}
                 />
-                
-              {isAuthenticated && user && user.tier && (
-            <Badge tier={user.tier.name} color={user.tier.badgeColor} />
-          )}
+
+                {isAuthenticated && user && user.tier && (
+                  <Badge tier={user.tier.name} color={user.tier.badgeColor} />
+                )}
               </button>
               {profileOpen && (
-                <div
-                  className="absolute end-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
-                  role="menu"
-                >
-                  <Link
-                    to={localizedPath(lang, `profile/${user.id}`)}
-                    role="menuitem"
-                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
+                /* pt-2 (not mt-2) keeps the hover bridge between avatar and menu */
+                <div className="absolute start-0 top-full z-50 pt-2 min-w-50">
+                  <div
+                    className="rounded-xl border border-gray-100 bg-white py-2 shadow-xl"
+                    role="menu"
                   >
-                    {lang === "ar" ? "ملفي الشخصي" : "My Profile"}
-                  </Link>
-                  <Link
-                    to={localizedPath(lang, "create-post")}
-                    role="menuitem"
-                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
-                  >
-                    {t("createPost.menuCreatePost")}
-                  </Link>
-                  <Link
-                    to={localizedPath(lang, "create-q&a")}
-                    role="menuitem"
-                    className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-                    onClick={() => { setProfileOpen(false); setMenuOpen(false); }}
-                  >
-                    {t("home.qnaAsk")}
-                  </Link>
-                  <div className="border-t border-gray-100 my-1" />
-                  <button
-                    type="button"
-                    role="menuitem"
-                    className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50"
-                    onClick={async () => {
-                      setProfileOpen(false);
-                      setMenuOpen(false);
-                      await logout();
-                      navigate(localizedPath(lang, "login"));
-                    }}
-                  >
-                    {t("login.logout")}
-                  </button>
+                    <Link
+                      to={localizedPath(lang, `profile/${user.id}`)}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log("is clicked")
+                        setProfileOpen(false)
+                      }}
+                    >
+                      {t("profileNav.menuProfile")}
+                    </Link>
+                    {(user.role === "ADMIN" || user.role === "MODERATOR") && (
+                      <Link
+                        to={localizedPath(lang, `admin`)}
+                        role="menuitem"
+                        className="block px-4 py-2.5 text-sm font-bold text-primary hover:bg-gray-50"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {t("admin.dashboard")}
+                      </Link>
+                    )}
+                    <Link
+                      to={localizedPath(lang, "create-post")}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("createPost.menuCreatePost")}
+                    </Link>
+                    <Link
+                      to={localizedPath(lang, "create-q&a")}
+                      role="menuitem"
+                      className="block px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {t("home.qnaAsk")}
+                    </Link>
+                    <div className="border-t border-gray-100 my-1" />
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="block w-full text-start px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-gray-50 hover:cursor-pointer transition-all duration-300"
+                      onClick={async () => {
+                        setProfileOpen(false);
+                        await logout();
+                        navigate(localizedPath(lang, "login"));
+                      }}
+                    >
+                      {t("login.logout")}
+                    </button>
+                  </div>
                 </div>
               )}
             </>
@@ -600,10 +621,10 @@ function NavigationBar({
               to={localizedPath(lang, "login")}
               className={`text-sm lg:text-lg font-semibold w-fit m-auto px-8 py-2 rounded-full transition-colors line-clamp-1 max-h-fit  text-white border  hover:opacity-80 bg-linear-to-r from-secondary  to-accent  to-accenttext-white  border-white/50 hover:bg-white/10 `}
             >
-              
               {t("login.signInSignUp")}
             </Link>
           )}
+          </div>
         </div>
       )}
     </>

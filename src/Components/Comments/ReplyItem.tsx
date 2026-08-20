@@ -15,7 +15,7 @@ import {
   unlikeToReply,
 } from "../../Apis/CommentsApi/CommentReplies";
 import useGetReplyReplies from "../../Hooks/CommentHooks/useGetReplyReplies";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { localizedPath } from "../../i18n/paths";
 import DeleteThreadDialog from "./DeleteItemDialog";
 import ReportDialog from "./ReportDialog";
@@ -290,12 +290,14 @@ export default function ReplyItem({
   return (
     <div className={`flex max-w-2xl scroll-mt-40 `} dir="rtl" ref={rootRef} id={reply?.id} key={reply?.id}>
       <div className={`relative w-9  ${lang === "ar" ? "ml-4" : "mr-4"} group`}>
+        <Link to={localizedPath(lang, `profile/${reply?.author?.id}`)}>
         <Avatar
-          src={reply?.author?.avatar}
           name={reply?.author?.name}
+          src={reply?.author?.avatar}
           className={`w-8 h-8 rounded-full object-cover ring-2 ring-white outline-3 shadow shrink-0 relative z-30 ${lang === "ar" ? "ml-4" : "mr-4"}`}
           style={{ outlineColor: reply?.author?.tier.badgeColor }}
         />
+        </Link>
 
         <div className="w-fit group">
           {showReplies && !isFetching && (
@@ -352,7 +354,9 @@ export default function ReplyItem({
             />
           )}
           <div className="flex gap-2 items-center">
-            <span className="font-bold">{reply?.author?.name}</span>
+            <span
+              onClick={()=>{navigate(localizedPath(lang, `profile/${reply?.author?.id}`))}}
+              className="font-bold hover:cursor-pointer hover:text-primary transition-all duration-300">{reply?.author?.name}</span>
             <Badge
               tier={reply?.author?.tier.name}
               color={reply?.author?.tier.badgeColor}

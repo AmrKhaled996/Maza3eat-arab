@@ -70,11 +70,9 @@ export default function AdminReportsPage() {
   const handleReportClick = async (report:Report) => {
 
   
-      // Navigate to the notification detail for all types (server marks it read)
-      if(report.targetType === "ANSWER" || report.targetType === "COMMENT" || report.targetType === "COMMENT_REPLY" || report.targetType === "COMMENT_REPLY_REPLY" || report.targetType === "ANSWER_REPLY" || report.targetType === "ANSWER_REPLY_REPLY"|| report.targetType === "POST_LIKE" || report.targetType === "QUESTION_LIKE"){
   
     await getAdminReportById(report?.id).then((res:any) => {
-  
+      console.log("response",res)
   
         switch (res?.targetType) {
             case "ANSWER":
@@ -102,19 +100,14 @@ export default function AdminReportsPage() {
               return (
                 navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.parentReply}})
               );
-            case "POST_LIKE":
-              return (
-                navigate(localizedPath(lang, `post/${res?.postId}#like`))
-              );
-            case "QUESTION_LIKE":
-              return (
-                navigate(localizedPath(lang, `q&a/${res?.questionId}#like`))
-              );
+              case "CONTACT_REQUEST":
+              return navigate(localizedPath(lang, `admin/reports/${report?.id}`));
             default:
               return navigate(localizedPath(lang, `admin/reports/${report?.id}`));
-        }
-      })
-    }
+            }
+          })
+
+  
     };
   
 
@@ -160,7 +153,7 @@ export default function AdminReportsPage() {
                       <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                         <button
                           onClick={() => setDetailModal({ isOpen: true, report })}
-                          className="text-start truncate hover:text-primary hover:underline block w-full"
+                          className="text-start truncate hover:text-primary hover:underline block w-full hover:cursor-pointer  transition-all duration-300"
                           title={t("admin.clickToViewReason", "Click to view full reason")}
                         >
                           {report.reason}
@@ -173,13 +166,13 @@ export default function AdminReportsPage() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, report })}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium  hover:cursor-pointer hover:opacity-80 transition-all duration-300"
                           >
                             <Eye className="w-4 h-4" /> {t("admin.view", "View Details")}
                           </button>
                           <button
                             onClick={() => handleDelete(report.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg  hover:cursor-pointer hover:opacity-80 transition-all duration-300 "
                             title={t("admin.deleteReport", "Delete Report")}
                           >
                             <Trash2 className="w-5 h-5" />
@@ -250,14 +243,14 @@ export default function AdminReportsPage() {
             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
               <div
                 onClick={()=>{handleReportClick(detailModal.report)}}
-                className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+                className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium hover:cursor-pointer hover:opacity-80 transition-all duration-300"
               >
                 <Eye className="w-4 h-4" /> {t("admin.goToFullReport", "Go to Full Report Page")}
               </div>
               
               <button
                 onClick={() => setDetailModal({ isOpen: false, report: null })}
-                className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl text-sm transition-colors"
+                className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl text-sm hover:cursor-pointer hover:opacity-80 transition-all duration-300"
               >
                 {t("admin.close", "Close")}
               </button>

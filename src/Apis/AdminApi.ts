@@ -66,7 +66,9 @@ export const getAdminReports = async (status: "PENDING" | "RESOLVED" | "REJECTED
   return data.data;
 };
 
-export const updateReportStatus = async (reportId: string, _status: "RESOLVED" | "REJECTED") => {
+export const updateReportStatus = async (reportId: string, status: "BANNING" | "REJECTED",userId?:string) => {
+   if(status === "BANNING" && userId)
+    await banUser(userId, "تم حظر الحساب بسبب إرسال طلبات تواصل غير مرغوب فيها، مما تسبب في إزعاج المستخدمين ومخالفة سياسات المنصة المتعلقة بالاستخدام المزعج لخدمة التواصل.");
   // Backend handles both resolve and reject by deleting the report
   const { data } = await axiosInstance.delete(`/admin/reports/${reportId}`);
   return data?.data;

@@ -21,7 +21,7 @@ function QandAPopularQuestion({ limit,location="" }: { limit: number,location?:s
         <div className="flex flex-col gap-4">
           {popularQuestions.map((popularQuestion: Question ,index:number) => (
             <div key={popularQuestion?.id}
-            onClick={() => {navigate(localizedPath(lang, `q&a?search=${encodeURIComponent(popularQuestion?.title || "")}` ))}} className="cursor-pointer group">
+            onClick={() => {navigate(localizedPath(lang, `q&a/${popularQuestion?.id}` ))}} className="cursor-pointer group">
               <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors leading-snug">
                 {popularQuestion?.title}
               </p>

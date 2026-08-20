@@ -1,4 +1,4 @@
-function FacebookIcon() {
+function FacebookIcon({color ,className}:{color?:string,className?:string}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -7,7 +7,8 @@ function FacebookIcon() {
       width="30"
       height="40"
       viewBox="0 0 50 80"
-      fill="#fff"
+      fill={color||"#fff"}
+      className={className}
     >
       <path d="M42,3H8C5.2,3,3,5.2,3,8v34c0,2.8,2.2,5,5,5h34c2.8,0,5-2.2,5-5V8C47,5.2,44.8,3,42,3z M37,19h-2c-2.1,0-3,0.5-3,2v3h5 l-1,5h-4v16h-5V29h-4v-5h4v-3c0-4,2-7,6-7c2.9,0,4,1,4,1V19z"></path>
     </svg>

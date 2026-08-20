@@ -49,12 +49,12 @@ export default function ConfirmModal({
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <div className={`p-3 rounded-full ${getThemeColor()}`}>
+            <div className={`p-3 rounded-full ${getThemeColor()} hover:cursor-pointer hover:opacity-80 transition-all duration-300`}>
               <AlertTriangle className="w-6 h-6" />
             </div>
             <button
               onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              className="text-gray-400 hover:text-gray-600 p-1 hover:cursor-pointer  transition-all duration-300"
             >
               <X className="w-5 h-5" />
             </button>

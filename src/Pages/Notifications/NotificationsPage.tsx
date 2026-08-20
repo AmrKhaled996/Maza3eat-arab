@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useNotifications } from "../../Hooks/useNotifications";
 import NavigationBar from "../../Components/shared/NavigationBar";
@@ -31,12 +31,15 @@ import { fetchNotificationById } from "../../Apis/NotificationApi";
 import { useToast } from "../../Context/Toast";
 import { Title } from "react-head";
 import Avatar from "../../Components/shared/Avatar";
+import FacebookIcon from "../../assets/images/icons/Facebook";
+import WhatsApp from "../../assets/images/icons/whatsApp";
+import InstagramIcon from "../../assets/images/icons/Instagram";
 
 export default function NotificationsPage() {
   const { lang } = useLocale();
   const { t } = useTranslation("common");
   const navigate = useNavigate();
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const {
     notifications,
@@ -55,19 +58,28 @@ export default function NotificationsPage() {
   } = useNotifications();
 
   // Contact method modal state for accepting requests
-  const [acceptModalReq, setAcceptModalReq] = useState<ContactRequest | null>(null);
-  const [contactMethodType, setContactMethodType] = useState<"FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL">("WHATSAPP");
+  const [acceptModalReq, setAcceptModalReq] = useState<ContactRequest | null>(
+    null,
+  );
+  const [contactMethodType, setContactMethodType] = useState<
+    "FACEBOOK" | "WHATSAPP" | "INSTAGRAM" | "EMAIL"
+  >("WHATSAPP");
   const [contactMethodValue, setContactMethodValue] = useState("");
   const [contactMethodError, setContactMethodError] = useState("");
   const [isReporting, setIsReporting] = useState(false);
   const [isReportMenuOpen, setIsReportMenuOpen] = useState(false);
 
   // Active tab state: 'notifications' | 'contacts'
-  const [activeTab, setActiveTab] = useState<"notifications" | "contacts">("notifications");
+  const [activeTab, setActiveTab] = useState<"notifications" | "contacts">(
+    "notifications",
+  );
 
   // Modals state
-  const [reasonModalReq, setReasonModalReq] = useState<ContactRequest | null>(null);
-  const [contactInfoModalReq, setContactInfoModalReq] = useState<ContactRequest | null>(null);
+  const [reasonModalReq, setReasonModalReq] = useState<ContactRequest | null>(
+    null,
+  );
+  const [contactInfoModalReq, setContactInfoModalReq] =
+    useState<ContactRequest | null>(null);
 
   // Time formatter helper
   const formatTime = (dateStr: string) => {
@@ -77,8 +89,10 @@ export default function NotificationsPage() {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffMins < 1) return t("notifications.justNow");
-    if (diffMins < 60) return t("notifications.minutesAgo", { count: diffMins });
-    if (diffHours < 24) return t("notifications.hoursAgo", { count: diffHours });
+    if (diffMins < 60)
+      return t("notifications.minutesAgo", { count: diffMins });
+    if (diffHours < 24)
+      return t("notifications.hoursAgo", { count: diffHours });
     if (diffDays === 1) return t("notifications.yesterday");
     return t("notifications.daysAgo", { count: diffDays });
   };
@@ -139,7 +153,8 @@ export default function NotificationsPage() {
               <Award className="h-2.5 w-2.5 text-white" />
             </div>
           ),
-          bgColor: "bg-gradient-to-r from-amber-100 via-pink-100 to-indigo-100 ring-4 ring-white shadow-md",
+          bgColor:
+            "bg-gradient-to-r from-amber-100 via-pink-100 to-indigo-100 ring-4 ring-white shadow-md",
         };
       case "ADMIN_ANNOUNCEMENT":
         return {
@@ -158,70 +173,127 @@ export default function NotificationsPage() {
   const renderNotificationText = (n: Notification) => {
     const senderName = n.sender?.name || (lang === "ar" ? "الإدارة" : "Admin");
     const count = (n.aggregatorCount || 1) - 1;
-    const othersText = count > 0 ? ` ${t("notifications.andOthers", { count })}` : "";
+    const othersText =
+      count > 0 ? ` ${t("notifications.andOthers", { count })}` : "";
 
     if (lang === "ar") {
       switch (n.type) {
         case "QUESTION_LIKE":
           return (
             <span>
-              قام <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              قام{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} بالإعجاب بسؤالك
             </span>
           );
         case "POST_LIKE":
           return (
             <span>
-              قام <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              قام{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} بالإعجاب بمنشورك
             </span>
           );
         case "ANSWER":
           return (
             <span>
-              قام <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              قام{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} بالإجابة على سؤالك
             </span>
           );
         case "COMMENT":
           return (
             <span>
-              قام <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              قام{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} بالتعليق على منشورك
             </span>
           );
         case "COMMENT_REPLY":
           return (
             <span>
-              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على تعليقك
+              رد{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              على تعليقك
             </span>
           );
         case "COMMENT_REPLY_REPLY":
           return (
             <span>
-              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على ردك
+              رد{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              على ردك
             </span>
           );
         case "ANSWER_REPLY":
           return (
             <span>
-              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على إجابتك
+              رد{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              على إجابتك
             </span>
           );
         case "ANSWER_REPLY_REPLY":
           return (
             <span>
-              رد <strong className="font-extrabold text-gray-900">{senderName}</strong> على ردك على إجابة
+              رد{" "}
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              على ردك على إجابة
             </span>
           );
         case "POST_APPROVAL":
-          return <span>تمت الموافقة على منشورك من قبل الإدارة — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              تمت الموافقة على منشورك من قبل الإدارة —{" "}
+              <span className="text-primary hover:underline font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "QUESTION_APPROVAL":
-          return <span>تمت الموافقة على سؤالك — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              تمت الموافقة على سؤالك —{" "}
+              <span className="text-primary hover:underline font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "POST_REJECTION":
-          return <span>تم رفض منشورك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              تم رفض منشورك من قبل الإدارة —{" "}
+              <span className="text-red-500 font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "QUESTION_REJECTION":
-          return <span>تم رفض سؤالك من قبل الإدارة — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              تم رفض سؤالك من قبل الإدارة —{" "}
+              <span className="text-red-500 font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "TIER_UPGRADE":
           return (
             <span className="flex items-center gap-1.5 font-bold bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 bg-clip-text text-transparent">
@@ -231,7 +303,9 @@ export default function NotificationsPage() {
         case "ADMIN_ANNOUNCEMENT":
           return (
             <span>
-              <strong className="font-extrabold text-blue-600">إعلان رسمى: </strong>
+              <strong className="font-extrabold text-blue-600">
+                إعلان رسمى:{" "}
+              </strong>
               {n.body || n.title || "إعلان جديد من الإدارة"}
             </span>
           );
@@ -243,70 +317,122 @@ export default function NotificationsPage() {
         case "ADMIN_ANNOUNCEMENT":
           return (
             <span>
-              <strong className="font-extrabold text-blue-600">Official Announcement: </strong>
-              {n.body || n.title || "New announcement from platform administration"}
+              <strong className="font-extrabold text-blue-600">
+                Official Announcement:{" "}
+              </strong>
+              {n.body ||
+                n.title ||
+                "New announcement from platform administration"}
             </span>
           );
         case "QUESTION_LIKE":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} liked your question
             </span>
           );
         case "POST_LIKE":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} liked your post
             </span>
           );
         case "ANSWER":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} answered your question
             </span>
           );
         case "COMMENT":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong>
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>
               {othersText} commented on your post
             </span>
           );
         case "COMMENT_REPLY":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your comment
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              replied to your comment
             </span>
           );
         case "COMMENT_REPLY_REPLY":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your reply
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              replied to your reply
             </span>
           );
         case "ANSWER_REPLY":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your answer
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              replied to your answer
             </span>
           );
         case "ANSWER_REPLY_REPLY":
           return (
             <span>
-              <strong className="font-extrabold text-gray-900">{senderName}</strong> replied to your answer reply
+              <strong className="font-extrabold text-gray-900">
+                {senderName}
+              </strong>{" "}
+              replied to your answer reply
             </span>
           );
         case "POST_APPROVAL":
-          return <span>Your post has been approved by admin — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              Your post has been approved by admin —{" "}
+              <span className="text-primary hover:underline font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "QUESTION_APPROVAL":
-          return <span>Your question has been approved — <span className="text-primary hover:underline font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              Your question has been approved —{" "}
+              <span className="text-primary hover:underline font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "POST_REJECTION":
-          return <span>Your post was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              Your post was rejected by admin —{" "}
+              <span className="text-red-500 font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "QUESTION_REJECTION":
-          return <span>Your question was rejected by admin — <span className="text-red-500 font-semibold">{t("notifications.seeItNow")}</span></span>;
+          return (
+            <span>
+              Your question was rejected by admin —{" "}
+              <span className="text-red-500 font-semibold">
+                {t("notifications.seeItNow")}
+              </span>
+            </span>
+          );
         case "TIER_UPGRADE":
           return (
             <span className="flex items-center gap-1.5 font-bold bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 bg-clip-text text-transparent">
@@ -325,51 +451,91 @@ export default function NotificationsPage() {
     }
 
     // Navigate to the notification detail for all types (server marks it read)
-    if(n.type === "ANSWER" || n.type === "COMMENT" || n.type === "COMMENT_REPLY" || n.type === "COMMENT_REPLY_REPLY" || n.type === "ANSWER_REPLY" || n.type === "ANSWER_REPLY_REPLY"|| n.type === "POST_LIKE" || n.type === "QUESTION_LIKE"){
-
-  await fetchNotificationById(n.id).then((res:any) => {
-
-
-      switch (res?.notification?.type) {
+    if (
+      n.type === "ANSWER" ||
+      n.type === "COMMENT" ||
+      n.type === "COMMENT_REPLY" ||
+      n.type === "COMMENT_REPLY_REPLY" ||
+      n.type === "ANSWER_REPLY" ||
+      n.type === "ANSWER_REPLY_REPLY" ||
+      n.type === "POST_LIKE" ||
+      n.type === "QUESTION_LIKE"
+    ) {
+      await fetchNotificationById(n.id).then((res: any) => {
+        switch (res?.notification?.type) {
           case "ANSWER":
-
-            return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}#${res?.notification?.answer?.id}`),{state:{answer: res?.notification?.answer}})
+            return navigate(
+              localizedPath(
+                lang,
+                `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.answer?.id}#${res?.notification?.answer?.id}`,
+              ),
+              { state: { answer: res?.notification?.answer } },
             );
           case "COMMENT":
-            return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}#${res?.notification?.comment?.id}`),{state:{comment: res?.notification?.comment}})
+            return navigate(
+              localizedPath(
+                lang,
+                `post/${res?.notification?.postId}?highlighted=${res?.notification?.comment?.id}#${res?.notification?.comment?.id}`,
+              ),
+              { state: { comment: res?.notification?.comment } },
             );
           case "COMMENT_REPLY":
-            return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply,commentId: res?.notification?.comment?.id}})
+            return navigate(
+              localizedPath(
+                lang,
+                `post/${res?.notification?.postId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`,
+              ),
+              {
+                state: {
+                  reply: res?.notification?.reply,
+                  commentId: res?.notification?.comment?.id,
+                },
+              },
             );
-            case "ANSWER_REPLY":
-            return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`),{state:{reply: res?.notification?.reply,answerId: res?.notification?.answer?.id}})
+          case "ANSWER_REPLY":
+            return navigate(
+              localizedPath(
+                lang,
+                `q&a/${res?.notification?.questionId}?highlighted=${res?.notification?.reply?.id}#${res?.notification?.reply?.id}`,
+              ),
+              {
+                state: {
+                  reply: res?.notification?.reply,
+                  answerId: res?.notification?.answer?.id,
+                },
+              },
             );
-            case "COMMENT_REPLY_REPLY":
-              return (
-                navigate(localizedPath(lang, `replies`),{state:{reply: res?.notification?.parentReply,postId: res?.notification?.postId,commentId: res?.notification?.comment?.id}})
-              );
+          case "COMMENT_REPLY_REPLY":
+            return navigate(localizedPath(lang, `replies`), {
+              state: {
+                reply: res?.notification?.parentReply,
+                postId: res?.notification?.postId,
+                commentId: res?.notification?.comment?.id,
+              },
+            });
           case "ANSWER_REPLY_REPLY":
-            return (
-              navigate(localizedPath(lang, `answer-replies`),{state:{reply: res?.notification?.parentReply,questionId: res?.notification?.questionId,answerId: res?.notification?.answer?.id}})
-            );
+            return navigate(localizedPath(lang, `answer-replies`), {
+              state: {
+                reply: res?.notification?.parentReply,
+                questionId: res?.notification?.questionId,
+                answerId: res?.notification?.answer?.id,
+              },
+            });
           case "POST_LIKE":
-            return (
-              navigate(localizedPath(lang, `post/${res?.notification?.postId}#like`))
+            return navigate(
+              localizedPath(lang, `post/${res?.notification?.postId}#like`),
             );
           case "QUESTION_LIKE":
-            return (
-              navigate(localizedPath(lang, `q&a/${res?.notification?.questionId}#like`))
+            return navigate(
+              localizedPath(lang, `q&a/${res?.notification?.questionId}#like`),
             );
           default:
-            return navigate(localizedPath(lang, `notifications/${res?.notification?.id}`));
-      }
-    })
-  }
-  else return navigate(localizedPath(lang, `notifications/${n.id}`));
+            return navigate(
+              localizedPath(lang, `notifications/${res?.notification?.id}`),
+            );
+        }
+      });
+    } else return navigate(localizedPath(lang, `notifications/${n.id}`));
   };
 
   return (
@@ -378,7 +544,6 @@ export default function NotificationsPage() {
       <NavigationBar page="notifications" solidNav />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-24 md:pt-28">
-        
         <div className="sticky top-24 z-10 mb-8 pt-6 flex flex-col items-center">
           {/* Dynamic Tabs Pills Container */}
           <div className="w-full bg-gray-100/80 p-1 rounded-2xl flex gap-1 border border-gray-200/50 backdrop-blur-md shadow-sm">
@@ -418,12 +583,14 @@ export default function NotificationsPage() {
         {/* Tab 1: Notifications Tab */}
         {activeTab === "notifications" && (
           <div className="space-y-4">
-            
             {/* List View */}
             {isLoading ? (
               // Skeletons list
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 flex gap-4 animate-pulse">
+                <div
+                  key={i}
+                  className="bg-white p-5 rounded-2xl border border-gray-100 flex gap-4 animate-pulse"
+                >
                   <Skeleton className="h-11 w-11 rounded-full shrink-0" />
                   <div className="space-y-2 flex-1 pt-1">
                     <Skeleton className="h-4 w-3/4 rounded" />
@@ -437,7 +604,9 @@ export default function NotificationsPage() {
                 <div className="h-16 w-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-5 border border-gray-100 text-gray-400">
                   <Compass className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("notifications.emptyTitleNotif")}</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  {t("notifications.emptyTitleNotif")}
+                </h3>
                 <p className="text-gray-400 text-sm max-w-sm mb-6 leading-relaxed">
                   {t("notifications.emptySubNotif")}
                 </p>
@@ -461,8 +630,8 @@ export default function NotificationsPage() {
                         n.type === "ADMIN_ANNOUNCEMENT"
                           ? "bg-blue-50 border-s-4 border-s-blue-600"
                           : !n.isRead
-                          ? "bg-blue-50/50"
-                          : ""
+                            ? "bg-blue-50/50"
+                            : ""
                       }`}
                     >
                       {/* Left side: Avatar + type badge */}
@@ -480,7 +649,9 @@ export default function NotificationsPage() {
                             AD
                           </div>
                         )}
-                        <div className={`absolute -bottom-1.5 -end-1.5 p-1 rounded-full ${iconConfig.bgColor} border border-white shadow-sm flex items-center justify-center`}>
+                        <div
+                          className={`absolute -bottom-1.5 -end-1.5 p-1 rounded-full ${iconConfig.bgColor} border border-white shadow-sm flex items-center justify-center`}
+                        >
                           {iconConfig.icon}
                         </div>
                       </div>
@@ -492,18 +663,29 @@ export default function NotificationsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {n.sender?.tier && (
-                            <span className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize`} style={{ background: n?.sender?.tier?.badgeColor }}>
+                            <span
+                              className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize`}
+                              style={{
+                                background: n?.sender?.tier?.badgeColor,
+                              }}
+                            >
                               {n.sender.tier.name}
                             </span>
                           )}
                           {!n.sender && (
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              n.type === "POST_REJECTION" || n.type === "QUESTION_REJECTION"
-                                ? "bg-red-50 text-red-600 border-red-100"
-                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                            }`}>
-                              {n.type === "POST_REJECTION" || n.type === "QUESTION_REJECTION"
-                                ? (lang === "ar" ? "مرفوض" : "Rejected")
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                n.type === "POST_REJECTION" ||
+                                n.type === "QUESTION_REJECTION"
+                                  ? "bg-red-50 text-red-600 border-red-100"
+                                  : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                              }`}
+                            >
+                              {n.type === "POST_REJECTION" ||
+                              n.type === "QUESTION_REJECTION"
+                                ? lang === "ar"
+                                  ? "مرفوض"
+                                  : "Rejected"
                                 : t("notifications.official")}
                             </span>
                           )}
@@ -537,11 +719,13 @@ export default function NotificationsPage() {
         {/* Tab 2: Contact Requests Tab */}
         {activeTab === "contacts" && (
           <div className="space-y-4">
-            
             {isLoading ? (
               // Skeletons
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 flex gap-4 animate-pulse">
+                <div
+                  key={i}
+                  className="bg-white p-5 rounded-2xl border border-gray-100 flex gap-4 animate-pulse"
+                >
                   <Skeleton className="h-11 w-11 rounded-full shrink-0" />
                   <div className="space-y-2 flex-1 pt-1">
                     <Skeleton className="h-4 w-3/4 rounded" />
@@ -555,7 +739,9 @@ export default function NotificationsPage() {
                 <div className="h-16 w-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-5 border border-gray-100 text-gray-400">
                   <Mail className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("notifications.emptyTitleContact")}</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  {t("notifications.emptyTitleContact")}
+                </h3>
                 <p className="text-gray-400 text-sm max-w-sm mb-6 leading-relaxed">
                   {t("notifications.emptySubContact")}
                 </p>
@@ -586,7 +772,9 @@ export default function NotificationsPage() {
                     <div className="flex-1 space-y-1">
                       <div className="text-sm text-gray-700 leading-relaxed">
                         <span>
-                          <strong className="font-extrabold text-gray-900">{req.user.name}</strong>{" "}
+                          <strong className="font-extrabold text-gray-900">
+                            {req.user.name}
+                          </strong>{" "}
                           {req.direction === "RECEIVED"
                             ? t("notifications.sentContactRequest")
                             : t("notifications.acceptedContactRequest")}
@@ -594,8 +782,9 @@ export default function NotificationsPage() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <span className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize `}
-                        style={{ background: req.user.tier?.badgeColor }}
+                        <span
+                          className={`text-[10px] text-white font-bold px-2 py-0.5 rounded-full capitalize `}
+                          style={{ background: req.user.tier?.badgeColor }}
                         >
                           {req.user.tier.name}
                         </span>
@@ -608,53 +797,70 @@ export default function NotificationsPage() {
                         <span className="text-xs text-gray-300">•</span>
 
                         {/* Interactive trigger label */}
-                        {req.direction === "RECEIVED" && req.status === "PENDING" && (
-                          <button
-                            onClick={async () => {
-                              // The list endpoint does not carry `reason` — only the
-                              // detail endpoint does, so merge it onto the list row.
-                              const detailed = await fetchContactRequestById(req.id);
-                              setReasonModalReq(
-                                detailed ? { ...req, reason: detailed.reason } : req
-                              );
-                            }}
-                            className="text-xs font-bold text-primary hover:underline hover:cursor-pointer"
-                          >
-                            {t("notifications.viewReason")}
-                          </button>
-                        )}
+                        {req.direction === "RECEIVED" &&
+                          req.status === "PENDING" && (
+                            <button
+                              onClick={async () => {
+                                // The list endpoint does not carry `reason` — only the
+                                // detail endpoint does, so merge it onto the list row.
+                                const detailed = await fetchContactRequestById(
+                                  req.id,
+                                );
+                                setReasonModalReq(
+                                  detailed
+                                    ? { ...req, reason: detailed.reason }
+                                    : req,
+                                );
+                              }}
+                              className="text-xs font-bold text-primary hover:underline hover:cursor-pointer"
+                            >
+                              {t("notifications.viewReason")}
+                            </button>
+                          )}
 
-                        {req.direction === "SENT" && req.status === "ACCEPTED" && (
-                          <button
-                            onClick={async () => {
-                              // The detail endpoint returns no user objects, so keep the
-                              // populated user/direction/status from the list row and only
-                              // take the fields it actually supplies.
-                              const detailed = await fetchContactRequestById(req.id);
-                              setContactInfoModalReq(
-                                detailed
-                                  ? { ...req, reason: detailed.reason, contactInfo: detailed.contactInfo }
-                                  : req
-                              );
-                            }}
-                            className="text-xs font-bold text-emerald-600 hover:underline hover:cursor-pointer flex items-center gap-1"
-                          >
-                            <Check className="h-3 w-3" />
-                            <span>{t("notifications.viewContact")}</span>
-                          </button>
-                        )}
+                        {req.direction === "SENT" &&
+                          req.status === "ACCEPTED" && (
+                            <button
+                              onClick={async () => {
+                                // The detail endpoint returns no user objects, so keep the
+                                // populated user/direction/status from the list row and only
+                                // take the fields it actually supplies.
+                                const detailed = await fetchContactRequestById(
+                                  req.id,
+                                );
+                                setContactInfoModalReq(
+                                  detailed
+                                    ? {
+                                        ...req,
+                                        reason: detailed.reason,
+                                        contactInfo: detailed.contactInfo,
+                                      }
+                                    : req,
+                                );
+                              }}
+                              className="text-xs font-bold text-emerald-600 hover:underline hover:cursor-pointer flex items-center gap-1"
+                            >
+                              <Check className="h-3 w-3" />
+                              <span>{t("notifications.viewContact")}</span>
+                            </button>
+                          )}
 
-                        {req.status === "ACCEPTED" && req.direction === "RECEIVED" && (
-                          <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                            <Check className="h-3 w-3" />
-                            <span>{lang === "ar" ? "تم القبول" : "Accepted"}</span>
-                          </span>
-                        )}
+                        {req.status === "ACCEPTED" &&
+                          req.direction === "RECEIVED" && (
+                            <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
+                              <Check className="h-3 w-3" />
+                              <span>
+                                {lang === "ar" ? "تم القبول" : "Accepted"}
+                              </span>
+                            </span>
+                          )}
 
                         {req.status === "DECLINED" && (
                           <span className="text-xs font-semibold text-red-500 flex items-center gap-1">
                             <X className="h-3 w-3" />
-                            <span>{lang === "ar" ? "تم الرفض" : "Declined"}</span>
+                            <span>
+                              {lang === "ar" ? "تم الرفض" : "Declined"}
+                            </span>
                           </span>
                         )}
                       </div>
@@ -704,15 +910,29 @@ export default function NotificationsPage() {
                       onClick={async () => {
                         setIsReporting(true);
                         try {
-                          const { reportContactRequest } = await import('../../Apis/ContactRequestApi');
-                          await reportContactRequest(reasonModalReq.id, "Inappropriate contact request message");
+                          const { reportContactRequest } =
+                            await import("../../Apis/ContactRequestApi");
+                          await reportContactRequest(
+                            reasonModalReq.id,
+                            "Inappropriate contact request message",
+                          );
                           // alert(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
-                          toast.success(lang === "ar" ? "تم الإبلاغ بنجاح" : "Reported successfully");
+                          toast.success(
+                            lang === "ar"
+                              ? "تم الإبلاغ بنجاح"
+                              : "Reported successfully",
+                          );
                           setReasonModalReq(null);
                         } catch (err: any) {
-                          const msg = err?.response?.data?.message || (lang === "ar" ? "فشل الإبلاغ" : "Failed to report");
+                          const msg =
+                            err?.response?.data?.message ||
+                            (lang === "ar"
+                              ? "فشل الإبلاغ"
+                              : "Failed to report");
                           alert(msg);
-                          toast.error(lang === "ar" ? "فشل الإبلاغ" : "Failed to report");
+                          toast.error(
+                            lang === "ar" ? "فشل الإبلاغ" : "Failed to report",
+                          );
                         } finally {
                           setIsReporting(false);
                           setIsReportMenuOpen(false);
@@ -722,7 +942,11 @@ export default function NotificationsPage() {
                       className="w-full text-start px-4 py-2.5 text-sm text-red-600 font-semibold hover:bg-red-50 flex items-center gap-2 hover:cursor-pointer transition-colors"
                     >
                       <Flag className="h-4 w-4" />
-                      {isReporting ? "..." : (lang === "ar" ? "إبلاغ عن هذا الطلب" : "Report this request")}
+                      {isReporting
+                        ? "..."
+                        : lang === "ar"
+                          ? "إبلاغ عن هذا الطلب"
+                          : "Report this request"}
                     </button>
                   </div>
                 )}
@@ -739,14 +963,25 @@ export default function NotificationsPage() {
             </div>
 
             <div className="p-6 pt-8 text-center">
+              <Link to={localizedPath(lang, `profile/${reasonModalReq.user.id}`)}>
               <Avatar
                 src={reasonModalReq.user.avatar}
                 name={reasonModalReq.user.name}
                 style={{ outlineColor: reasonModalReq.user?.tier?.badgeColor }}
                 className="h-16 w-16 rounded-full object-cover  mx-auto outline-3 shadow-md mb-3"
               />
-              <h3 className="text-lg font-extrabold text-gray-900">{reasonModalReq.user.name}</h3>
-              <span className={`inline-block text-white text-[10px] font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize `} style={{ backgroundColor: reasonModalReq.user?.tier?.badgeColor }}>
+              </Link>
+              <h3 
+              onClick={() => navigate(localizedPath(lang, `profile/${reasonModalReq.user.id}`))}
+              className="text-lg font-extrabold text-gray-900 hover:cursor-pointer hover:text-primary transition-all duration-300">
+                {reasonModalReq.user.name}
+              </h3>
+              <span
+                className={`inline-block text-white text-[10px] font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize `}
+                style={{
+                  backgroundColor: reasonModalReq.user?.tier?.badgeColor,
+                }}
+              >
                 {reasonModalReq.user.tier.name}
               </span>
 
@@ -772,7 +1007,10 @@ export default function NotificationsPage() {
                   </button>
                   <button
                     onClick={async () => {
-                      await respondToContactRequest({ id: reasonModalReq.id, action: "DECLINED" });
+                      await respondToContactRequest({
+                        id: reasonModalReq.id,
+                        action: "DECLINED",
+                      });
                       setReasonModalReq(null);
                     }}
                     className="flex-1 py-3.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl border border-red-100 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
@@ -798,15 +1036,27 @@ export default function NotificationsPage() {
             </button>
 
             <div className="p-6 pt-8">
-              <div className="text-center mb-6">
+              <div 
+              onClick={() => navigate(localizedPath(lang, `profile/${contactInfoModalReq.user.id}`))}
+              className="text-center mb-6 hover:cursor-pointer hover:opacity-80 transition-all duration-300">
                 <Avatar
                   src={contactInfoModalReq.user.avatar}
                   name={contactInfoModalReq.user.name}
-                  style={{ outlineColor: contactInfoModalReq.user?.tier?.badgeColor }}
+                  style={{
+                    outlineColor: contactInfoModalReq.user?.tier?.badgeColor,
+                  }}
                   className="h-16 w-16 rounded-full object-cover mx-auto outline-3 shadow-md mb-3"
+
                 />
-                <h3 className="text-lg font-extrabold text-gray-900">{contactInfoModalReq.user.name}</h3>
-                <span className={`inline-block text-[10px] text-white font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize` } style={{ background: contactInfoModalReq.user.tier?.badgeColor }} >
+                <h3 className="text-lg font-extrabold text-gray-900">
+                  {contactInfoModalReq.user.name}
+                </h3>
+                <span
+                  className={`inline-block text-[10px] text-white font-bold px-2.5 py-0.5 mt-1 rounded-full capitalize`}
+                  style={{
+                    background: contactInfoModalReq.user.tier?.badgeColor,
+                  }}
+                >
                   {contactInfoModalReq.user.tier.name}
                 </span>
               </div>
@@ -817,15 +1067,63 @@ export default function NotificationsPage() {
                 </span>
 
                 {/* Email row */}
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-gray-400 shrink-0" />
-                  <div className="min-w-0">
-                    <span className="block text-[10px] text-gray-400 uppercase font-semibold">{t("notifications.email")}</span>
-                    <a href={`mailto:${contactInfoModalReq.contactInfo?.email}`} className="text-sm font-bold text-gray-800 hover:text-primary break-all">
-                      {contactInfoModalReq.contactInfo?.email || "n/a"}
-                    </a>
+                {contactInfoModalReq.contactInfo?.email && (
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-gray-400 shrink-0" />
+                    <div className="min-w-0">
+                      <span className="block text-[10px] text-gray-400 uppercase font-semibold">
+                        {t("notifications.email")}
+                      </span>
+                      <a
+                        href={`mailto:${contactInfoModalReq.contactInfo?.email}`}
+                        className="text-sm font-bold text-gray-800 hover:text-primary break-all"
+                      >
+                        {contactInfoModalReq.contactInfo?.email || "n/a"}
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
+                {contactInfoModalReq.contactInfo?.facebook && (
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center  gap-3">
+                    <FacebookIcon className="h-8 w-8 text-gray-400 shrink-0 translate-y-1" color={"#1877F2"} />
+
+                    <div className="min-w-0">
+                      <span className="block text-[10px] text-gray-400 uppercase font-semibold">
+                        {t("notifications.facebook")}
+                      </span>
+
+                      <a
+                        href={contactInfoModalReq?.contactInfo?.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-gray-800 hover:text-primary break-all"
+                      >
+                        {contactInfoModalReq?.contactInfo?.facebook}
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {contactInfoModalReq.contactInfo?.instagram && (
+                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+                    <InstagramIcon className="h-8 w-8 text-gray-400 shrink-0 translate-y-1" color={"#E1306C"} />
+
+                    <div className="min-w-0">
+                      <span className="block text-[10px] text-gray-400 uppercase font-semibold">
+                        {t("notifications.instagram")}
+                      </span>
+
+                      <a
+                        href={"https://www.instagram.com/" + contactInfoModalReq.contactInfo?.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-gray-800 hover:text-primary break-all hover:cursor-pointer hover:opacity-80 transition-all duration-300"
+                      >
+                        {contactInfoModalReq?.contactInfo?.instagram} 
+                      </a>
+                    </div>
+                  </div>
+                )}
 
                 {/* Phone row */}
                 {/* <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
@@ -840,9 +1138,9 @@ export default function NotificationsPage() {
               </div>
 
               <div className="space-y-2.5">
-                {contactInfoModalReq.contactInfo?.phone && (
+                {contactInfoModalReq.contactInfo?.whatsapp && (
                   <a
-                    href={`https://wa.me/${contactInfoModalReq.contactInfo.phone.replace("+", "")}`}
+                    href={`https://wa.me/${contactInfoModalReq.contactInfo.whatsapp.replace("+", "")}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 hover:cursor-pointer transition-transform hover:-translate-y-0.5"
@@ -851,7 +1149,7 @@ export default function NotificationsPage() {
                     <span>{t("notifications.whatsapp")}</span>
                   </a>
                 )}
-                
+
                 <button
                   onClick={() => setContactInfoModalReq(null)}
                   className="w-full py-3 border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition-all hover:cursor-pointer"
@@ -887,66 +1185,124 @@ export default function NotificationsPage() {
 
               {/* Contact method type selector */}
               <div className="flex gap-2 mb-4">
-                {(["FACEBOOK", "WHATSAPP", "INSTAGRAM", "EMAIL"] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      setContactMethodType(type);
-                      setContactMethodValue("");
-                    }}
-                    className={`flex-1 py-2 text-[10px] font-bold rounded-xl border transition-all hover:cursor-pointer ${
-                      contactMethodType === type
-                        ? "bg-primary text-white border-primary"
-                        : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
-                    }`}
-                  >
-                    {type === "FACEBOOK" ? "📘 Facebook" : type === "EMAIL" ? "✉️ Email" : type === "WHATSAPP" ? "💬 WhatsApp" : "📸 Instagram"}
-                  </button>
-                ))}
+                {(["FACEBOOK", "WHATSAPP", "INSTAGRAM", "EMAIL"] as const).map(
+                  (type) => (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        setContactMethodType(type);
+                        setContactMethodValue("");
+                      }}
+                      className={`flex-1 py-2 text-[10px] font-bold rounded-xl border transition-all hover:cursor-pointer ${
+                        contactMethodType === type
+                          ? "bg-slate-300 text-white border-slate-300"
+                          : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                      }`}
+                    >
+                      {type === "FACEBOOK" ? (
+                        <div className="flex gap-2 justify-center items-center">
+                          {" "}
+                          <FacebookIcon
+                            color="blue"
+                            className="h-6 w-6 flex items-center translate-y-1"
+                          />{" "}
+                          Facebook
+                        </div>
+                      ) : type === "EMAIL" ? (
+                        <div className="flex gap-2 justify-center items-center">
+                          <Mail className="h-4 w-4" />
+                          Email
+                        </div>
+                      ) : type === "WHATSAPP" ? (
+                        <div className="flex gap-2 justify-center items-center">
+                          <WhatsApp className="h-4 w-4" />
+                          WhatsApp
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 justify-center items-center">
+                          {" "}
+                          <InstagramIcon
+                            color="currentColor"
+                            className="h-6 w-6 flex items-center translate-y-1 text-[#d14cd5] "
+                          />{" "}
+                          Instagram
+                        </div>
+                      )}
+                    </button>
+                  ),
+                )}
               </div>
 
               {/* Contact value input */}
               <input
-                type={contactMethodType === "EMAIL" ? "email" : contactMethodType === "WHATSAPP" ? "tel" : "url"}
+                type={
+                  contactMethodType === "EMAIL"
+                    ? "email"
+                    : contactMethodType === "WHATSAPP"
+                      ? "tel"
+                      : "url"
+                }
                 placeholder={
                   contactMethodType === "EMAIL"
                     ? "you@example.com"
                     : contactMethodType === "WHATSAPP"
-                    ? "+201234567890"
-                    : "https://..."
+                      ? "+201234567890"
+                      : contactMethodType === "FACEBOOK"
+                        ? "https://..."
+                        : "username..."
                 }
+                dir="ltr"
                 value={contactMethodValue}
                 onChange={(e) => setContactMethodValue(e.target.value)}
-                className="w-full mb-6 p-3 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full mb-6  p-3 border force-ltr border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
-                {contactMethodError && <p className="text-xs text-red-500">*{contactMethodError}</p>}
-                <div className="flex gap-3">
+              {contactMethodError && (
+                <p className="text-xs text-red-500">*{contactMethodError}</p>
+              )}
+              <div className="flex gap-3">
                 <button
                   disabled={
                     !contactMethodValue.trim() ||
-                    (contactMethodType === "EMAIL" && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(contactMethodValue)) ||
-                    (contactMethodType === "WHATSAPP" && !/^\+\d{10,15}$/.test(contactMethodValue)) ||
-                    ((contactMethodType === "FACEBOOK") && !/^(https?:\/\/)?(www\.)?facebook\.com\/[A-Za-z0-9.]+\/?$/.test(contactMethodValue))||
-                    ((contactMethodType === "INSTAGRAM") && !/^[a-z0-9](?!.*\.\.)(?!.*__)[a-z0-9._]{1,29}$/.test(contactMethodValue))
+                    (contactMethodType === "EMAIL" &&
+                      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                        contactMethodValue,
+                      )) ||
+                    (contactMethodType === "WHATSAPP" &&
+                      !/^\+\d{10,15}$/.test(contactMethodValue)) ||
+                    (contactMethodType === "FACEBOOK" &&
+                      !/^(https?:\/\/)?(www\.)?facebook\.com\/[A-Za-z0-9.]+\/?(\?[A-Za-z0-9_=&-]+)?$/.test(
+                        contactMethodValue,
+                      )) ||
+                    (contactMethodType === "INSTAGRAM" &&
+                      !/^[a-z0-9](?!.*\.\.)(?!.*__)[a-z0-9._]{1,29}$/.test(
+                        contactMethodValue,
+                      ))
                   }
                   onClick={async () => {
                     if (!contactMethodValue.trim()) return;
                     try {
-                      
                       await respondToContactRequest({
                         id: acceptModalReq.id,
                         action: "ACCEPTED",
-                        contactMethod: { type: contactMethodType, value: contactMethodValue.trim() },
+                        contactMethod: {
+                          type: contactMethodType,
+                          value: contactMethodValue.trim(),
+                        },
                       });
                       setAcceptModalReq(null);
                       setContactMethodValue("");
-                      toast.success(t("notifications.successContactRequestAccepted"));
-                    } catch (error:any) {
+                      toast.success(
+                        t("notifications.successContactRequestAccepted"),
+                      );
+                    } catch (error: any) {
                       console.error(error);
-                      toast.error(t("error.tryAgain"))
-                      if(error.response?.status===422){
-                        setContactMethodError(lang==="ar"?"قم بإدخال معلومات تواصل صحيحة":"Please enter a valid contact information")
-                        
+                      toast.error(t("error.tryAgain"));
+                      if (error.response?.status === 422) {
+                        setContactMethodError(
+                          lang === "ar"
+                            ? "قم بإدخال معلومات تواصل صحيحة"
+                            : "Please enter a valid contact information",
+                        );
                       }
                     }
                   }}
@@ -988,7 +1344,7 @@ function InfiniteScrollSentinel({
           onIntersect();
         }
       },
-      { threshold: 0 }
+      { threshold: 0 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -998,9 +1354,18 @@ function InfiniteScrollSentinel({
     <div ref={ref} className="flex justify-center py-6">
       {isFetching && (
         <div className="flex gap-1.5">
-          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div
+            className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+            style={{ animationDelay: "0ms" }}
+          />
+          <div
+            className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+            style={{ animationDelay: "150ms" }}
+          />
+          <div
+            className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
       )}
     </div>

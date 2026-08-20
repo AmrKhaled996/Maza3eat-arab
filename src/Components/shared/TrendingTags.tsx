@@ -56,7 +56,7 @@ export default function TrendingTags({ limit = 10 }: { limit?: number }) {
             <button
               key={tag.name}
               onClick={() => handleTagClick(tag.name)}
-              className="inline-flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-50 hover:bg-primary/10 hover:text-primary border border-gray-200/80 rounded-full px-3 py-1.5 transition-all duration-200 cursor-pointer"
+              className="inline-flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-50 hover:bg-primary/10 hover:text-primary  rounded-lg px-3 py-3 transition-all duration-200 cursor-pointer"
             >
               <p className="text-md">{index+1}.</p>
               <Hash className="w-3 h-3 text-primary/70" />

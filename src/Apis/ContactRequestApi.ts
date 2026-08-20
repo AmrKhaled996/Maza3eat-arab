@@ -84,7 +84,7 @@ export function mapDetailedContactRequest(raw: any, currentUserId?: string): Con
   if (contactType === "EMAIL") {
     contactInfo.email = decryptedValue;
   } else if (contactType === "WHATSAPP") {
-    contactInfo.phone = decryptedValue;
+    // contactInfo.phone = decryptedValue;
     contactInfo.whatsapp = decryptedValue;
   } else if (contactType === "FACEBOOK") {
     contactInfo.facebook = decryptedValue;

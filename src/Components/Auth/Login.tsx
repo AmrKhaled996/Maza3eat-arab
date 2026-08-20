@@ -83,7 +83,7 @@ export default function Login() {
               <button
                 onClick={handleGoogleLogin}
                 disabled={isRedirecting}
-                className="group relative flex items-center justify-center gap-3 w-full py-3.5 px-6 rounded-full 
+                className="group relative flex items-center justify-center gap-3 w-full py-3.5 px-6 rounded-full hover:cursor-pointer hover:opacity-80  
                   bg-gradient-to-r from-primary/90 via-secondary/80 to-secondary/90
                   hover:from-primary hover:via-secondary hover:to-secondary
                   text-white font-bold text-base shadow-lg hover:shadow-xl 
